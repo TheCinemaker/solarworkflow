@@ -8,6 +8,22 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const [isWorkerModalOpen, setIsWorkerModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [stats, setStats] = useState({ projects: 0, workers: 0, worklogs: 0 });
+
+  React.useEffect(() => {
+    async function fetchStats() {
+      const { count: projectsCount } = await supabase.from('projects').select('*', { count: 'exact', head: true });
+      const { count: workersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+      const { count: worklogsCount } = await supabase.from('worklogs').select('*', { count: 'exact', head: true }).eq('date', new Date().toISOString().split('T')[0]);
+      
+      setStats({
+        projects: projectsCount || 0,
+        workers: workersCount || 0,
+        worklogs: worklogsCount || 0
+      });
+    }
+    fetchStats();
+  }, [isWorkerModalOpen, isProjectModalOpen]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -67,17 +83,17 @@ export default function AdminDashboard() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-6">
-            <h3 className="text-slate-400 text-sm font-medium">Aktív Projektek</h3>
-            <p className="text-3xl font-bold text-white mt-2">0</p>
+          <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-6 transition-all hover:bg-white/10">
+            <h3 className="text-slate-400 text-sm font-medium">Összes Projekt</h3>
+            <p className="text-3xl font-bold text-white mt-2">{stats.projects}</p>
           </div>
-          <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-6">
-            <h3 className="text-slate-400 text-sm font-medium">Aktív Dolgozók</h3>
-            <p className="text-3xl font-bold text-white mt-2">0</p>
+          <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-6 transition-all hover:bg-white/10">
+            <h3 className="text-slate-400 text-sm font-medium">Regisztrált Dolgozók</h3>
+            <p className="text-3xl font-bold text-white mt-2">{stats.workers}</p>
           </div>
-          <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-6">
+          <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-6 transition-all hover:bg-white/10">
             <h3 className="text-slate-400 text-sm font-medium">Mai Munkalapok</h3>
-            <p className="text-3xl font-bold text-white mt-2">0</p>
+            <p className="text-3xl font-bold text-white mt-2">{stats.worklogs}</p>
           </div>
         </div>
 
