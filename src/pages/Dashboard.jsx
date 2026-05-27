@@ -63,32 +63,26 @@ export default function Dashboard() {
         <div className="hdr-btn">🔔</div>
       </div>
 
-      <div className="alert-strip fu d1" onClick={() => navigate('/issues')}>
-        <div className="as-dot"></div>
-        <div className="as-txt"><b>3 nyitott hiba</b> – Nagy villa, Horváth porta</div>
-        <div className="as-arr">›</div>
-      </div>
-
       <div className="stats-grid fu d2">
-        <div className="sc" onClick={() => navigate('/project/1')}>
+        <div className="sc" onClick={() => navigate('/projects')}>
           <div className="sc-lbl">Aktív projektek</div>
           <div className="sc-val" style={{color:'#4f8ef7'}}>{stats.projects}</div>
           <div className="sc-sub"><span className="sc-dot"></span>Összes db</div>
         </div>
-        <div className="sc" onClick={() => navigate('/finance')}>
+        <div className="sc" onClick={() => navigate('/timesheet')}>
           <div className="sc-lbl">Mai munkalapok</div>
           <div className="sc-val" style={{color:'#2ed158'}}>{stats.worklogs}</div>
           <div className="sc-sub">{stats.workers} munkás terepen</div>
         </div>
         <div className="sc">
           <div className="sc-lbl">Havi bevétel</div>
-          <div className="sc-val" style={{color:'#ffd60a'}}>2.4M</div>
+          <div className="sc-val" style={{color:'#ffd60a'}}>0 Ft</div>
           <div className="sc-sub">Ft · számlázott</div>
         </div>
         <div className="sc" onClick={() => navigate('/issues')}>
           <div className="sc-lbl">Nyitott hibák</div>
-          <div className="sc-val" style={{color:'#ff3b30'}}>3</div>
-          <div className="sc-sub">2 visszajárás</div>
+          <div className="sc-val" style={{color:'#ff3b30'}}>0</div>
+          <div className="sc-sub">0 visszajárás</div>
         </div>
       </div>
 
@@ -99,7 +93,7 @@ export default function Dashboard() {
         <div className="qa" onClick={() => navigate('/timesheet')}>
           <span className="qa-i">📋</span><div className="qa-l">Napi lap</div>
         </div>
-        <div className="qa" onClick={() => navigate('/project/1')}>
+        <div className="qa" onClick={() => navigate('/projects')}>
           <span className="qa-i">📷</span><div className="qa-l">Fotó küld.</div>
         </div>
         <div className="qa" onClick={() => setIsProjectModalOpen(true)}>
@@ -112,7 +106,7 @@ export default function Dashboard() {
 
       <div className="shdr fu d4">
         <div className="shdr-t">Projektek</div>
-        <div className="shdr-a" onClick={() => navigate('/project/1')}>Mind →</div>
+        <div className="shdr-a" onClick={() => navigate('/projects')}>Mind →</div>
       </div>
       
       <div className="hscroll fu d4">
