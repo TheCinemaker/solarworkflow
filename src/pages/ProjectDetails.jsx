@@ -8,7 +8,12 @@ export default function ProjectDetails() {
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [completedTasks, setCompletedTasks] = useState([]);
+  
+  // Fényképek, megjegyzések és feltöltés állapotai
   const [photos, setPhotos] = useState([]);
+  const [photoComment, setPhotoComment] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
+  
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,7 +23,11 @@ export default function ProjectDetails() {
     try {
       if (!id) return;
 
-      // 1. Projekt betöltése
+      // 1. Felhasználó lekérése a feltöltő azonosításához
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUser(user);
+
+      // 2. Projekt betöltése
       const { data: projData, error: projErr } = await supabase
         .from('projects')
         .select('*')
@@ -39,32 +48,22 @@ export default function ProjectDetails() {
         }
       }
 
-      // 2. Fényképek betöltése a Supabase Storage-ból
-      // A képeket a 'project-photos' bucket {id} mappájában tároljuk
-      const { data: files, error: storageErr } = await supabase.storage
-        .from('project-photos')
-        .list(id);
+      // 3. Fényképek és megjegyzések betöltése a public.media táblából
+      const { data: mediaData, error: mediaErr } = await supabase
+        .from('media')
+        .select(`
+          id,
+          file_path,
+          description,
+          created_at,
+          profiles (full_name, serial_number)
+        `)
+        .eq('project_id', id)
+        .order('created_at', { ascending: false });
 
-      if (!storageErr && files) {
-        // Kiszűrjük a .placeholder fájlokat, ha lennének
-        const imageFiles = files.filter(f => f.name !== '.emptyFolderPlaceholder');
-        
-        // Generálunk nyilvános URL-t minden képhez
-        const photoUrls = imageFiles.map(file => {
-          const { data } = supabase.storage
-            .from('project-photos')
-            .getPublicUrl(`${id}/${file.name}`);
-          
-          return {
-            name: file.name,
-            url: data.publicUrl,
-            created_at: file.created_at
-          };
-        });
-        
-        // Dátum szerint csökkenőbe rendezzük
-        photoUrls.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        setPhotos(photoUrls);
+      if (mediaErr) throw mediaErr;
+      if (mediaData) {
+        setPhotos(mediaData);
       }
     } catch (err) {
       console.error("Hiba az adatok betöltésekor:", err);
@@ -85,6 +84,14 @@ export default function ProjectDetails() {
         schema: 'public', 
         table: 'projects', 
         filter: `id=eq.${id}` 
+      }, () => {
+        loadData();
+      })
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'media', 
+        filter: `project_id=eq.${id}` 
       }, () => {
         loadData();
       })
@@ -116,7 +123,7 @@ export default function ProjectDetails() {
     }
   };
 
-  // Fénykép feltöltése
+  // Fénykép feltöltése megjegyzéssel együtt
   const handlePhotoUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -130,21 +137,42 @@ export default function ProjectDetails() {
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `${id}/${fileName}`;
 
-      // Fájl feltöltése
+      // 1. Fájl feltöltése a Supabase Storage-ba
       const { error: uploadErr } = await supabase.storage
         .from('project-photos')
         .upload(filePath, file);
 
       if (uploadErr) throw uploadErr;
 
-      // "Megbökjük" a projekt tábla updated_at mezőjét, hogy a Realtime azonnal frissítse a többi felhasználó képernyőjét is!
+      // 2. Publikus URL lekérése
+      const { data: urlData } = supabase.storage
+        .from('project-photos')
+        .getPublicUrl(filePath);
+
+      const publicUrl = urlData.publicUrl;
+
+      // 3. Rekord mentése a public.media táblába a megjegyzéssel együtt
+      const { error: dbInsertErr } = await supabase
+        .from('media')
+        .insert([{
+          project_id: id,
+          user_id: currentUser?.id,
+          file_path: publicUrl,
+          description: photoComment || ''
+        }]);
+
+      if (dbInsertErr) throw dbInsertErr;
+
+      // 4. "Megbökjük" a projekt tábla updated_at mezőjét, hogy a Realtime azonnal frissítsen mindenkit
       await supabase
         .from('projects')
         .update({ updated_at: new Date().toISOString() })
         .eq('id', id);
 
-      // Adatok újratöltése a galériához
+      // Siker! Űrlap törlése és adatok újratöltése
+      setPhotoComment('');
       await loadData();
+      alert("Fénykép sikeresen feltöltve!");
     } catch (err) {
       console.error("Feltöltési hiba:", err);
       setError("Feltöltés sikertelen: " + err.message);
@@ -278,8 +306,36 @@ export default function ProjectDetails() {
         <div className="shdr-a">{photos.length} db</div>
       </div>
 
-      {/* Kép feltöltése zóna */}
-      <div className="px-5 fu d4">
+      {/* Kép feltöltése zóna és megjegyzés rovat */}
+      <div className="px-5 fu d4 space-y-3">
+        <div>
+          <label style={{
+            color: 'var(--t2)',
+            fontSize: '11px',
+            fontWeight: '600',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em',
+            marginBottom: '5px',
+            display: 'block'
+          }}>Megjegyzés a képhez (pl. ha baj van / hiba jelentés)</label>
+          <input 
+            type="text" 
+            value={photoComment} 
+            onChange={(e) => setPhotoComment(e.target.value)}
+            placeholder="Írd ide, ha valami nem stimmel, pl. törött vagy karcos..."
+            style={{
+              background: 'var(--s1)',
+              border: '1px solid var(--b1)',
+              borderRadius: '10px',
+              padding: '8px 12px',
+              color: 'var(--t1)',
+              fontSize: '13px',
+              width: '100%',
+              outline: 'none'
+            }}
+          />
+        </div>
+
         <label className="upload-area block relative overflow-hidden" style={{ background: 'var(--s1)', border: '1.5px dashed var(--b2)', borderRadius: '22px' }}>
           <input 
             type="file" 
@@ -291,7 +347,7 @@ export default function ProjectDetails() {
           {uploading ? (
             <div className="py-6 flex flex-col items-center justify-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-2"></div>
-              <div className="ua-t">Feltöltés folyamatban...</div>
+              <div className="ua-t">Checkpoint feltöltése...</div>
             </div>
           ) : (
             <div className="py-4 text-center cursor-pointer">
@@ -303,31 +359,65 @@ export default function ProjectDetails() {
         </label>
       </div>
 
-      {/* Galéria Rács */}
-      <div className="px-5 mt-4 fu d5">
+      {/* Galéria Rács (Modern 2-oszlopos Kártyarendszer megjegyzésekkel) */}
+      <div className="px-5 mt-4 pb-20 fu d5">
         {photos.length === 0 ? (
           <div className="text-center text-xs text-slate-400 italic py-6" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px' }}>
             Még nincs feltöltött fotó ehhez a projekthez.
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-2.5">
-            {photos.map((photo, index) => (
-              <a 
-                key={index} 
-                href={photo.url} 
-                target="_blank" 
-                rel="noreferrer" 
-                className="aspect-ratio pitem block" 
-                style={{
-                  backgroundImage: `url(${photo.url})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  borderRadius: '12px',
-                  border: '1px solid var(--b1)',
-                  aspectRatio: '1 / 1'
-                }}
-              />
-            ))}
+          <div className="grid grid-cols-2 gap-3.5">
+            {photos.map((photo, index) => {
+              const formattedDate = new Date(photo.created_at).toLocaleDateString('hu-HU', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+
+              return (
+                <div 
+                  key={photo.id || index} 
+                  className="rounded-2xl overflow-hidden flex flex-col"
+                  style={{
+                    background: 'var(--s1)',
+                    border: '1px solid var(--b1)',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)'
+                  }}
+                >
+                  {/* Kép kattintható változata nagyban megnyitáshoz */}
+                  <a 
+                    href={photo.file_path} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="block aspect-video relative"
+                    style={{
+                      backgroundImage: `url(${photo.file_path})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      aspectRatio: '4 / 3'
+                    }}
+                  />
+                  
+                  {/* Kártya alsó rész: Feltöltő + Időpont + Megjegyzés */}
+                  <div className="p-2.5 flex flex-col space-y-1 text-[11px] leading-tight">
+                    <div className="flex justify-between items-center text-[9px] text-slate-400 font-semibold uppercase tracking-wider">
+                      <span>👷 {photo.profiles?.full_name || 'Szerelő'}</span>
+                    </div>
+                    <div className="text-[9px] text-slate-500">{formattedDate}</div>
+                    
+                    {photo.description ? (
+                      <div className="text-xs text-amber-300 font-medium italic mt-1.5 p-1.5 rounded-lg border leading-snug" style={{ background: 'rgba(255, 159, 10, 0.08)', borderColor: 'rgba(255, 159, 10, 0.15)' }}>
+                        💬 {photo.description}
+                      </div>
+                    ) : (
+                      <div className="text-[10px] text-slate-500 italic mt-1">Nincs megjegyzés</div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

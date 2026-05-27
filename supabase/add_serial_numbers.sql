@@ -18,6 +18,10 @@ ALTER TABLE public.worklogs
 ADD COLUMN IF NOT EXISTS start_time TEXT,
 ADD COLUMN IF NOT EXISTS end_time TEXT;
 
+-- Média (media) tábla bővítése leírás (description) mezővel a kép megjegyzésekhez
+ALTER TABLE public.media
+ADD COLUMN IF NOT EXISTS description TEXT;
+
 -- A régi auth trigger törlése és új létrehozása
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 DROP FUNCTION IF EXISTS public.handle_new_user();
@@ -45,3 +49,4 @@ CREATE TRIGGER on_auth_user_created
 ALTER PUBLICATION supabase_realtime ADD TABLE public.projects;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.worklogs;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.media;
