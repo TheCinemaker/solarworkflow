@@ -5,7 +5,8 @@ ADD COLUMN IF NOT EXISTS tasks TEXT,
 ADD COLUMN IF NOT EXISTS client_phone TEXT,
 ADD COLUMN IF NOT EXISTS start_time TEXT,
 ADD COLUMN IF NOT EXISTS end_time TEXT,
-ADD COLUMN IF NOT EXISTS important_info TEXT;
+ADD COLUMN IF NOT EXISTS important_info TEXT,
+ADD COLUMN IF NOT EXISTS completed_tasks JSONB DEFAULT '[]'::jsonb;
 
 -- A meglévő dolgozók (profiles) táblájának bővítése
 ALTER TABLE public.profiles

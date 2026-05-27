@@ -70,17 +70,17 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
 
   const labelStyle = {
     color: 'var(--t2)',
-    fontSize: '13px', // Megnövelve 2px-szel (11px-ről)
+    fontSize: '13px',
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: '0.05em',
-    marginBottom: '6px', // Nagyobb térköz a címke és az input között
+    marginBottom: '6px',
     display: 'block'
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: 'rgba(7, 9, 15, 0.75)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
-      <div className="w-full max-w-md relative max-h-[95vh] overflow-y-auto" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px', padding: '20px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+    <div className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-4" style={{ background: 'rgba(7, 9, 15, 0.85)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+      <div className="w-full max-w-md relative my-auto" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px', padding: '20px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
         <button 
           onClick={onClose}
           className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-full"
@@ -106,7 +106,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-3"> {/*space-y-2 helyett space-y-3 a nagyobb térközért*/}
+        <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid grid-cols-3 gap-2">
             <div className="col-span-1">
               <label style={labelStyle}>Sorszám / ID</label>

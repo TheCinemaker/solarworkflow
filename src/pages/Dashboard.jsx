@@ -113,15 +113,23 @@ export default function Dashboard() {
         {projects.length === 0 ? (
           <div className="p-4 text-center text-slate-500 text-sm italic w-full">Nincsenek még projektek.</div>
         ) : (
-          projects.map(proj => (
-            <div key={proj.id} className="pc" onClick={() => navigate(`/project/${proj.id}`)}>
-              <div className="pc-tag" style={{background:'rgba(46,209,88,.14)',color:'#2ed158'}}>⚡ Projekt {proj.serial_number ? `· ${proj.serial_number}` : ''}</div>
-              <div className="pc-name">{proj.name}</div>
-              <div className="pc-addr">📍 {proj.address}</div>
-              <div className="pbar"><div className="pfill" style={{width:'10%',background:'#2ed158'}}></div></div>
-              <div className="pc-bot"><span>Kezdésre vár</span><span className="pill p-ok">Aktív</span></div>
-            </div>
-          ))
+          projects.map(proj => {
+            // Dinamikus haladás számítás
+            const tasksList = proj.tasks ? proj.tasks.split('\n').map(t => t.trim()).filter(Boolean) : [];
+            const totalTasks = tasksList.length;
+            const completedCount = proj.completed_tasks ? proj.completed_tasks.length : 0;
+            const progress = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
+            
+            return (
+              <div key={proj.id} className="pc" onClick={() => navigate(`/project/${proj.id}`)}>
+                <div className="pc-tag" style={{background:'rgba(46,209,88,.14)',color:'#2ed158'}}>⚡ Projekt {proj.serial_number ? `· ${proj.serial_number}` : ''}</div>
+                <div className="pc-name">{proj.name}</div>
+                <div className="pc-addr">📍 {proj.address}</div>
+                <div className="pbar"><div className="pfill" style={{width:`${progress}%`,background:'#2ed158'}}></div></div>
+                <div className="pc-bot"><span>{progress === 100 ? 'Befejezve ✓' : `${progress}% kész`}</span><span className="pill p-ok">Aktív</span></div>
+              </div>
+            );
+          })
         )}
       </div>
 
