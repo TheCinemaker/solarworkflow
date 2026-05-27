@@ -93,6 +93,9 @@ We recently updated the database tables to support the new modular forms. The us
 11. **Centralized Visual Issue Feed (Issues.jsx)**: Implemented the visual "Hibák és Visszajárás" dashboard. It queries all site checkpoint photos with descriptions to form a real-time central feed of construction blockers and client remarks, linking directly to each project detail view.
 12. **Telegram Project Association**: Added a `telegram_link` field to `NewProjectModal.jsx` and built a gorgeous, custom glowing blue button in `ProjectDetails.jsx` linking directly to the project's Telegram group for instant on-site team communication.
 13. **Before / After Defect Resolution**: Designed and coded a complete visual defect resolution lifecycle! Workers can mark open issues as fixed by providing a mandatory resolution photo and description. The database automatically logs the resolver, resolution timestamp, and photo. Resolved issues display in a stunning side-by-side Before/After comparison card.
+14. **Apple-style Redesigns & Realtime Dashboard**: Redesigned the "Projekt Archiválása" button to be a centered, compact Apple-style capsule button. Connected the Dashboard "Nyitott hibák" card to query the real media database count and sync in realtime.
+15. **Photo Upload Wizard Modal**: Created a robust, field-proof 2-step Photo Upload Wizard Modal that displays a live image preview and offers two card buttons to classify the photo (🟢 Munkafolyamat or ⚠️ Hiba/Akadály). If a defect/blocker is selected, the description is **strictly mandatory** to submit.
+16. **PostgREST Relationship & RLS Fixes**: Resolved the `profiles` table ambiguity crash in both `ProjectDetails.jsx` and `Issues.jsx` using explicit foreign key bindings. Added a database update policy (`Enable update for authenticated users` FOR UPDATE) to the RLS schema to allow workers to resolve and close issues successfully.
 
 ---
 
@@ -114,6 +117,10 @@ We recently updated the database tables to support the new modular forms. The us
 ### [COMPLETED] Task D: Checkpoint Photo Tracking (Supabase Storage)
 - **Done**: Implemented direct file uploads and photo gallery rendering with project UUID folder isolation.
 
+### Task E: Telegram Webhooks Integration
+- **Action**: Configure automatic Telegram webhook alerts when a new blocker/defect is uploaded or an issue is resolved, providing rapid alert synchronization to the field chat.
+
 ---
 
 Good luck! Let's build a stunning, lightning-fast application together! 🚀☀️
+
