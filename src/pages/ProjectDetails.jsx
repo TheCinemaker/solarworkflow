@@ -58,7 +58,7 @@ export default function ProjectDetails() {
           description,
           is_issue,
           created_at,
-          profiles (full_name, serial_number)
+          profiles:profiles!user_id (full_name, serial_number)
         `)
         .eq('project_id', id)
         .order('created_at', { ascending: false });
