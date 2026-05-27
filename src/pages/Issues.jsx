@@ -37,7 +37,7 @@ export default function Issues() {
           resolved_file_path,
           project_id,
           created_at,
-          profiles (full_name, serial_number),
+          profiles:profiles!user_id (full_name, serial_number),
           projects (name, serial_number),
           resolved_by_profile:profiles!media_resolved_by_fkey (full_name, serial_number)
         `)
