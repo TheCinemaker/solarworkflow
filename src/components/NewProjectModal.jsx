@@ -16,21 +16,28 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
     setLoading(true);
     setError(null);
 
-    // Mivel még nem hoztuk létre a 'projects' táblát a Supabase-ben, 
-    // egyelőre csak szimuláljuk a mentést az UI kedvéért.
-    // Később: await supabase.from('projects').insert([{ name, address, client_name, deadline }])
-    
-    setTimeout(() => {
+    const { error: insertError } = await supabase.from('projects').insert([{ 
+      name, 
+      address, 
+      client_name: clientName, 
+      deadline 
+    }]);
+
+    if (insertError) {
+      setError(insertError.message);
       setLoading(false);
-      onSuccess();
-      onClose();
-      
-      // Reset form
-      setName('');
-      setAddress('');
-      setClientName('');
-      setDeadline('');
-    }, 1000);
+      return;
+    }
+    
+    setLoading(false);
+    onSuccess();
+    onClose();
+    
+    // Reset form
+    setName('');
+    setAddress('');
+    setClientName('');
+    setDeadline('');
   };
 
   return (
