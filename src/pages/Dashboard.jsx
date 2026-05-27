@@ -6,7 +6,7 @@ import NewProjectModal from '../components/NewProjectModal';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [stats, setStats] = useState({ projects: 0, workers: 0, worklogs: 0 });
+  const [stats, setStats] = useState({ projects: 0, workers: 0, worklogs: 0, issues: 0, income: 0 });
   const [projects, setProjects] = useState([]);
   const [activities, setActivities] = useState([]);
   const [isWorkerModalOpen, setIsWorkerModalOpen] = useState(false);
@@ -38,11 +38,16 @@ export default function Dashboard() {
       const { count: worklogsCount } = await supabase.from('worklogs').select('*', { count: 'exact', head: true }).eq('date', new Date().toISOString().split('T')[0]);
       const { count: issuesCount } = await supabase.from('media').select('*', { count: 'exact', head: true }).eq('is_issue', true).eq('resolved', false);
       
+      // Valós havi bevétel / szerződéses összeg kiszámolása a projektek árából
+      const { data: priceData } = await supabase.from('projects').select('client_price').eq('archived', false);
+      const totalIncome = priceData ? priceData.reduce((sum, p) => sum + (p.client_price || 0), 0) : 0;
+
       setStats({
         projects: projectsCount || 0,
         workers: workersCount || 0,
         worklogs: worklogsCount || 0,
-        issues: issuesCount || 0
+        issues: issuesCount || 0,
+        income: totalIncome
       });
 
       // Fetch projects (Csak az aktívakat listázzuk ki)
@@ -110,10 +115,10 @@ export default function Dashboard() {
           <div className="sc-val" style={{color:'#2ed158'}}>{stats.worklogs}</div>
           <div className="sc-sub">{stats.workers} munkás terepen</div>
         </div>
-        <div className="sc">
+        <div className="sc cursor-pointer" onClick={() => navigate('/finance')}>
           <div className="sc-lbl">Havi bevétel</div>
-          <div className="sc-val" style={{color:'#ffd60a'}}>0 Ft</div>
-          <div className="sc-sub">Ft · számlázott</div>
+          <div className="sc-val" style={{color:'#ffd60a'}}>{(stats.income || 0).toLocaleString('hu-HU')} Ft</div>
+          <div className="sc-sub">Részletes könyvelés →</div>
         </div>
         <div className="sc" onClick={() => navigate('/issues')}>
           <div className="sc-lbl">Nyitott hibák</div>
