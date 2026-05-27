@@ -12,6 +12,13 @@ export default function Dashboard() {
   const [isWorkerModalOpen, setIsWorkerModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
+  const handleLogout = async () => {
+    const confirmLogout = window.confirm("Biztosan ki szeretnél jelentkezni?");
+    if (confirmLogout) {
+      await supabase.auth.signOut();
+    }
+  };
+
   useEffect(() => {
     // Small animation effect for progress bars
     const timeout = setTimeout(() => {
@@ -60,7 +67,21 @@ export default function Dashboard() {
           <div className="pg-greet">Jó reggelt 👋</div>
           <div className="pg-title">Áttekintés</div>
         </div>
-        <div className="hdr-btn">🔔</div>
+        <div className="flex items-center space-x-2">
+          <div className="hdr-btn">🔔</div>
+          <div 
+            className="hdr-btn" 
+            onClick={handleLogout}
+            style={{ 
+              border: '1px solid rgba(255, 59, 48, 0.25)', 
+              color: 'var(--red)', 
+              background: 'rgba(255, 59, 48, 0.12)' 
+            }}
+            title="Kijelentkezés"
+          >
+            🚪
+          </div>
+        </div>
       </div>
 
       <div className="stats-grid fu d2">
