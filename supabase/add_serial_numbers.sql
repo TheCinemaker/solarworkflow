@@ -33,3 +33,9 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+-- 5. VALÓS IDEJŰ (REALTIME) SZINKRONIZÁCIÓ BEKAPCSOLÁSA A TÁBLÁKON
+-- Ezzel engedélyezzük, hogy a Supabase azonnal értesítse az appot bármilyen változásról!
+-- (Ha valamelyik tábla már fel van véve a publikációba, az SQL hibát dobhat rá, ami figyelmen kívül hagyható)
+ALTER PUBLICATION supabase_realtime ADD TABLE public.projects;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;

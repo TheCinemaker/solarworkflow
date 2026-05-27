@@ -76,6 +76,23 @@ export default function ProjectDetails() {
 
   useEffect(() => {
     loadData();
+
+    // REALTIME SUBSCRIBER: Valós idejű frissítés a projekten történő módosításokkor
+    const channel = supabase
+      .channel(`project-${id}-realtime-sync`)
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'projects', 
+        filter: `id=eq.${id}` 
+      }, () => {
+        loadData();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [id]);
 
   // Feladat befejezésének mentése

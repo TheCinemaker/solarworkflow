@@ -55,9 +55,21 @@ export default function Dashboard() {
       
       if (worklogsData) setActivities(worklogsData);
     }
+    
     fetchData();
 
-    return () => clearTimeout(timeout);
+    // REALTIME SUBSCRIBER: Valós idejű szinkronizáció projektekre, profilokra és munkalapokra
+    const channel = supabase
+      .channel('dashboard-realtime-sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => { fetchData(); })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => { fetchData(); })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'worklogs' }, () => { fetchData(); })
+      .subscribe();
+
+    return () => {
+      clearTimeout(timeout);
+      supabase.removeChannel(channel);
+    };
   }, [isWorkerModalOpen, isProjectModalOpen]);
 
   return (

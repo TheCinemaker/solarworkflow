@@ -12,6 +12,16 @@ export default function ProjectList() {
       if (data) setProjects(data);
     }
     fetchProjects();
+
+    // REALTIME SUBSCRIBER: Valós idejű frissítés a projektek táblánál
+    const channel = supabase
+      .channel('projects-list-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => { fetchProjects(); })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return (
