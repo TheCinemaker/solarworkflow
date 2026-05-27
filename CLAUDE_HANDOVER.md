@@ -89,6 +89,9 @@ We recently updated the database tables to support the new modular forms. The us
 5. **Realtime Database Synchronization**: Configured full Supabase Realtime subscriptions in `Dashboard.jsx`, `ProjectList.jsx`, and `ProjectDetails.jsx`. Updates (like a worker checking a task or uploading a photo on the field) reflect instantly on the Admin's screen without reloading.
 8. **Daily Timesheets (Munkalapok)**: Fully implemented a premium daily work logging system inside `Timesheet.jsx` featuring dynamic project associations, automated decimal work hour calculations from time inputs (start/end times), and an isolated workflow tied to the logged-in user profile.
 9. **Full Realtime Sync for Timesheets**: Handled real-time updates for worklogs using Supabase postgres changes subscription, so new worker logs appear instantly on the Admin's listing.
+10. **Worker Pay & Hour Tracker (Finance.jsx)**: Completed the full finance view! It queries profiles and worklogs to aggregate total hours worked and estimated payouts dynamically (Hungarian standard 3,500 Ft/hr basis) with real-time sync.
+11. **Centralized Visual Issue Feed (Issues.jsx)**: Implemented the visual "Hibák és Visszajárás" dashboard. It queries all site checkpoint photos with descriptions to form a real-time central feed of construction blockers and client remarks, linking directly to each project detail view.
+12. **Telegram Project Association**: Added a `telegram_link` field to `NewProjectModal.jsx` and built a gorgeous, custom glowing blue button in `ProjectDetails.jsx` linking directly to the project's Telegram group for instant on-site team communication.
 
 ---
 
