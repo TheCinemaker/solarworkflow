@@ -9,7 +9,10 @@ ADD COLUMN IF NOT EXISTS important_info TEXT,
 ADD COLUMN IF NOT EXISTS completed_tasks JSONB DEFAULT '[]'::jsonb,
 ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now(),
 ADD COLUMN IF NOT EXISTS telegram_link TEXT,
-ADD COLUMN IF NOT EXISTS archived BOOLEAN DEFAULT false;
+ADD COLUMN IF NOT EXISTS archived BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS inverter_brand TEXT,
+ADD COLUMN IF NOT EXISTS inverter_api_key TEXT,
+ADD COLUMN IF NOT EXISTS inverter_id TEXT;
 
 -- A meglévő dolgozók (profiles) táblájának bővítése
 ALTER TABLE public.profiles
