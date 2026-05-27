@@ -19,10 +19,15 @@ ALTER TABLE public.worklogs
 ADD COLUMN IF NOT EXISTS start_time TEXT,
 ADD COLUMN IF NOT EXISTS end_time TEXT;
 
--- Média (media) tábla bővítése leírás (description) és is_issue (hiba flag) mezőkkel
+-- Média (media) tábla bővítése hiba és javítás követő mezőkkel (Before/After)
 ALTER TABLE public.media
 ADD COLUMN IF NOT EXISTS description TEXT,
-ADD COLUMN IF NOT EXISTS is_issue BOOLEAN DEFAULT false;
+ADD COLUMN IF NOT EXISTS is_issue BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS resolved BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS resolved_at TIMESTAMPTZ,
+ADD COLUMN IF NOT EXISTS resolved_by UUID REFERENCES public.profiles(id),
+ADD COLUMN IF NOT EXISTS resolved_file_path TEXT,
+ADD COLUMN IF NOT EXISTS resolved_comment TEXT;
 
 -- A régi auth trigger törlése és új létrehozása
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
