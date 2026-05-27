@@ -137,6 +137,12 @@ export default function ProjectDetails() {
 
       if (uploadErr) throw uploadErr;
 
+      // "Megbökjük" a projekt tábla updated_at mezőjét, hogy a Realtime azonnal frissítse a többi felhasználó képernyőjét is!
+      await supabase
+        .from('projects')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', id);
+
       // Adatok újratöltése a galériához
       await loadData();
     } catch (err) {

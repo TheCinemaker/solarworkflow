@@ -86,6 +86,9 @@ We recently updated the database tables to support the new modular forms. The us
 2. **Apple Dashboard Restructuring**: Purged fake battery/cellular top status bars. Cleaned up dead navigation links and aligned everything to the custom CSS classes.
 3. **Modals Redesigned**: `NewProjectModal.jsx` and `NewWorkerModal.jsx` are fully functioning, hook directly to Supabase, and implement the approved compact styling.
 4. **Dashboard List**: Displays real database projects dynamically, appending the user-facing serial number next to the tag (e.g., `⚡ Projekt · PRJ-01`).
+5. **Realtime Database Synchronization**: Configured full Supabase Realtime subscriptions in `Dashboard.jsx`, `ProjectList.jsx`, and `ProjectDetails.jsx`. Updates (like a worker checking a task or uploading a photo on the field) reflect instantly on the Admin's screen without reloading.
+6. **Isolated worker registration**: Resolved auth session hijacking by using a temporary standalone Supabase client (`persistSession: false`) for creating users.
+7. **Storage Photo Uploads**: Wired up robust, direct file uploads from the field to a public `project-photos` storage bucket inside `ProjectDetails.jsx`, complete with directory isolation per project UUID.
 
 ---
 
