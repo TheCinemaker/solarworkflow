@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
+import NewWorkerModal from '../components/NewWorkerModal';
+import NewProjectModal from '../components/NewProjectModal';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const [isWorkerModalOpen, setIsWorkerModalOpen] = useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -46,10 +50,16 @@ export default function AdminDashboard() {
             <p className="text-slate-400 text-sm mt-1">Kezeld a dolgozókat és a projekteket.</p>
           </div>
           <div className="flex space-x-3">
-            <button className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-slate-700">
+            <button 
+              onClick={() => setIsWorkerModalOpen(true)}
+              className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-slate-700"
+            >
               + Új Dolgozó
             </button>
-            <button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-cyan-500/20">
+            <button 
+              onClick={() => setIsProjectModalOpen(true)}
+              className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-cyan-500/20"
+            >
               + Új Projekt
             </button>
           </div>
@@ -72,6 +82,18 @@ export default function AdminDashboard() {
         </div>
 
       </main>
+
+      <NewWorkerModal 
+        isOpen={isWorkerModalOpen} 
+        onClose={() => setIsWorkerModalOpen(false)} 
+        onSuccess={() => alert('Dolgozó sikeresen létrehozva! (Jelentkezz ki és vissza teszteléshez)')} 
+      />
+
+      <NewProjectModal
+        isOpen={isProjectModalOpen}
+        onClose={() => setIsProjectModalOpen(false)}
+        onSuccess={() => alert('Projekt sikeresen létrehozva!')}
+      />
     </div>
   );
 }
