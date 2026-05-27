@@ -68,6 +68,16 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
     transition: 'border-color 0.15s ease'
   };
 
+  const labelStyle = {
+    color: 'var(--t2)',
+    fontSize: '11px',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    marginBottom: '4px',
+    display: 'block'
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: 'rgba(7, 9, 15, 0.75)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
       <div className="w-full max-w-md relative max-h-[95vh] overflow-y-auto" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px', padding: '16px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
@@ -99,49 +109,49 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
         <form onSubmit={handleSubmit} className="space-y-2">
           <div className="grid grid-cols-3 gap-2">
             <div className="col-span-1">
-              <label className="block text-[9px] font-bold uppercase tracking-wider mb-0.5" style={{ color: 'var(--t3)' }}>Sorszám / ID</label>
+              <label style={labelStyle}>Sorszám / ID</label>
               <input type="text" value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} placeholder="PRJ-01" required style={inputStyle} />
             </div>
             <div className="col-span-2">
-              <label className="block text-[9px] font-bold uppercase tracking-wider mb-0.5" style={{ color: 'var(--t3)' }}>Projekt Neve</label>
+              <label style={labelStyle}>Projekt Neve</label>
               <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="pl. Napelem - Kovács porta" required style={inputStyle} />
             </div>
           </div>
           
           <div>
-            <label className="block text-[9px] font-bold uppercase tracking-wider mb-0.5" style={{ color: 'var(--t3)' }}>Helyszín / Cím</label>
+            <label style={labelStyle}>Helyszín / Cím</label>
             <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="1234 Bp., Példa u. 1." required style={inputStyle} />
           </div>
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-[9px] font-bold uppercase tracking-wider mb-0.5" style={{ color: 'var(--t3)' }}>Megrendelő Neve</label>
+              <label style={labelStyle}>Megrendelő Neve</label>
               <input type="text" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="Kovács Péter" required style={inputStyle} />
             </div>
             <div>
-              <label className="block text-[9px] font-bold uppercase tracking-wider mb-0.5" style={{ color: 'var(--t3)' }}>Telefonszáma</label>
+              <label style={labelStyle}>Telefonszáma</label>
               <input type="text" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} placeholder="+36 30 123 4567" style={inputStyle} />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-[9px] font-bold uppercase tracking-wider mb-0.5" style={{ color: 'var(--t3)' }}>Kezdési dátum</label>
+              <label style={labelStyle}>Kezdési dátum</label>
               <input type="date" value={startTime} onChange={(e) => setStartTime(e.target.value)} style={inputStyle} required />
             </div>
             <div>
-              <label className="block text-[9px] font-bold uppercase tracking-wider mb-0.5" style={{ color: 'var(--t3)' }}>Befejezési dátum</label>
+              <label style={labelStyle}>Befejezési dátum</label>
               <input type="date" value={endTime} onChange={(e) => setEndTime(e.target.value)} style={inputStyle} required />
             </div>
           </div>
 
           <div>
-            <label className="block text-[9px] font-bold uppercase tracking-wider mb-0.5" style={{ color: 'var(--t3)' }}>Fontos Infó (pl. kulcs helye)</label>
+            <label style={labelStyle}>Fontos Infó (pl. kulcs helye)</label>
             <input type="text" value={importantInfo} onChange={(e) => setImportantInfo(e.target.value)} placeholder="pl. Kulcs a villanyóra szekrényben" style={inputStyle} />
           </div>
 
           <div>
-            <label className="block text-[9px] font-bold uppercase tracking-wider mb-0.5" style={{ color: 'var(--t3)' }}>Feladatlista</label>
+            <label style={labelStyle}>Feladatlista</label>
             <textarea value={tasks} onChange={(e) => setTasks(e.target.value)} placeholder="1. Tartószerkezet felszerelése&#10;2. Kábelezés behúzása&#10;3. Inverter telepítése" style={{ ...inputStyle, minHeight: '60px', resize: 'vertical' }} />
           </div>
           

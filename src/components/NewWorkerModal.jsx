@@ -59,6 +59,16 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
     transition: 'border-color 0.15s ease'
   };
 
+  const labelStyle = {
+    color: 'var(--t2)',
+    fontSize: '11px',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    marginBottom: '4px',
+    display: 'block'
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: 'rgba(7, 9, 15, 0.75)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
       <div className="w-full max-w-md relative max-h-[90vh] overflow-y-auto" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px', padding: '16px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
@@ -89,25 +99,25 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
 
         <form onSubmit={handleSubmit} className="space-y-2">
           <div>
-            <label className="block text-[9px] font-bold uppercase tracking-wider mb-0.5" style={{ color: 'var(--t3)' }}>Sorszám / Dolgozói ID</label>
+            <label style={labelStyle}>Sorszám / Dolgozói ID</label>
             <input type="text" value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} placeholder="EMP-01" required style={inputStyle} />
           </div>
           <div>
-            <label className="block text-[9px] font-bold uppercase tracking-wider mb-0.5" style={{ color: 'var(--t3)' }}>Teljes Név</label>
+            <label style={labelStyle}>Teljes Név</label>
             <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Nagy Béla" required style={inputStyle} />
           </div>
           <div>
-            <label className="block text-[9px] font-bold uppercase tracking-wider mb-0.5" style={{ color: 'var(--t3)' }}>Email Cím</label>
+            <label style={labelStyle}>Email Cím</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="bela@cegem.hu" required style={inputStyle} />
           </div>
           
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[9px] font-bold uppercase tracking-wider mb-0.5" style={{ color: 'var(--t3)' }}>Ideiglenes Jelszó</label>
+              <label style={labelStyle}>Ideiglenes Jelszó</label>
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••" required minLength={6} style={inputStyle} />
             </div>
             <div>
-              <label className="block text-[9px] font-bold uppercase tracking-wider mb-0.5" style={{ color: 'var(--t3)' }}>Szerepkör</label>
+              <label style={labelStyle}>Szerepkör</label>
               <select value={role} onChange={(e) => setRole(e.target.value)} style={inputStyle}>
                 <option value="worker" style={{ background: '#07090f' }}>Terepi Szerelő</option>
                 <option value="admin" style={{ background: '#07090f' }}>Irodai Admin</option>
