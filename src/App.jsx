@@ -5,6 +5,7 @@ import { supabase } from './lib/supabase';
 import Login from './pages/Login';
 import MainLayout from './layouts/MainLayout';
 import Dashboard from './pages/Dashboard';
+import ProjectList from './pages/ProjectList';
 import ProjectDetails from './pages/ProjectDetails';
 import Timesheet from './pages/Timesheet';
 import Finance from './pages/Finance';
@@ -50,6 +51,7 @@ export default function App() {
           element={session ? <MainLayout /> : <Navigate to="/login" />} 
         >
           <Route index element={<Dashboard />} />
+          <Route path="projects" element={<ProjectList />} />
           <Route path="project/:id" element={<ProjectDetails />} />
           <Route path="timesheet" element={<Timesheet />} />
           <Route path="finance" element={<Finance />} />
