@@ -7,6 +7,8 @@ import NewProjectModal from '../components/NewProjectModal';
 export default function Dashboard() {
   const navigate = useNavigate();
   const [stats, setStats] = useState({ projects: 0, workers: 0, worklogs: 0 });
+  const [projects, setProjects] = useState([]);
+  const [activities, setActivities] = useState([]);
   const [isWorkerModalOpen, setIsWorkerModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
@@ -22,7 +24,8 @@ export default function Dashboard() {
       });
     }, 100);
 
-    async function fetchStats() {
+    async function fetchData() {
+      // Fetch stats
       const { count: projectsCount } = await supabase.from('projects').select('*', { count: 'exact', head: true });
       const { count: workersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
       const { count: worklogsCount } = await supabase.from('worklogs').select('*', { count: 'exact', head: true }).eq('date', new Date().toISOString().split('T')[0]);
@@ -32,8 +35,20 @@ export default function Dashboard() {
         workers: workersCount || 0,
         worklogs: worklogsCount || 0
       });
+
+      // Fetch projects
+      const { data: projectsData } = await supabase.from('projects').select('*').order('created_at', { ascending: false }).limit(5);
+      if (projectsData) setProjects(projectsData);
+
+      // Fetch activities (Worklogs as mock activity for now)
+      const { data: worklogsData } = await supabase.from('worklogs')
+        .select(`*, profiles(full_name), projects(name)`)
+        .order('created_at', { ascending: false })
+        .limit(5);
+      
+      if (worklogsData) setActivities(worklogsData);
     }
-    fetchStats();
+    fetchData();
 
     return () => clearTimeout(timeout);
   }, [isWorkerModalOpen, isProjectModalOpen]);
@@ -101,68 +116,38 @@ export default function Dashboard() {
       </div>
       
       <div className="hscroll fu d4">
-        <div className="pc" onClick={() => navigate('/project/1')}>
-          <div className="pc-tag" style={{background:'rgba(46,209,88,.14)',color:'#2ed158'}}>☀️ Napelemes</div>
-          <div className="pc-name">Molnár ház – 10kWp</div>
-          <div className="pc-addr">📍 Pécs, Alkotmány u. 14</div>
-          <div className="pbar"><div className="pfill" style={{width:'68%',background:'#2ed158'}}></div></div>
-          <div className="pc-bot"><span>68% kész</span><span className="pill p-ok">Aktív</span></div>
-        </div>
-        <div className="pc" onClick={() => navigate('/project/2')}>
-          <div className="pc-tag" style={{background:'rgba(79,142,247,.14)',color:'#4f8ef7'}}>⚡ Villamos</div>
-          <div className="pc-name">Irodaház fővezeték</div>
-          <div className="pc-addr">📍 Budapest, XIII. ker.</div>
-          <div className="pbar"><div className="pfill" style={{width:'22%',background:'#4f8ef7'}}></div></div>
-          <div className="pc-bot"><span>22% kész</span><span className="pill p-ok">Aktív</span></div>
-        </div>
-        <div className="pc" onClick={() => navigate('/project/3')}>
-          <div className="pc-tag" style={{background:'rgba(255,159,10,.14)',color:'#ff9f0a'}}>⚡ Villamos</div>
-          <div className="pc-name">Horváth porta bekötés</div>
-          <div className="pc-addr">📍 Győr, Rét u. 3</div>
-          <div className="pbar"><div className="pfill" style={{width:'45%',background:'#ff9f0a'}}></div></div>
-          <div className="pc-bot"><span>Anyagra vár</span><span className="pill p-wait">Várakozás</span></div>
-        </div>
-        <div className="pc" onClick={() => navigate('/project/4')}>
-          <div className="pc-tag" style={{background:'rgba(255,59,48,.14)',color:'#ff3b30'}}>☀️ Napelemes</div>
-          <div className="pc-name">Nagy villa 6kWp + tároló</div>
-          <div className="pc-addr">📍 Debrecen</div>
-          <div className="pbar"><div className="pfill" style={{width:'80%',background:'#ff3b30'}}></div></div>
-          <div className="pc-bot"><span>Inverter hiba</span><span className="pill p-err">Hiba</span></div>
-        </div>
+        {projects.length === 0 ? (
+          <div className="p-4 text-center text-slate-500 text-sm italic w-full">Nincsenek még projektek.</div>
+        ) : (
+          projects.map(proj => (
+            <div key={proj.id} className="pc" onClick={() => navigate(`/project/${proj.id}`)}>
+              <div className="pc-tag" style={{background:'rgba(46,209,88,.14)',color:'#2ed158'}}>⚡ Projekt</div>
+              <div className="pc-name">{proj.name}</div>
+              <div className="pc-addr">📍 {proj.address}</div>
+              <div className="pbar"><div className="pfill" style={{width:'10%',background:'#2ed158'}}></div></div>
+              <div className="pc-bot"><span>Kezdésre vár</span><span className="pill p-ok">Aktív</span></div>
+            </div>
+          ))
+        )}
       </div>
 
       <div className="shdr fu d5">
-        <div className="shdr-t">Mai aktivitás</div>
+        <div className="shdr-t">Friss aktivitás</div>
       </div>
       <div className="act-list fu d5">
-        <div class="act">
-          <div class="act-ico" style={{background:'rgba(46,209,88,.12)'}}>📷</div>
-          <div class="act-body">
-            <div class="act-txt"><b>Tóth Péter</b> checkpoint fotót küldött – Molnár ház</div>
-            <div class="act-time">08:42</div>
-          </div>
-        </div>
-        <div class="act">
-          <div class="act-ico" style={{background:'rgba(79,142,247,.12)'}}>⏱</div>
-          <div class="act-body">
-            <div class="act-txt"><b>Varga Gábor</b> 8 órát rögzített – Irodaház</div>
-            <div class="act-time">08:05</div>
-          </div>
-        </div>
-        <div class="act">
-          <div class="act-ico" style={{background:'rgba(255,59,48,.12)'}}>⚠️</div>
-          <div class="act-body">
-            <div class="act-txt"><b>Nagy villa</b> – inverter meghibásodás jelentve</div>
-            <div class="act-time">Tegnap 17:23</div>
-          </div>
-        </div>
-        <div className="act">
-          <div className="act-ico" style={{background:'rgba(255,159,10,.12)'}}>🚚</div>
-          <div className="act-body">
-            <div className="act-txt"><b>Horváth porta</b> – anyagszállítás késik 2 napot</div>
-            <div className="act-time">Tegnap 15:10</div>
-          </div>
-        </div>
+        {activities.length === 0 ? (
+          <div className="p-4 text-center text-slate-500 text-sm italic">Nincs még aktivitás.</div>
+        ) : (
+          activities.map(act => (
+            <div key={act.id} className="act">
+              <div className="act-ico" style={{background:'rgba(79,142,247,.12)'}}>⏱</div>
+              <div className="act-body">
+                <div className="act-txt"><b>{act.profiles?.full_name || 'Ismeretlen'}</b> órát rögzített – {act.projects?.name || 'Projekt'}</div>
+                <div className="act-time">{new Date(act.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <NewWorkerModal 
