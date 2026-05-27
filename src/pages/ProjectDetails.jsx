@@ -300,138 +300,173 @@ export default function ProjectDetails() {
         </div>
       </div>
 
-      {/* NAPELEM ELEKTROMOS TELEMETRIA (PRÉMIUM LIVE MONITOR) */}
-      <div className="px-5 mt-3.5 fu d1">
-        <div 
-          className="p-4 rounded-3xl overflow-hidden transition-all duration-300 relative"
-          style={{
-            background: 'linear-gradient(135deg, rgba(7, 9, 15, 0.9), rgba(15, 23, 42, 0.8))',
-            border: showLiveTelemetry ? '1px solid rgba(46, 209, 88, 0.3)' : '1px solid var(--b1)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            boxShadow: showLiveTelemetry ? '0 10px 30px rgba(46, 209, 88, 0.08)' : 'none'
-          }}
-        >
-          {/* Felső információs sáv */}
-          <div className="flex justify-between items-center mb-3">
-            <div className="flex items-center space-x-2">
-              <span className="text-base">⚡</span>
-              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-200">
-                {showLiveTelemetry ? 'Élő Termelés Követés' : 'Inverter Telemetria'}
-              </span>
+      {/* NAPELEM ELEKTROMOS TELEMETRIA VAGY AKTIVÁLÓ GOMB */}
+      {!project?.inverter_brand ? (
+        <div className="px-5 mt-3.5 fu d1">
+          <div 
+            onClick={async () => {
+              const brand = window.prompt("Milyen invertert szereltek ezen a projekten?\n(pl. Fronius, SolarEdge, Huawei, Growatt)\n\nHa beírod a márkát, az app azonnal aktiválja az élő telemetria monitort!");
+              if (brand) {
+                const { error: updateErr } = await supabase
+                  .from('projects')
+                  .update({ inverter_brand: brand })
+                  .eq('id', id);
+                if (updateErr) {
+                  alert("Hiba a mentéskor: " + updateErr.message);
+                } else {
+                  loadData();
+                }
+              }
+            }}
+            className="p-3.5 rounded-3xl flex items-center justify-between cursor-pointer transition-all hover:bg-white/[0.02] active:scale-98"
+            style={{
+              background: 'var(--s1)',
+              border: '1px dashed var(--b1)',
+            }}
+          >
+            <div className="flex items-center space-x-3">
+              <span className="text-xl">☀️</span>
+              <div className="text-left">
+                <div className="text-xs font-black text-slate-300 tracking-tight">Napelemes távfelügyelet beállítása</div>
+                <div className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Inverter API távoli elérés konfigurálása</div>
+              </div>
             </div>
-            
-            <div className="flex items-center space-x-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-400">DEMO MÓD</span>
-            </div>
+            <span className="text-[10px] bg-white/5 border border-white/10 px-2.5 py-1 rounded-full text-slate-400 font-black uppercase tracking-wider">Aktiválás ›</span>
           </div>
-
-          {!showLiveTelemetry ? (
-            // Összecsukott, tiszta állapot
-            <div className="flex justify-between items-center">
-              <div className="text-xs text-slate-400 font-medium">
-                Készülék: <span className="text-slate-200 font-bold">Fronius Symo (3-fázis)</span>
+        </div>
+      ) : (
+        <div className="px-5 mt-3.5 fu d1">
+          <div 
+            className="p-4 rounded-3xl overflow-hidden transition-all duration-300 relative"
+            style={{
+              background: 'linear-gradient(135deg, rgba(7, 9, 15, 0.9), rgba(15, 23, 42, 0.8))',
+              border: showLiveTelemetry ? '1px solid rgba(46, 209, 88, 0.3)' : '1px solid var(--b1)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              boxShadow: showLiveTelemetry ? '0 10px 30px rgba(46, 209, 88, 0.08)' : 'none'
+            }}
+          >
+            {/* Felső információs sáv */}
+            <div className="flex justify-between items-center mb-3">
+              <div className="flex items-center space-x-2">
+                <span className="text-base">⚡</span>
+                <span className="text-xs font-extrabold uppercase tracking-wider text-slate-200">
+                  {showLiveTelemetry ? 'Élő Termelés Követés' : 'Inverter Telemetria'}
+                </span>
               </div>
-              <button 
-                onClick={() => setShowLiveTelemetry(true)}
-                className="px-3.5 py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-wider transition-all hover:scale-[1.03]"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  color: 'var(--t1)',
-                  border: '1px solid var(--b1)'
-                }}
-              >
-                Monitor Megnyitása
-              </button>
+              
+              <div className="flex items-center space-x-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="text-[9px] font-extrabold uppercase tracking-wider text-emerald-400">DEMO MÓD ({project.inverter_brand})</span>
+              </div>
             </div>
-          ) : (
-            // Kibővített, sci-fi Apple műszerfal grafikonnal és valós idejű fluktuációval
-            <div className="space-y-4 animate-[fadeIn_0.3s_ease-out]">
-              {/* Telemetria Rács */}
-              <div className="grid grid-cols-2 gap-3.5">
-                {/* 1. kártya: Pillanatnyi teljesítmény */}
-                <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/[0.04] flex flex-col justify-between">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Aktuális erő</span>
-                  <div className="flex items-baseline space-x-1 mt-1.5">
-                    <span className="text-2xl font-black text-emerald-400 tracking-tight transition-all duration-300">
-                      {simulatedPower}
-                    </span>
-                    <span className="text-xs font-bold text-slate-400">kW</span>
-                  </div>
-                  <span className="text-[8px] text-emerald-500/80 font-bold mt-1">● Élő adás a tetőről</span>
-                </div>
 
-                {/* 2. kártya: Napi összes termelés */}
-                <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/[0.04] flex flex-col justify-between">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Mai termelés</span>
-                  <div className="flex items-baseline space-x-1 mt-1.5">
-                    <span className="text-2xl font-black text-slate-200 tracking-tight">14.82</span>
-                    <span className="text-xs font-bold text-slate-400">kWh</span>
-                  </div>
-                  <span className="text-[8px] text-slate-500 font-medium mt-1">Összesített napi hozam</span>
-                </div>
-              </div>
-
-              {/* Grafikon Zóna: Gyönyörű neon-zöld SVG szinusz hullám */}
-              <div className="p-3.5 rounded-2xl bg-black/20 border border-white/[0.03] relative overflow-hidden">
-                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Termelési görbe (Ma)</span>
-                
-                {/* Neon vonal diagram */}
-                <div className="w-full h-16 flex items-end">
-                  <svg viewBox="0 0 100 30" className="w-full h-full overflow-visible">
-                    <defs>
-                      <linearGradient id="chart-glow" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
-                        <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
-                      </linearGradient>
-                    </defs>
-                    {/* Kitöltött árnyékolás */}
-                    <path 
-                      d="M0,30 Q25,25 35,15 T65,8 T85,25 T100,30 L100,30 L0,30 Z" 
-                      fill="url(#chart-glow)" 
-                    />
-                    {/* Fő görbe */}
-                    <path 
-                      d="M0,30 Q25,25 35,15 T65,8 T85,25 T100,30" 
-                      fill="none" 
-                      stroke="#10b981" 
-                      strokeWidth="1.5" 
-                      strokeLinecap="round"
-                    />
-                    {/* Aktuális időpont kör jelölő */}
-                    <circle cx="65" cy="8" r="2.5" fill="#fff" className="animate-ping" style={{ transformOrigin: '65px 8px' }} />
-                    <circle cx="65" cy="8" r="1.5" fill="#10b981" />
-                  </svg>
-                </div>
-                <div className="flex justify-between items-center text-[7px] text-slate-500 font-bold uppercase tracking-wider mt-2.5">
-                  <span>06:00 (Napfelkelte)</span>
-                  <span className="text-emerald-400 font-extrabold">12:35 (Most)</span>
-                  <span>20:00 (Naplemente)</span>
-                </div>
-              </div>
-
-              {/* Részletek és Összecsukás */}
-              <div className="flex justify-between items-center pt-1">
-                <div className="text-[10px] text-slate-400">
-                  IP: <span className="text-slate-300 font-bold">192.168.1.185</span> · Fronius API v2
+            {!showLiveTelemetry ? (
+              // Összecsukott, tiszta állapot
+              <div className="flex justify-between items-center">
+                <div className="text-xs text-slate-400 font-medium">
+                  Készülék: <span className="text-slate-200 font-bold">{project.inverter_brand} (3-fázis)</span>
                 </div>
                 <button 
-                  onClick={() => setShowLiveTelemetry(false)}
-                  className="px-3.5 py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-wider"
+                  onClick={() => setShowLiveTelemetry(true)}
+                  className="px-3.5 py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-wider transition-all hover:scale-[1.03]"
                   style={{
-                    background: 'rgba(255, 59, 48, 0.08)',
-                    color: 'var(--red)',
-                    border: '1px solid rgba(255, 59, 48, 0.15)'
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    color: 'var(--t1)',
+                    border: '1px solid var(--b1)'
                   }}
                 >
-                  Bezárás
+                  Monitor Megnyitása
                 </button>
               </div>
-            </div>
-          )}
+            ) : (
+              // Kibővített, sci-fi Apple műszerfal grafikonnal és valós idejű fluktuációval
+              <div className="space-y-4 animate-[fadeIn_0.3s_ease-out]">
+                {/* Telemetria Rács */}
+                <div className="grid grid-cols-2 gap-3.5">
+                  {/* 1. kártya: Pillanatnyi teljesítmény */}
+                  <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/[0.04] flex flex-col justify-between">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Aktuális erő</span>
+                    <div className="flex items-baseline space-x-1 mt-1.5">
+                      <span className="text-2xl font-black text-emerald-400 tracking-tight transition-all duration-300">
+                        {simulatedPower}
+                      </span>
+                      <span className="text-xs font-bold text-slate-400">kW</span>
+                    </div>
+                    <span className="text-[8px] text-emerald-500/80 font-bold mt-1">● Élő adás a tetőről</span>
+                  </div>
+
+                  {/* 2. kártya: Napi összes termelés */}
+                  <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/[0.04] flex flex-col justify-between">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Mai termelés</span>
+                    <div className="flex items-baseline space-x-1 mt-1.5">
+                      <span className="text-2xl font-black text-slate-200 tracking-tight">14.82</span>
+                      <span className="text-xs font-bold text-slate-400">kWh</span>
+                    </div>
+                    <span className="text-[8px] text-slate-500 font-medium mt-1">Összesített napi hozam</span>
+                  </div>
+                </div>
+
+                {/* Grafikon Zóna: Gyönyörű neon-zöld SVG szinusz hullám */}
+                <div className="p-3.5 rounded-2xl bg-black/20 border border-white/[0.03] relative overflow-hidden">
+                  <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Termelési görbe (Ma)</span>
+                  
+                  {/* Neon vonal diagram */}
+                  <div className="w-full h-16 flex items-end">
+                    <svg viewBox="0 0 100 30" className="w-full h-full overflow-visible">
+                      <defs>
+                        <linearGradient id="chart-glow" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
+                          <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
+                        </linearGradient>
+                      </defs>
+                      {/* Kitöltött árnyékolás */}
+                      <path 
+                        d="M0,30 Q25,25 35,15 T65,8 T85,25 T100,30 L100,30 L0,30 Z" 
+                        fill="url(#chart-glow)" 
+                      />
+                      {/* Fő görbe */}
+                      <path 
+                        d="M0,30 Q25,25 35,15 T65,8 T85,25 T100,30" 
+                        fill="none" 
+                        stroke="#10b981" 
+                        strokeWidth="1.5" 
+                        strokeLinecap="round"
+                      />
+                      {/* Aktuális időpont kör jelölő */}
+                      <circle cx="65" cy="8" r="2.5" fill="#fff" className="animate-ping" style={{ transformOrigin: '65px 8px' }} />
+                      <circle cx="65" cy="8" r="1.5" fill="#10b981" />
+                    </svg>
+                  </div>
+                  <div className="flex justify-between items-center text-[7px] text-slate-500 font-bold uppercase tracking-wider mt-2.5">
+                    <span>06:00 (Napfelkelte)</span>
+                    <span className="text-emerald-400 font-extrabold">12:35 (Most)</span>
+                    <span>20:00 (Naplemente)</span>
+                  </div>
+                </div>
+
+                {/* Részletek és Összecsukás */}
+                <div className="flex justify-between items-center pt-1">
+                  <div className="text-[10px] text-slate-400">
+                    IP: <span className="text-slate-300 font-bold">192.168.1.185</span> · {project.inverter_brand} API v2
+                  </div>
+                  <button 
+                    onClick={() => setShowLiveTelemetry(false)}
+                    className="px-3.5 py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-wider"
+                    style={{
+                      background: 'rgba(255, 59, 48, 0.08)',
+                      color: 'var(--red)',
+                      border: '1px solid rgba(255, 59, 48, 0.15)'
+                    }}
+                  >
+                    Bezárás
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Telegram Csoport Link Gomb */}
       {project?.telegram_link && (
