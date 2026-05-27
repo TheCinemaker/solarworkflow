@@ -14,6 +14,8 @@ export default function ProjectDetails() {
   const [photoComment, setPhotoComment] = useState('');
   const [isIssue, setIsIssue] = useState(false); // Hiba/Munkafolyamat megkülönböztetés
   const [currentUser, setCurrentUser] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null); // Feltöltendő fájl átmenetileg
+  const [filePreview, setFilePreview] = useState(null); // Előnézet URL
   
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -125,24 +127,38 @@ export default function ProjectDetails() {
     }
   };
 
-  // Fénykép feltöltése megjegyzéssel együtt
-  const handlePhotoUpload = async (e) => {
+  // Kép kiválasztása - megnyitja a varázslót
+  const handlePhotoSelected = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setSelectedFile(file);
+    setFilePreview(URL.createObjectURL(file));
+    e.target.value = ''; // Reset input
+  };
+
+  // Kép feltöltése a varázslóból
+  const submitPhotoUpload = async (e) => {
+    e.preventDefault();
+    if (!selectedFile) return;
+
+    if (isIssue && !photoComment.trim()) {
+      alert("Hiba / Blokk fotó bejelentése esetén a megjegyzés (hiba leírása) KÖTELEZŐ! Kérjük, írd le mi a probléma!");
+      return;
+    }
 
     setUploading(true);
     setError(null);
 
     try {
-      // Egyedi fájlnév generálása timestamp-pel a felülírás ellen
-      const fileExt = file.name.split('.').pop();
+      // Egyedi fájlnév generálása timestamp-pel
+      const fileExt = selectedFile.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `${id}/${fileName}`;
 
       // 1. Fájl feltöltése a Supabase Storage-ba
       const { error: uploadErr } = await supabase.storage
         .from('project-photos')
-        .upload(filePath, file);
+        .upload(filePath, selectedFile);
 
       if (uploadErr) throw uploadErr;
 
@@ -153,7 +169,7 @@ export default function ProjectDetails() {
 
       const publicUrl = urlData.publicUrl;
 
-      // 3. Rekord mentése a public.media táblába a megjegyzéssel és a hiba flaggel együtt
+      // 3. Rekord mentése a public.media táblába
       const { error: dbInsertErr } = await supabase
         .from('media')
         .insert([{
@@ -166,23 +182,33 @@ export default function ProjectDetails() {
 
       if (dbInsertErr) throw dbInsertErr;
 
-      // 4. "Megbökjük" a projekt tábla updated_at mezőjét, hogy a Realtime azonnal frissítsen mindenkit
+      // 4. "Megbökjük" a projekt táblát a valós idejű szinkronizációhoz
       await supabase
         .from('projects')
         .update({ updated_at: new Date().toISOString() })
         .eq('id', id);
 
-      // Siker! Űrlap törlése és adatok újratöltése
+      // Sikeres befejezés
+      setSelectedFile(null);
+      setFilePreview(null);
       setPhotoComment('');
       setIsIssue(false);
       await loadData();
-      alert("Fénykép sikeresen feltöltve!");
+      alert("Fénykép sikeresen feltöltve! 👍");
     } catch (err) {
       console.error("Feltöltési hiba:", err);
       setError("Feltöltés sikertelen: " + err.message);
     } finally {
       setUploading(false);
     }
+  };
+
+  // Visszavonás
+  const cancelPhotoUpload = () => {
+    setSelectedFile(null);
+    setFilePreview(null);
+    setPhotoComment('');
+    setIsIssue(false);
   };
 
   const handleArchiveProject = async () => {
@@ -390,79 +416,161 @@ export default function ProjectDetails() {
         <div className="shdr-a">{photos.length} db</div>
       </div>
 
-      {/* Kép feltöltése zóna és megjegyzés rovat */}
-      <div className="px-5 fu d4 space-y-3">
-        <div>
-          <label style={{
-            color: 'var(--t2)',
-            fontSize: '11px',
-            fontWeight: '600',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-            marginBottom: '5px',
-            display: 'block'
-          }}>Megjegyzés a képhez (opcionális)</label>
-          <input 
-            type="text" 
-            value={photoComment} 
-            onChange={(e) => setPhotoComment(e.target.value)}
-            placeholder="Írd le mi látható a képen, vagy mi a probléma..."
-            style={{
-              background: 'var(--s1)',
-              border: '1px solid var(--b1)',
-              borderRadius: '10px',
-              padding: '8px 12px',
-              color: 'var(--t1)',
-              fontSize: '13px',
-              width: '100%',
-              outline: 'none'
-            }}
-          />
-        </div>
-
-        {/* Hiba bejelentése checkbox */}
-        <div className="flex items-center space-x-2.5 py-1">
-          <div 
-            onClick={() => setIsIssue(!isIssue)} 
-            className="w-5.5 h-5.5 rounded-md flex items-center justify-center border cursor-pointer transition-all"
-            style={{
-              background: isIssue ? 'rgba(255, 59, 48, 0.25)' : 'rgba(255,255,255,0.05)',
-              borderColor: isIssue ? 'var(--red)' : 'rgba(255,255,255,0.2)'
-            }}
-          >
-            {isIssue && <span className="text-red-400 text-xs font-bold">✓</span>}
-          </div>
-          <span 
-            onClick={() => setIsIssue(!isIssue)}
-            className="text-xs font-bold cursor-pointer select-none"
-            style={{ color: isIssue ? 'var(--red)' : 'var(--t2)' }}
-          >
-            ⚠️ Hiba / Akadály bejelentése (Hiba fotóként jelölve)
-          </span>
-        </div>
-
+      {/* Kép feltöltése zóna */}
+      <div className="px-5 fu d4">
         <label className="upload-area block relative overflow-hidden" style={{ background: 'var(--s1)', border: '1.5px dashed var(--b2)', borderRadius: '22px' }}>
           <input 
             type="file" 
             accept="image/*" 
-            onChange={handlePhotoUpload} 
+            onChange={handlePhotoSelected} 
             disabled={uploading}
             className="hidden" 
           />
           {uploading ? (
             <div className="py-6 flex flex-col items-center justify-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-2"></div>
-              <div className="ua-t">Checkpoint feltöltése...</div>
+              <div className="ua-t">Feltöltés folyamatban...</div>
             </div>
           ) : (
             <div className="py-4 text-center cursor-pointer">
               <span className="ua-ico text-3xl block mb-1">📸</span>
-              <span className="ua-t text-sm font-bold text-slate-200">Kép rögzítése és beküldése</span>
-              <span className="ua-s text-[10px] text-slate-400 block mt-1">Kattints a kamera megnyitásához vagy fájl választáshoz</span>
+              <span className="ua-t text-sm font-bold text-slate-200">Fénykép készítése és beküldése</span>
+              <span className="ua-s text-[10px] text-slate-400 block mt-1">Kattints a kamera megnyitásához</span>
             </div>
           )}
         </label>
       </div>
+
+      {/* KÉPFELTÖLTÉSI VARÁZSLÓ MODAL (Apple-stílusú overlay) */}
+      {selectedFile && (
+        <div 
+          className="fixed inset-0 z-[1000] flex items-center justify-center p-4" 
+          style={{ 
+            background: 'rgba(7, 9, 15, 0.85)', 
+            backdropFilter: 'blur(20px)', 
+            WebkitBackdropFilter: 'blur(20px)' 
+          }}
+        >
+          <div 
+            className="w-full max-w-sm overflow-hidden animate-[scaleUp_0.25s_ease-out]" 
+            style={{ 
+              background: 'var(--s1)', 
+              border: '1px solid var(--b1)', 
+              borderRadius: '24px', 
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' 
+            }}
+          >
+            {/* Modal Fejléc */}
+            <div className="p-4 border-b border-white/5 flex justify-between items-center">
+              <span className="text-xs font-bold text-slate-100">📸 Fénykép ellenőrzése</span>
+              <button type="button" onClick={cancelPhotoUpload} className="text-slate-400 hover:text-white text-xs">Bezárás</button>
+            </div>
+
+            <form onSubmit={submitPhotoUpload} className="p-4 space-y-4">
+              {/* Fotó előnézet */}
+              {filePreview && (
+                <div 
+                  className="w-full aspect-video rounded-xl"
+                  style={{
+                    backgroundImage: `url(${filePreview})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    border: '1px solid var(--b1)',
+                    aspectRatio: '16 / 9'
+                  }}
+                />
+              )}
+
+              {/* TÍPUS KIVÁLASZTÁSA (2 hatalmas, gyönyörű Apple kártya egymás mellett) */}
+              <div>
+                <label className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-2 block">Mi látható ezen a képen?</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Kártya 1: Munkafolyamat */}
+                  <div 
+                    onClick={() => setIsIssue(false)}
+                    className="p-3 rounded-xl cursor-pointer flex flex-col items-center justify-center space-y-1 transition-all"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.02)',
+                      border: !isIssue ? '2px solid var(--green)' : '1px solid var(--b1)',
+                      boxShadow: !isIssue ? '0 4px 15px rgba(46, 209, 88, 0.15)' : 'none'
+                    }}
+                  >
+                    <span className="text-xl">🟢</span>
+                    <span className="text-[11px] font-bold text-slate-200">Munkafolyamat</span>
+                  </div>
+
+                  {/* Kártya 2: Hiba */}
+                  <div 
+                    onClick={() => setIsIssue(true)}
+                    className="p-3 rounded-xl cursor-pointer flex flex-col items-center justify-center space-y-1 transition-all"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.02)',
+                      border: isIssue ? '2px solid var(--red)' : '1px solid var(--b1)',
+                      boxShadow: isIssue ? '0 4px 15px rgba(255, 59, 48, 0.15)' : 'none'
+                    }}
+                  >
+                    <span className="text-xl">⚠️</span>
+                    <span className="text-[11px] font-bold text-slate-200">Hiba / Akadály</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* MEGJEGYZÉS (Ha hiba, akkor KÖTELEZŐ) */}
+              <div>
+                <label className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1 block">
+                  {isIssue ? '🔴 Probléma leírása (KÖTELEZŐ)' : 'Megjegyzés a képhez (Opcionális)'}
+                </label>
+                <input 
+                  type="text" 
+                  value={photoComment} 
+                  onChange={(e) => setPhotoComment(e.target.value)}
+                  required={isIssue}
+                  placeholder={isIssue ? "pl. Törött a napelem sarka..." : "pl. Sínek felszerelve a tetőre..."}
+                  style={{
+                    background: 'var(--s2)',
+                    border: isIssue && !photoComment.trim() ? '1px solid rgba(255, 59, 48, 0.5)' : '1px solid var(--b1)',
+                    borderRadius: '10px',
+                    padding: '8px 12px',
+                    color: 'var(--t1)',
+                    fontSize: '12px',
+                    width: '100%',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              {/* AKCIÓ GOMBOK */}
+              <div className="flex space-x-3 pt-2">
+                <button 
+                  type="button" 
+                  onClick={cancelPhotoUpload} 
+                  className="flex-1 py-2 font-bold text-xs rounded-xl"
+                  style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--t2)', border: '1px solid var(--b1)' }}
+                >
+                  Mégsem
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={uploading}
+                  className="flex-1 py-2 font-bold text-xs rounded-xl transition-all"
+                  style={{
+                    background: isIssue 
+                      ? 'linear-gradient(135deg, #ff3b30, #ff453a)' 
+                      : 'linear-gradient(135deg, #2ed158, #1ca542)',
+                    color: '#fff',
+                    border: 'none',
+                    boxShadow: isIssue 
+                      ? '0 6px 15px rgba(255, 59, 48, 0.2)' 
+                      : '0 6px 15px rgba(46, 209, 88, 0.2)'
+                  }}
+                >
+                  {uploading ? 'Feltöltés...' : 'Fotó Beküldése'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Galéria Rács (Modern 2-oszlopos Kártyarendszer megjegyzésekkel) */}
       <div className="px-5 mt-4 pb-20 fu d5">
