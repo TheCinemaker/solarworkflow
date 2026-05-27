@@ -214,6 +214,28 @@ export default function ProjectDetails() {
         </div>
       </div>
 
+      {/* Telegram Csoport Link Gomb */}
+      {project?.telegram_link && (
+        <div className="px-5 mt-3.5 fu d1">
+          <a 
+            href={project.telegram_link} 
+            target="_blank" 
+            rel="noreferrer"
+            className="w-full font-bold flex items-center justify-center space-x-2 pt-2.5 pb-2.5 text-center text-sm"
+            style={{
+              background: 'linear-gradient(135deg, #0088cc, #006699)',
+              borderRadius: '12px',
+              color: '#fff',
+              border: '1px solid rgba(0, 136, 204, 0.4)',
+              boxShadow: '0 8px 25px rgba(0, 136, 204, 0.25)'
+            }}
+          >
+            <span>💬</span>
+            <span>Közös Telegram Csoport</span>
+          </a>
+        </div>
+      )}
+
       {error && (
         <div className="mx-5 mt-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-xs">
           {error}

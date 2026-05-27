@@ -11,6 +11,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
   const [endTime, setEndTime] = useState('');     // Befejezési dátum
   const [importantInfo, setImportantInfo] = useState('');
   const [tasks, setTasks] = useState('');
+  const [telegramLink, setTelegramLink] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -31,7 +32,8 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
       start_time: startTime,
       end_time: endTime,
       important_info: importantInfo,
-      tasks
+      tasks,
+      telegram_link: telegramLink
     }]);
 
     if (insertError) {
@@ -54,6 +56,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
     setEndTime('');
     setImportantInfo('');
     setTasks('');
+    setTelegramLink('');
   };
 
   const inputStyle = {
@@ -148,6 +151,11 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
           <div>
             <label style={labelStyle}>Fontos Infó (pl. kulcs helye)</label>
             <input type="text" value={importantInfo} onChange={(e) => setImportantInfo(e.target.value)} placeholder="pl. Kulcs a villanyóra szekrényben" style={inputStyle} />
+          </div>
+
+          <div>
+            <label style={labelStyle}>Telegram Csoport Link (opcionális)</label>
+            <input type="text" value={telegramLink} onChange={(e) => setTelegramLink(e.target.value)} placeholder="https://t.me/joinchat/..." style={inputStyle} />
           </div>
 
           <div>
