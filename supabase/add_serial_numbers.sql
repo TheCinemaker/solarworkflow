@@ -1,13 +1,17 @@
--- A meglévő projektek táblájának bővítése
+-- A meglévő projektek táblájának bővítése új mezőkkel
 ALTER TABLE public.projects 
 ADD COLUMN IF NOT EXISTS serial_number TEXT,
-ADD COLUMN IF NOT EXISTS tasks TEXT;
+ADD COLUMN IF NOT EXISTS tasks TEXT,
+ADD COLUMN IF NOT EXISTS client_phone TEXT,
+ADD COLUMN IF NOT EXISTS start_time TEXT,
+ADD COLUMN IF NOT EXISTS end_time TEXT,
+ADD COLUMN IF NOT EXISTS important_info TEXT;
 
 -- A meglévő dolgozók (profiles) táblájának bővítése
 ALTER TABLE public.profiles
 ADD COLUMN IF NOT EXISTS serial_number TEXT;
 
--- A régi auth trigger törlése és új létrehozása, hogy kezelje a serial_number-t is
+-- A régi auth trigger törlése és új létrehozása
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 DROP FUNCTION IF EXISTS public.handle_new_user();
 
