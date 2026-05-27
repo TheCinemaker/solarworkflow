@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 export default function ProjectList() {
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [activeTab, setActiveTab] = useState('active'); // 'active' vagy 'archived'
+  const [searchQuery, setSearchQuery] = useState('');   // Valós idejű keresési lekérdezés
 
   async function fetchProjects() {
     const isArchived = activeTab === 'archived';
@@ -32,6 +33,18 @@ export default function ProjectList() {
     };
   }, [activeTab]);
 
+  // Keresési szűrés név, cím vagy sorszám alapján
+  const filteredProjects = projects.filter(proj => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+
+    const nameMatch = proj.name ? proj.name.toLowerCase().includes(query) : false;
+    const addrMatch = proj.address ? proj.address.toLowerCase().includes(query) : false;
+    const serialMatch = proj.serial_number ? proj.serial_number.toLowerCase().includes(query) : false;
+    
+    return nameMatch || addrMatch || serialMatch;
+  });
+
   const tabStyle = (tabName) => ({
     flex: 1,
     padding: '8px 0',
@@ -48,7 +61,7 @@ export default function ProjectList() {
 
   return (
     <div className="page active scroll-area">
-      <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza</div>
+      <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
       
       <div className="page-header fu">
         <div>
@@ -57,28 +70,63 @@ export default function ProjectList() {
       </div>
 
       {/* TABS (Aktív / Archivált szűrő) */}
-      <div className="mx-5 mb-4 p-1 rounded-xl flex items-center" style={{ background: 'var(--s1)', border: '1px solid var(--b1)' }}>
+      <div className="mx-5 mb-3 p-1 rounded-xl flex items-center" style={{ background: 'var(--s1)', border: '1px solid var(--b1)' }}>
         <div 
-          onClick={() => setActiveTab('active')} 
+          onClick={() => {
+            setActiveTab('active');
+            setSearchQuery('');
+          }} 
           style={tabStyle('active')}
         >
           ⚡ Aktív munkák
         </div>
         <div 
-          onClick={() => setActiveTab('archived')} 
+          onClick={() => {
+            setActiveTab('archived');
+            setSearchQuery('');
+          }} 
           style={tabStyle('archived')}
         >
           🗂 Archivált / Kész
         </div>
       </div>
 
-      <div className="hscroll fu d3" style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '15px', pb: '80px' }}>
-        {projects.length === 0 ? (
-          <div className="text-center text-slate-500 text-sm italic w-full mt-4 py-8" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px' }}>
-            Nincsenek {activeTab === 'active' ? 'aktív' : 'archivált'} projektek.
+      {/* 🔍 MODERNEBB APPLE STÍLUSÚ VALÓS IDEJŰ KERESŐ */}
+      <div className="mx-5 mb-4 relative fu d2">
+        <input 
+          type="text" 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Keresés név, utca vagy sorszám alapján..."
+          className="w-full text-xs font-semibold"
+          style={{
+            background: 'var(--s1)',
+            border: '1px solid var(--b1)',
+            borderRadius: '12px',
+            padding: '10px 14px 10px 36px',
+            color: 'var(--t1)',
+            outline: 'none',
+            transition: 'all 0.15s ease'
+          }}
+        />
+        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" style={{ fontSize: '13px' }}>🔍</span>
+        {searchQuery && (
+          <button 
+            onClick={() => setSearchQuery('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white/10 hover:bg-white/20 text-[8px] flex items-center justify-center text-slate-300 font-bold transition-all"
+          >
+            ✕
+          </button>
+        )}
+      </div>
+
+      <div className="hscroll fu d3" style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '15px', paddingBottom: '100px' }}>
+        {filteredProjects.length === 0 ? (
+          <div className="text-center text-slate-500 text-sm italic w-full mt-2 py-8" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px' }}>
+            {searchQuery ? 'Nincs a keresésnek megfelelő projekt.' : `Nincsenek ${activeTab === 'active' ? 'aktív' : 'archivált'} projektek.`}
           </div>
         ) : (
-          projects.map(proj => {
+          filteredProjects.map(proj => {
             // Dinamikus haladás számítás
             const tasksList = proj.tasks ? proj.tasks.split('\n').map(t => t.trim()).filter(Boolean) : [];
             const totalTasks = tasksList.length;
@@ -88,7 +136,7 @@ export default function ProjectList() {
             return (
               <div 
                 key={proj.id} 
-                className="pc" 
+                className="pc animate-[fadeIn_0.2s_ease-out]" 
                 style={{ 
                   minWidth: '100%',
                   border: proj.archived ? '1px solid rgba(255,255,255,0.05)' : '1px solid var(--b1)',

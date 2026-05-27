@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import EditProjectModal from '../components/EditProjectModal';
 
 export default function ProjectDetails() {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ export default function ProjectDetails() {
   const [photos, setPhotos] = useState([]);
   const [photoComment, setPhotoComment] = useState('');
   const [isIssue, setIsIssue] = useState(false); // Hiba/Munkafolyamat megkülönböztetés
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null); // Feltöltendő fájl átmenetileg
   const [filePreview, setFilePreview] = useState(null); // Előnézet URL
@@ -263,7 +265,20 @@ export default function ProjectDetails() {
 
   return (
     <div className="page active scroll-area" id="p-detail">
-      <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
+      <div className="flex justify-between items-center px-5 mb-2.5 fu">
+        <div className="back-btn" style={{ margin: 0 }} onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
+        <button 
+          onClick={() => setIsEditModalOpen(true)}
+          className="px-3.5 py-1.5 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all hover:scale-[1.03] active:scale-97 flex items-center space-x-1"
+          style={{
+            background: 'rgba(79, 142, 247, 0.12)',
+            color: 'var(--blue)',
+            border: '1px solid rgba(79, 142, 247, 0.25)'
+          }}
+        >
+          <span>✏️ Projekt Szerkesztése</span>
+        </button>
+      </div>
 
       {/* Archivált Banner */}
       {project?.archived && (
@@ -870,6 +885,15 @@ export default function ProjectDetails() {
           </div>
         )}
       </div>
+
+      <EditProjectModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        project={project}
+        onSuccess={() => {
+          loadData();
+        }}
+      />
     </div>
   );
 }
