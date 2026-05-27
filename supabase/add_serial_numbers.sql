@@ -8,7 +8,8 @@ ADD COLUMN IF NOT EXISTS end_time TEXT,
 ADD COLUMN IF NOT EXISTS important_info TEXT,
 ADD COLUMN IF NOT EXISTS completed_tasks JSONB DEFAULT '[]'::jsonb,
 ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now(),
-ADD COLUMN IF NOT EXISTS telegram_link TEXT;
+ADD COLUMN IF NOT EXISTS telegram_link TEXT,
+ADD COLUMN IF NOT EXISTS archived BOOLEAN DEFAULT false;
 
 -- A meglévő dolgozók (profiles) táblájának bővítése
 ALTER TABLE public.profiles

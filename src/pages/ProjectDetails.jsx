@@ -185,6 +185,26 @@ export default function ProjectDetails() {
     }
   };
 
+  const handleArchiveProject = async () => {
+    if (window.confirm("Biztosan archiválod ezt a projektet? Lezárás után átkerül az Archiváltak közé.")) {
+      const { error } = await supabase.from('projects').update({ archived: true }).eq('id', id);
+      if (error) alert(error.message);
+      else {
+        alert("Projekt sikeresen archiválva!");
+        navigate('/projects');
+      }
+    }
+  };
+
+  const handleRestoreProject = async () => {
+    const { error } = await supabase.from('projects').update({ archived: false }).eq('id', id);
+    if (error) alert(error.message);
+    else {
+      alert("Projekt visszaállítva aktív állapotba!");
+      await loadData();
+    }
+  };
+
   if (loading) {
     return (
       <div className="page active flex items-center justify-center h-screen text-slate-400">
@@ -199,6 +219,23 @@ export default function ProjectDetails() {
   return (
     <div className="page active scroll-area" id="p-detail">
       <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
+
+      {/* Archivált Banner */}
+      {project?.archived && (
+        <div className="mx-5 mb-4 p-3 rounded-2xl flex items-center justify-between text-xs font-semibold" style={{ background: 'rgba(255, 214, 10, 0.12)', border: '1px solid rgba(255, 214, 10, 0.25)', color: '#ffd60a' }}>
+          <div className="flex items-center space-x-2">
+            <span>🗂</span>
+            <span>Ez egy lezárt, archivált projekt.</span>
+          </div>
+          <button 
+            onClick={handleRestoreProject}
+            className="px-2.5 py-1 rounded-lg font-bold transition-all hover:scale-[1.03]"
+            style={{ background: '#ffd60a', color: '#000', border: 'none' }}
+          >
+            Visszaállítás aktívvá
+          </button>
+        </div>
+      )}
       
       {/* Fő Kártya (Hero Panel) */}
       <div className="dhero fu d1">
@@ -237,6 +274,27 @@ export default function ProjectDetails() {
             <span>💬</span>
             <span>Közös Telegram Csoport</span>
           </a>
+        </div>
+      )}
+
+      {/* Archiválás Gomb (Csak ha még nincs lezárva) */}
+      {!project?.archived && (
+        <div className="px-5 mt-2.5 fu d1">
+          <button 
+            onClick={handleArchiveProject} 
+            className="w-full font-bold flex items-center justify-center space-x-2 pt-2.5 pb-2.5 text-center text-sm"
+            style={{
+              background: progressPercent === 100 ? 'linear-gradient(135deg, #ffd60a, #ccab00)' : 'rgba(255,255,255,0.05)',
+              borderRadius: '12px',
+              color: progressPercent === 100 ? '#000' : 'var(--t2)',
+              border: progressPercent === 100 ? 'none' : '1px solid var(--b1)',
+              boxShadow: progressPercent === 100 ? '0 8px 25px rgba(255, 214, 10, 0.2)' : 'none',
+              cursor: 'pointer'
+            }}
+          >
+            <span>🗂</span>
+            <span>{progressPercent === 100 ? 'Projekt Archiválása (100% Kész!)' : 'Projekt Archiválása (Lezárás)'}</span>
+          </button>
         </div>
       )}
 

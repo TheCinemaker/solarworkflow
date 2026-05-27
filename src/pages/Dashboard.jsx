@@ -33,7 +33,7 @@ export default function Dashboard() {
 
     async function fetchData() {
       // Fetch stats
-      const { count: projectsCount } = await supabase.from('projects').select('*', { count: 'exact', head: true });
+      const { count: projectsCount } = await supabase.from('projects').select('*', { count: 'exact', head: true }).eq('archived', false);
       const { count: workersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
       const { count: worklogsCount } = await supabase.from('worklogs').select('*', { count: 'exact', head: true }).eq('date', new Date().toISOString().split('T')[0]);
       
@@ -43,8 +43,8 @@ export default function Dashboard() {
         worklogs: worklogsCount || 0
       });
 
-      // Fetch projects
-      const { data: projectsData } = await supabase.from('projects').select('*').order('created_at', { ascending: false }).limit(5);
+      // Fetch projects (Csak az aktívakat listázzuk ki)
+      const { data: projectsData } = await supabase.from('projects').select('*').eq('archived', false).order('created_at', { ascending: false }).limit(5);
       if (projectsData) setProjects(projectsData);
 
       // Fetch activities (Worklogs as mock activity for now)
