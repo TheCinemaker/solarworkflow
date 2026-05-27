@@ -70,28 +70,28 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
 
   const labelStyle = {
     color: 'var(--t2)',
-    fontSize: '11px',
+    fontSize: '13px', // Megnövelve 2px-szel (11px-ről)
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: '0.05em',
-    marginBottom: '4px',
+    marginBottom: '6px', // Nagyobb térköz a címke és az input között
     display: 'block'
   };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: 'rgba(7, 9, 15, 0.75)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
-      <div className="w-full max-w-md relative max-h-[95vh] overflow-y-auto" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px', padding: '16px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+      <div className="w-full max-w-md relative max-h-[95vh] overflow-y-auto" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px', padding: '20px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
         <button 
           onClick={onClose}
-          className="absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded-full"
+          className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-full"
           style={{ background: 'var(--s2)', color: 'var(--t2)' }}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
         
-        <div className="flex items-center space-x-3 mb-3">
+        <div className="flex items-center space-x-3 mb-4">
           <div className="w-8 h-8 rounded-[8px] flex items-center justify-center" style={{ background: 'rgba(79, 142, 247, 0.15)', border: '1px solid rgba(79, 142, 247, 0.3)' }}>
             <span style={{ fontSize: '16px' }}>⚡</span>
           </div>
@@ -106,7 +106,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-2">
+        <form onSubmit={handleSubmit} className="space-y-3"> {/*space-y-2 helyett space-y-3 a nagyobb térközért*/}
           <div className="grid grid-cols-3 gap-2">
             <div className="col-span-1">
               <label style={labelStyle}>Sorszám / ID</label>
