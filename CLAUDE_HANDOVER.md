@@ -92,6 +92,7 @@ We recently updated the database tables to support the new modular forms. The us
 10. **Worker Pay & Hour Tracker (Finance.jsx)**: Completed the full finance view! It queries profiles and worklogs to aggregate total hours worked and estimated payouts dynamically (Hungarian standard 3,500 Ft/hr basis) with real-time sync.
 11. **Centralized Visual Issue Feed (Issues.jsx)**: Implemented the visual "Hibák és Visszajárás" dashboard. It queries all site checkpoint photos with descriptions to form a real-time central feed of construction blockers and client remarks, linking directly to each project detail view.
 12. **Telegram Project Association**: Added a `telegram_link` field to `NewProjectModal.jsx` and built a gorgeous, custom glowing blue button in `ProjectDetails.jsx` linking directly to the project's Telegram group for instant on-site team communication.
+13. **Before / After Defect Resolution**: Designed and coded a complete visual defect resolution lifecycle! Workers can mark open issues as fixed by providing a mandatory resolution photo and description. The database automatically logs the resolver, resolution timestamp, and photo. Resolved issues display in a stunning side-by-side Before/After comparison card.
 
 ---
 
