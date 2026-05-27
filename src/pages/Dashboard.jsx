@@ -36,11 +36,13 @@ export default function Dashboard() {
       const { count: projectsCount } = await supabase.from('projects').select('*', { count: 'exact', head: true }).eq('archived', false);
       const { count: workersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
       const { count: worklogsCount } = await supabase.from('worklogs').select('*', { count: 'exact', head: true }).eq('date', new Date().toISOString().split('T')[0]);
+      const { count: issuesCount } = await supabase.from('media').select('*', { count: 'exact', head: true }).eq('is_issue', true).eq('resolved', false);
       
       setStats({
         projects: projectsCount || 0,
         workers: workersCount || 0,
-        worklogs: worklogsCount || 0
+        worklogs: worklogsCount || 0,
+        issues: issuesCount || 0
       });
 
       // Fetch projects (Csak az aktívakat listázzuk ki)
@@ -58,12 +60,13 @@ export default function Dashboard() {
     
     fetchData();
 
-    // REALTIME SUBSCRIBER: Valós idejű szinkronizáció projektekre, profilokra és munkalapokra
+    // REALTIME SUBSCRIBER: Valós idejű szinkronizáció projektekre, profilokra, munkalapokra és médiákra (hibákra)
     const channel = supabase
       .channel('dashboard-realtime-sync')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, () => { fetchData(); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => { fetchData(); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'worklogs' }, () => { fetchData(); })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'media' }, () => { fetchData(); })
       .subscribe();
 
     return () => {
@@ -114,8 +117,8 @@ export default function Dashboard() {
         </div>
         <div className="sc" onClick={() => navigate('/issues')}>
           <div className="sc-lbl">Nyitott hibák</div>
-          <div className="sc-val" style={{color:'#ff3b30'}}>0</div>
-          <div className="sc-sub">0 visszajárás</div>
+          <div className="sc-val" style={{color:'#ff3b30'}}>{stats.issues}</div>
+          <div className="sc-sub">⚠️ Aktív visszajárás</div>
         </div>
       </div>
 

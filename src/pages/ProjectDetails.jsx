@@ -59,6 +59,10 @@ export default function ProjectDetails() {
           file_path,
           description,
           is_issue,
+          resolved,
+          resolved_at,
+          resolved_comment,
+          resolved_file_path,
           created_at,
           profiles:profiles!user_id (full_name, serial_number)
         `)
@@ -594,7 +598,9 @@ export default function ProjectDetails() {
                   className="rounded-2xl overflow-hidden flex flex-col relative"
                   style={{
                     background: 'var(--s1)',
-                    border: photo.is_issue ? '1px solid rgba(255, 59, 48, 0.4)' : '1px solid var(--b1)',
+                    border: photo.resolved 
+                      ? '1px solid rgba(46, 209, 88, 0.4)' 
+                      : (photo.is_issue ? '1px solid rgba(255, 59, 48, 0.4)' : '1px solid var(--b1)'),
                     backdropFilter: 'blur(8px)',
                     WebkitBackdropFilter: 'blur(8px)'
                   }}
@@ -614,11 +620,13 @@ export default function ProjectDetails() {
                   >
                     {/* Hiba vs Munkafolyamat Jelvény ráúsztatva a képre */}
                     <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[8px] font-extrabold uppercase tracking-wider text-white" style={{
-                      background: photo.is_issue ? 'rgba(255, 59, 48, 0.85)' : 'rgba(46, 209, 88, 0.85)',
+                      background: photo.resolved 
+                        ? 'rgba(46, 209, 88, 0.9)' 
+                        : (photo.is_issue ? 'rgba(255, 59, 48, 0.9)' : 'rgba(46, 209, 88, 0.85)'),
                       backdropFilter: 'blur(4px)',
                       WebkitBackdropFilter: 'blur(4px)'
                     }}>
-                      {photo.is_issue ? '⚠️ Hiba' : '🟢 Haladás'}
+                      {photo.resolved ? '🟢 Kijavítva' : (photo.is_issue ? '⚠️ Hiba' : '🟢 Haladás')}
                     </div>
                   </a>
                   
@@ -631,14 +639,46 @@ export default function ProjectDetails() {
                     
                     {photo.description ? (
                       <div className="text-xs font-medium italic mt-1.5 p-1.5 rounded-lg border leading-snug" style={{ 
-                        background: photo.is_issue ? 'rgba(255, 59, 48, 0.08)' : 'rgba(255, 255, 255, 0.03)', 
-                        borderColor: photo.is_issue ? 'rgba(255, 59, 48, 0.15)' : 'rgba(255, 255, 255, 0.06)',
-                        color: photo.is_issue ? 'var(--red)' : 'var(--t1)'
+                        background: photo.resolved 
+                          ? 'rgba(46, 209, 88, 0.05)' 
+                          : (photo.is_issue ? 'rgba(255, 59, 48, 0.08)' : 'rgba(255, 255, 255, 0.03)'), 
+                        borderColor: photo.resolved 
+                          ? 'rgba(46, 209, 88, 0.15)' 
+                          : (photo.is_issue ? 'rgba(255, 59, 48, 0.15)' : 'rgba(255, 255, 255, 0.06)'),
+                        color: photo.resolved 
+                          ? 'var(--green)' 
+                          : (photo.is_issue ? 'var(--red)' : 'var(--t1)')
                       }}>
                         💬 {photo.description}
                       </div>
                     ) : (
                       <div className="text-[10px] text-slate-500 italic mt-1">Nincs leírás</div>
+                    )}
+
+                    {/* JAVÍTÁS KÉPE ÉS LEÍRÁSA (Ha van) */}
+                    {photo.resolved && (
+                      <div className="mt-2 pt-2 border-t border-white/5 space-y-1.5">
+                        <div className="text-[9px] text-emerald-400 font-extrabold uppercase tracking-wider">✅ Javítás Igazolása:</div>
+                        {photo.resolved_file_path && (
+                          <a 
+                            href={photo.resolved_file_path} 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            className="block aspect-video rounded-lg overflow-hidden border border-emerald-500/20 relative"
+                            style={{
+                              backgroundImage: `url(${photo.resolved_file_path})`,
+                              backgroundSize: 'cover',
+                              backgroundPosition: 'center',
+                              aspectRatio: '16 / 9'
+                            }}
+                          >
+                            <div className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-emerald-500/80 text-[7px] text-white font-bold">Nagyítás</div>
+                          </a>
+                        )}
+                        <div className="text-[10px] text-slate-300 italic p-1.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 leading-snug">
+                          🛠️ {photo.resolved_comment || 'Sikeresen javítva.'}
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>

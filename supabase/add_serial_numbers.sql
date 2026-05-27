@@ -79,3 +79,8 @@ BEGIN
     RAISE NOTICE 'media már tagja, kihagyás...';
   END;
 END $$;
+
+-- RLS (Row Level Security) UPDATE engedélyezése a media táblára
+-- Ez szükséges ahhoz, hogy a dolgozók módosíthassák a hiba állapotát (resolved: true stb.)
+DROP POLICY IF EXISTS "Enable update for authenticated users" ON public.media;
+CREATE POLICY "Enable update for authenticated users" ON public.media FOR UPDATE TO authenticated USING (true);
