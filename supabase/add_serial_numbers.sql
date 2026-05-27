@@ -19,9 +19,10 @@ ALTER TABLE public.worklogs
 ADD COLUMN IF NOT EXISTS start_time TEXT,
 ADD COLUMN IF NOT EXISTS end_time TEXT;
 
--- Média (media) tábla bővítése leírás (description) mezővel a kép megjegyzésekhez
+-- Média (media) tábla bővítése leírás (description) és is_issue (hiba flag) mezőkkel
 ALTER TABLE public.media
-ADD COLUMN IF NOT EXISTS description TEXT;
+ADD COLUMN IF NOT EXISTS description TEXT,
+ADD COLUMN IF NOT EXISTS is_issue BOOLEAN DEFAULT false;
 
 -- A régi auth trigger törlése és új létrehozása
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
@@ -46,8 +47,6 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
 -- GOLYÓÁLLÓ REALTIME BEKAPCSOLÁS
--- Ha egy tábla már tagja a publikációnak, a Postgres hibát dobna.
--- Ezzel a PL/pgSQL blokkal elkapjuk és figyelmen kívül hagyjuk a hibát, így a futtatás sikeres lesz!
 DO $$
 BEGIN
   BEGIN

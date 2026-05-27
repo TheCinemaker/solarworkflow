@@ -10,19 +10,20 @@ export default function Issues() {
 
   async function loadIssues() {
     try {
-      // Lekérünk minden olyan médiát, amihez van csatolva szöveges leírás (ezek a helyszíni megjegyzések/hibák)
+      // Lekérünk minden olyan médiát, ami hiba fotóként (is_issue = true) lett megjelölve
       const { data, error: issuesErr } = await supabase
         .from('media')
         .select(`
           id,
           file_path,
           description,
+          is_issue,
           created_at,
           project_id,
           profiles (full_name, serial_number),
           projects (name, serial_number)
         `)
-        .neq('description', '')
+        .eq('is_issue', true)
         .order('created_at', { ascending: false });
 
       if (issuesErr) throw issuesErr;

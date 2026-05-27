@@ -12,6 +12,7 @@ export default function ProjectDetails() {
   // Fényképek, megjegyzések és feltöltés állapotai
   const [photos, setPhotos] = useState([]);
   const [photoComment, setPhotoComment] = useState('');
+  const [isIssue, setIsIssue] = useState(false); // Hiba/Munkafolyamat megkülönböztetés
   const [currentUser, setCurrentUser] = useState(null);
   
   const [uploading, setUploading] = useState(false);
@@ -55,6 +56,7 @@ export default function ProjectDetails() {
           id,
           file_path,
           description,
+          is_issue,
           created_at,
           profiles (full_name, serial_number)
         `)
@@ -151,14 +153,15 @@ export default function ProjectDetails() {
 
       const publicUrl = urlData.publicUrl;
 
-      // 3. Rekord mentése a public.media táblába a megjegyzéssel együtt
+      // 3. Rekord mentése a public.media táblába a megjegyzéssel és a hiba flaggel együtt
       const { error: dbInsertErr } = await supabase
         .from('media')
         .insert([{
           project_id: id,
           user_id: currentUser?.id,
           file_path: publicUrl,
-          description: photoComment || ''
+          description: photoComment || '',
+          is_issue: isIssue
         }]);
 
       if (dbInsertErr) throw dbInsertErr;
@@ -171,6 +174,7 @@ export default function ProjectDetails() {
 
       // Siker! Űrlap törlése és adatok újratöltése
       setPhotoComment('');
+      setIsIssue(false);
       await loadData();
       alert("Fénykép sikeresen feltöltve!");
     } catch (err) {
@@ -339,12 +343,12 @@ export default function ProjectDetails() {
             letterSpacing: '0.05em',
             marginBottom: '5px',
             display: 'block'
-          }}>Megjegyzés a képhez (pl. ha baj van / hiba jelentés)</label>
+          }}>Megjegyzés a képhez (opcionális)</label>
           <input 
             type="text" 
             value={photoComment} 
             onChange={(e) => setPhotoComment(e.target.value)}
-            placeholder="Írd ide, ha valami nem stimmel, pl. törött vagy karcos..."
+            placeholder="Írd le mi látható a képen, vagy mi a probléma..."
             style={{
               background: 'var(--s1)',
               border: '1px solid var(--b1)',
@@ -356,6 +360,27 @@ export default function ProjectDetails() {
               outline: 'none'
             }}
           />
+        </div>
+
+        {/* Hiba bejelentése checkbox */}
+        <div className="flex items-center space-x-2.5 py-1">
+          <div 
+            onClick={() => setIsIssue(!isIssue)} 
+            className="w-5.5 h-5.5 rounded-md flex items-center justify-center border cursor-pointer transition-all"
+            style={{
+              background: isIssue ? 'rgba(255, 59, 48, 0.25)' : 'rgba(255,255,255,0.05)',
+              borderColor: isIssue ? 'var(--red)' : 'rgba(255,255,255,0.2)'
+            }}
+          >
+            {isIssue && <span className="text-red-400 text-xs font-bold">✓</span>}
+          </div>
+          <span 
+            onClick={() => setIsIssue(!isIssue)}
+            className="text-xs font-bold cursor-pointer select-none"
+            style={{ color: isIssue ? 'var(--red)' : 'var(--t2)' }}
+          >
+            ⚠️ Hiba / Akadály bejelentése (Hiba fotóként jelölve)
+          </span>
         </div>
 
         <label className="upload-area block relative overflow-hidden" style={{ background: 'var(--s1)', border: '1.5px dashed var(--b2)', borderRadius: '22px' }}>
@@ -374,7 +399,7 @@ export default function ProjectDetails() {
           ) : (
             <div className="py-4 text-center cursor-pointer">
               <span className="ua-ico text-3xl block mb-1">📸</span>
-              <span className="ua-t text-sm font-bold text-slate-200">Checkpoint fotó készítése / feltöltése</span>
+              <span className="ua-t text-sm font-bold text-slate-200">Kép rögzítése és beküldése</span>
               <span className="ua-s text-[10px] text-slate-400 block mt-1">Kattints a kamera megnyitásához vagy fájl választáshoz</span>
             </div>
           )}
@@ -400,10 +425,10 @@ export default function ProjectDetails() {
               return (
                 <div 
                   key={photo.id || index} 
-                  className="rounded-2xl overflow-hidden flex flex-col"
+                  className="rounded-2xl overflow-hidden flex flex-col relative"
                   style={{
                     background: 'var(--s1)',
-                    border: '1px solid var(--b1)',
+                    border: photo.is_issue ? '1px solid rgba(255, 59, 48, 0.4)' : '1px solid var(--b1)',
                     backdropFilter: 'blur(8px)',
                     WebkitBackdropFilter: 'blur(8px)'
                   }}
@@ -420,7 +445,16 @@ export default function ProjectDetails() {
                       backgroundPosition: 'center',
                       aspectRatio: '4 / 3'
                     }}
-                  />
+                  >
+                    {/* Hiba vs Munkafolyamat Jelvény ráúsztatva a képre */}
+                    <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[8px] font-extrabold uppercase tracking-wider text-white" style={{
+                      background: photo.is_issue ? 'rgba(255, 59, 48, 0.85)' : 'rgba(46, 209, 88, 0.85)',
+                      backdropFilter: 'blur(4px)',
+                      WebkitBackdropFilter: 'blur(4px)'
+                    }}>
+                      {photo.is_issue ? '⚠️ Hiba' : '🟢 Haladás'}
+                    </div>
+                  </a>
                   
                   {/* Kártya alsó rész: Feltöltő + Időpont + Megjegyzés */}
                   <div className="p-2.5 flex flex-col space-y-1 text-[11px] leading-tight">
@@ -430,11 +464,15 @@ export default function ProjectDetails() {
                     <div className="text-[9px] text-slate-500">{formattedDate}</div>
                     
                     {photo.description ? (
-                      <div className="text-xs text-amber-300 font-medium italic mt-1.5 p-1.5 rounded-lg border leading-snug" style={{ background: 'rgba(255, 159, 10, 0.08)', borderColor: 'rgba(255, 159, 10, 0.15)' }}>
+                      <div className="text-xs font-medium italic mt-1.5 p-1.5 rounded-lg border leading-snug" style={{ 
+                        background: photo.is_issue ? 'rgba(255, 59, 48, 0.08)' : 'rgba(255, 255, 255, 0.03)', 
+                        borderColor: photo.is_issue ? 'rgba(255, 59, 48, 0.15)' : 'rgba(255, 255, 255, 0.06)',
+                        color: photo.is_issue ? 'var(--red)' : 'var(--t1)'
+                      }}>
                         💬 {photo.description}
                       </div>
                     ) : (
-                      <div className="text-[10px] text-slate-500 italic mt-1">Nincs megjegyzés</div>
+                      <div className="text-[10px] text-slate-500 italic mt-1">Nincs leírás</div>
                     )}
                   </div>
                 </div>
