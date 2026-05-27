@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
+  const [serialNumber, setSerialNumber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -15,12 +16,6 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
-    // Mivel az authentikáció kliens oldalon van, a Supabase alapértelmezetten 
-    // belépteti a felhasználót a signUp után, ha az email confirm ki van kapcsolva.
-    // Ezt később Supabase Edge Function-nel vagy Admin API-val elegánsabb megoldani,
-    // de az MVP-hez megfelel a sima signUp, utána az adminnak újra be kell majd lépnie,
-    // VAGY használhatjuk az admin Auth-t. Most egyelőre sima signUp-ot hívunk.
     
     const { data, error: authError } = await supabase.auth.signUp({
       email,
@@ -29,6 +24,7 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
         data: {
           full_name: fullName,
           role: role,
+          serial_number: serialNumber
         }
       }
     });
@@ -38,14 +34,13 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
       setLoading(false);
       return;
     }
-
-    // Profil létrehozása a custom táblában (ha van, de egyelőre elég az auth)
     
     setLoading(false);
     onSuccess();
     onClose();
     
     // Reset form
+    setSerialNumber('');
     setEmail('');
     setPassword('');
     setFullName('');
@@ -53,8 +48,8 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-      <div className="bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
+      <div className="w-full max-w-md rounded-2xl p-6 shadow-2xl relative" style={{ background: '#101524', border: '1px solid rgba(255,255,255,0.09)' }}>
         <button 
           onClick={onClose}
           className="absolute top-4 right-4 text-slate-400 hover:text-white"
@@ -64,22 +59,35 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
           </svg>
         </button>
         
-        <h2 className="text-xl font-bold text-white mb-6">Új Dolgozó Felvétele</h2>
+        <h2 className="text-xl font-bold text-white mb-5">Új Dolgozó Felvétele</h2>
         
         {error && (
-          <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg mb-6 text-sm">
+          <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg mb-5 text-sm">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1">Sorszám / Dolgozói ID</label>
+            <input
+              type="text"
+              value={serialNumber}
+              onChange={(e) => setSerialNumber(e.target.value)}
+              placeholder="pl. EMP-01"
+              className="w-full rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500 transition-colors"
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)' }}
+              required
+            />
+          </div>
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">Teljes Név</label>
             <input
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full bg-slate-950/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="w-full rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500 transition-colors"
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)' }}
               required
             />
           </div>
@@ -89,45 +97,51 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-slate-950/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="w-full rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500 transition-colors"
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)' }}
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">Ideiglenes Jelszó</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-slate-950/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-              required
-              minLength={6}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">Szerepkör</label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full bg-slate-950/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-            >
-              <option value="worker">Terepi Szerelő (Worker)</option>
-              <option value="admin">Irodai Admin (Admin)</option>
-            </select>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1">Ideiglenes Jelszó</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500 transition-colors"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)' }}
+                required
+                minLength={6}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1">Szerepkör</label>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500 transition-colors"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)' }}
+              >
+                <option value="worker" className="bg-slate-900 text-white">Terepi Szerelő</option>
+                <option value="admin" className="bg-slate-900 text-white">Irodai Admin</option>
+              </select>
+            </div>
           </div>
           
-          <div className="pt-4 flex justify-end space-x-3">
+          <div className="pt-4 flex justify-end items-center space-x-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-slate-300 hover:text-white transition-colors"
+              className="text-slate-300 hover:text-white transition-colors text-sm"
             >
               Mégse
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+              className="text-white px-5 py-2.5 rounded-xl font-bold transition-all disabled:opacity-50"
+              style={{ background: 'linear-gradient(135deg, #0284c7, #0369a1)', boxShadow: '0 4px 14px rgba(2,132,199,0.35)' }}
             >
               {loading ? 'Mentés...' : 'Létrehozás'}
             </button>

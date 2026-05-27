@@ -29,7 +29,7 @@ export default function ProjectList() {
         ) : (
           projects.map(proj => (
             <div key={proj.id} className="pc" style={{ minWidth: '100%' }} onClick={() => navigate(`/project/${proj.id}`)}>
-              <div className="pc-tag" style={{background:'rgba(46,209,88,.14)',color:'#2ed158'}}>⚡ Projekt</div>
+              <div className="pc-tag" style={{background:'rgba(46,209,88,.14)',color:'#2ed158'}}>⚡ Projekt {proj.serial_number ? `· ${proj.serial_number}` : ''}</div>
               <div className="pc-name">{proj.name}</div>
               <div className="pc-addr">📍 {proj.address}</div>
               <div className="pbar"><div className="pfill" style={{width:'10%',background:'#2ed158'}}></div></div>

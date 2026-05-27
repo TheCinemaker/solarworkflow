@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
+  const [serialNumber, setSerialNumber] = useState('');
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [clientName, setClientName] = useState('');
   const [deadline, setDeadline] = useState('');
+  const [tasks, setTasks] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -17,10 +19,12 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
     setError(null);
 
     const { error: insertError } = await supabase.from('projects').insert([{ 
+      serial_number: serialNumber,
       name, 
       address, 
       client_name: clientName, 
-      deadline 
+      deadline,
+      tasks
     }]);
 
     if (insertError) {
@@ -34,15 +38,17 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
     onClose();
     
     // Reset form
+    setSerialNumber('');
     setName('');
     setAddress('');
     setClientName('');
     setDeadline('');
+    setTasks('');
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-      <div className="bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
+      <div className="w-full max-w-md rounded-2xl p-6 shadow-2xl relative" style={{ background: '#101524', border: '1px solid rgba(255,255,255,0.09)' }}>
         <button 
           onClick={onClose}
           className="absolute top-4 right-4 text-slate-400 hover:text-white"
@@ -52,8 +58,8 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
           </svg>
         </button>
         
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center border border-blue-500/30">
+        <div className="flex items-center space-x-3 mb-5">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(42,92,204,0.3)', border: '1px solid rgba(42,92,204,0.6)' }}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
@@ -62,12 +68,24 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
         </div>
         
         {error && (
-          <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg mb-6 text-sm">
+          <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg mb-5 text-sm">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-1">Projekt Sorszáma / ID</label>
+            <input
+              type="text"
+              value={serialNumber}
+              onChange={(e) => setSerialNumber(e.target.value)}
+              placeholder="pl. PRJ-2026-01"
+              className="w-full rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)' }}
+              required
+            />
+          </div>
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">Projekt Neve</label>
             <input
@@ -75,7 +93,8 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="pl. Napelem telepítés - Kovács Család"
-              className="w-full bg-slate-950/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="w-full rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)' }}
               required
             />
           </div>
@@ -86,43 +105,59 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="1234 Budapest, Példa utca 1."
-              className="w-full bg-slate-950/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="w-full rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)' }}
               required
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">Megrendelő Neve</label>
-            <input
-              type="text"
-              value={clientName}
-              onChange={(e) => setClientName(e.target.value)}
-              className="w-full bg-slate-950/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-              required
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1">Megrendelő Neve</label>
+              <input
+                type="text"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                className="w-full rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)' }}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1">Határidő</label>
+              <input
+                type="date"
+                value={deadline}
+                onChange={(e) => setDeadline(e.target.value)}
+                className="w-full rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)' }}
+                required
+              />
+            </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">Határidő</label>
-            <input
-              type="date"
-              value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
-              className="w-full bg-slate-950/50 border border-slate-700/50 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-              required
+            <label className="block text-sm font-medium text-slate-300 mb-1">Feladatlista</label>
+            <textarea
+              value={tasks}
+              onChange={(e) => setTasks(e.target.value)}
+              placeholder="1. Tartószerkezet felszerelése&#10;2. Kábelezés behúzása&#10;3. Inverter telepítése"
+              className="w-full rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors"
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)', minHeight: '80px' }}
             />
           </div>
           
-          <div className="pt-4 flex justify-end space-x-3">
+          <div className="pt-3 flex justify-end items-center space-x-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-slate-300 hover:text-white transition-colors"
+              className="text-slate-300 hover:text-white transition-colors text-sm"
             >
               Mégse
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+              className="text-white px-5 py-2.5 rounded-xl font-bold transition-all disabled:opacity-50"
+              style={{ background: 'linear-gradient(135deg, #4f8ef7, #2a5ccc)', boxShadow: '0 4px 14px rgba(79,142,247,0.35)' }}
             >
               {loading ? 'Mentés...' : 'Létrehozás'}
             </button>
