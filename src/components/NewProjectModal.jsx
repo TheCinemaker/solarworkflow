@@ -12,6 +12,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
   const [importantInfo, setImportantInfo] = useState('');
   const [tasks, setTasks] = useState('');
   const [telegramLink, setTelegramLink] = useState('');
+  const [clientPrice, setClientPrice] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -33,7 +34,8 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
       end_time: endTime,
       important_info: importantInfo,
       tasks,
-      telegram_link: telegramLink
+      telegram_link: telegramLink,
+      client_price: parseInt(clientPrice) || 0
     }]);
 
     if (insertError) {
@@ -57,6 +59,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
     setImportantInfo('');
     setTasks('');
     setTelegramLink('');
+    setClientPrice('');
   };
 
   const inputStyle = {
@@ -153,9 +156,15 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
             <input type="text" value={importantInfo} onChange={(e) => setImportantInfo(e.target.value)} placeholder="pl. Kulcs a villanyóra szekrényben" style={inputStyle} />
           </div>
 
-          <div>
-            <label style={labelStyle}>Telegram Csoport Link (opcionális)</label>
-            <input type="text" value={telegramLink} onChange={(e) => setTelegramLink(e.target.value)} placeholder="https://t.me/joinchat/..." style={inputStyle} />
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label style={labelStyle}>Megrendelési összeg (Ft)</label>
+              <input type="number" value={clientPrice} onChange={(e) => setClientPrice(e.target.value)} placeholder="pl. 2450000" style={inputStyle} required />
+            </div>
+            <div>
+              <label style={labelStyle}>Telegram Csoport Link</label>
+              <input type="text" value={telegramLink} onChange={(e) => setTelegramLink(e.target.value)} placeholder="https://t.me/joinchat/..." style={inputStyle} />
+            </div>
           </div>
 
           <div>

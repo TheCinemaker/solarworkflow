@@ -22,6 +22,17 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Új könyvelési és személyes állapotok
+  const [address, setAddress] = useState('');
+  const [phone, setPhone] = useState('');
+  const [taxId, setTaxId] = useState('');
+  const [tbNumber, setTbNumber] = useState('');
+  const [bankAccount, setBankAccount] = useState('');
+  const [idCardNumber, setIdCardNumber] = useState('');
+  const [emergencyPhone, setEmergencyPhone] = useState('');
+  const [jobTitle, setJobTitle] = useState('');
+  const [hourlyWage, setHourlyWage] = useState('3500');
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
@@ -37,7 +48,16 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
         data: {
           full_name: fullName,
           role: role,
-          serial_number: serialNumber
+          serial_number: serialNumber,
+          address,
+          phone,
+          tax_id: taxId,
+          tb_number: tbNumber,
+          bank_account: bankAccount,
+          id_card_number: idCardNumber,
+          emergency_phone: emergencyPhone,
+          job_title: jobTitle,
+          hourly_wage: parseInt(hourlyWage) || 3500
         }
       }
     });
@@ -58,6 +78,15 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
     setPassword('');
     setFullName('');
     setRole('worker');
+    setAddress('');
+    setPhone('');
+    setTaxId('');
+    setTbNumber('');
+    setBankAccount('');
+    setIdCardNumber('');
+    setEmergencyPhone('');
+    setJobTitle('');
+    setHourlyWage('3500');
   };
 
   const inputStyle = {
@@ -111,34 +140,93 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-3">
-          <div>
-            <label style={labelStyle}>Sorszám / Dolgozói ID</label>
-            <input type="text" value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} placeholder="EMP-01" required style={inputStyle} />
-          </div>
-          <div>
-            <label style={labelStyle}>Teljes Név</label>
-            <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Nagy Béla" required style={inputStyle} />
-          </div>
-          <div>
-            <label style={labelStyle}>Email Cím</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="bela@cegem.hu" required style={inputStyle} />
+          <div className="space-y-3 max-h-[340px] overflow-y-auto pr-1.5 scroll-area">
+            <div className="grid grid-cols-3 gap-2">
+              <div className="col-span-1">
+                <label style={labelStyle}>Sorszám / ID</label>
+                <input type="text" value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} placeholder="EMP-01" required style={inputStyle} />
+              </div>
+              <div className="col-span-2">
+                <label style={labelStyle}>Teljes Név</label>
+                <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Nagy Béla" required style={inputStyle} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label style={labelStyle}>Email Cím</label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="bela@cegem.hu" required style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Szerepkör</label>
+                <select value={role} onChange={(e) => setRole(e.target.value)} style={inputStyle}>
+                  <option value="worker" style={{ background: '#07090f' }}>Terepi Szerelő</option>
+                  <option value="admin" style={{ background: '#07090f' }}>Irodai Admin</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label style={labelStyle}>Ideiglenes Jelszó</label>
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••" required minLength={6} style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Munkakör</label>
+                <input type="text" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} placeholder="pl. Villanyszerelő" required style={inputStyle} />
+              </div>
+            </div>
+
+            {/* Órabér és Telefonszám */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label style={labelStyle}>Bruttó Órabér (Ft)</label>
+                <input type="number" value={hourlyWage} onChange={(e) => setHourlyWage(e.target.value)} placeholder="3500" required style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Telefonszám</label>
+                <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+36 30 123 4567" required style={inputStyle} />
+              </div>
+            </div>
+
+            {/* Lakcím */}
+            <div>
+              <label style={labelStyle}>Lakcím</label>
+              <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="1234 Bp., Példa utca 12." style={inputStyle} />
+            </div>
+
+            {/* Adó és TB szám */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label style={labelStyle}>Adószám</label>
+                <input type="text" value={taxId} onChange={(e) => setTaxId(e.target.value)} placeholder="12345678-1-12" style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>TB szám (TAJ)</label>
+                <input type="text" value={tbNumber} onChange={(e) => setTbNumber(e.target.value)} placeholder="123 456 789" style={inputStyle} />
+              </div>
+            </div>
+
+            {/* Bank és személyi szám */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label style={labelStyle}>Bankszámlaszám</label>
+                <input type="text" value={bankAccount} onChange={(e) => setBankAccount(e.target.value)} placeholder="11773004-..." style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Személyi Szám</label>
+                <input type="text" value={idCardNumber} onChange={(e) => setIdCardNumber(e.target.value)} placeholder="123456AB" style={inputStyle} />
+              </div>
+            </div>
+
+            {/* Vészhelyzeti Telefonszám */}
+            <div>
+              <label style={labelStyle}>Vészhelyzeti Kapcsolat (Tel.)</label>
+              <input type="text" value={emergencyPhone} onChange={(e) => setEmergencyPhone(e.target.value)} placeholder="pl. Kovács Mária (feleség) - +36 30 987 6543" style={inputStyle} />
+            </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label style={labelStyle}>Ideiglenes Jelszó</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••" required minLength={6} style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Szerepkör</label>
-              <select value={role} onChange={(e) => setRole(e.target.value)} style={inputStyle}>
-                <option value="worker" style={{ background: '#07090f' }}>Terepi Szerelő</option>
-                <option value="admin" style={{ background: '#07090f' }}>Irodai Admin</option>
-              </select>
-            </div>
-          </div>
-          
-          <div className="pt-2">
+          <div className="pt-2 border-t border-white/5">
             <button type="submit" disabled={loading} className="w-full font-bold transition-all disabled:opacity-50 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #2ed158, #1a8a38)', border: 'none', borderRadius: '10px', padding: '10px', color: '#fff', fontSize: '14px', boxShadow: '0 8px 25px rgba(46, 209, 88, 0.35)' }}>
               {loading ? 'Mentés...' : 'Létrehozás'}
             </button>

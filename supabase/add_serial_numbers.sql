@@ -12,11 +12,22 @@ ADD COLUMN IF NOT EXISTS telegram_link TEXT,
 ADD COLUMN IF NOT EXISTS archived BOOLEAN DEFAULT false,
 ADD COLUMN IF NOT EXISTS inverter_brand TEXT,
 ADD COLUMN IF NOT EXISTS inverter_api_key TEXT,
-ADD COLUMN IF NOT EXISTS inverter_id TEXT;
+ADD COLUMN IF NOT EXISTS inverter_id TEXT,
+ADD COLUMN IF NOT EXISTS client_price INTEGER DEFAULT 0,
+ADD COLUMN IF NOT EXISTS paid BOOLEAN DEFAULT false;
 
 -- A meglévő dolgozók (profiles) táblájának bővítése
 ALTER TABLE public.profiles
-ADD COLUMN IF NOT EXISTS serial_number TEXT;
+ADD COLUMN IF NOT EXISTS serial_number TEXT,
+ADD COLUMN IF NOT EXISTS address TEXT,
+ADD COLUMN IF NOT EXISTS phone TEXT,
+ADD COLUMN IF NOT EXISTS tax_id TEXT,
+ADD COLUMN IF NOT EXISTS tb_number TEXT,
+ADD COLUMN IF NOT EXISTS bank_account TEXT,
+ADD COLUMN IF NOT EXISTS id_card_number TEXT,
+ADD COLUMN IF NOT EXISTS emergency_phone TEXT,
+ADD COLUMN IF NOT EXISTS job_title TEXT,
+ADD COLUMN IF NOT EXISTS hourly_wage INTEGER DEFAULT 3500;
 
 -- Munkalapok (worklogs) tábla bővítése a mettől-meddig adatokkal
 ALTER TABLE public.worklogs
@@ -40,12 +51,35 @@ DROP FUNCTION IF EXISTS public.handle_new_user();
 CREATE OR REPLACE FUNCTION public.handle_new_user() 
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, full_name, role, serial_number)
+  INSERT INTO public.profiles (
+    id, 
+    full_name, 
+    role, 
+    serial_number,
+    address,
+    phone,
+    tax_id,
+    tb_number,
+    bank_account,
+    id_card_number,
+    emergency_phone,
+    job_title,
+    hourly_wage
+  )
   VALUES (
     new.id, 
     new.raw_user_meta_data->>'full_name', 
     COALESCE(new.raw_user_meta_data->>'role', 'worker'),
-    new.raw_user_meta_data->>'serial_number'
+    new.raw_user_meta_data->>'serial_number',
+    new.raw_user_meta_data->>'address',
+    new.raw_user_meta_data->>'phone',
+    new.raw_user_meta_data->>'tax_id',
+    new.raw_user_meta_data->>'tb_number',
+    new.raw_user_meta_data->>'bank_account',
+    new.raw_user_meta_data->>'id_card_number',
+    new.raw_user_meta_data->>'emergency_phone',
+    new.raw_user_meta_data->>'job_title',
+    COALESCE((new.raw_user_meta_data->>'hourly_wage')::INTEGER, 3500)
   );
   RETURN new;
 END;
