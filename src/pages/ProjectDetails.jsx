@@ -279,21 +279,21 @@ export default function ProjectDetails() {
 
       {/* Archiválás Gomb (Csak ha még nincs lezárva) */}
       {!project?.archived && (
-        <div className="px-5 mt-2.5 fu d1">
+        <div className="px-5 mt-3 fu d1 flex justify-center">
           <button 
             onClick={handleArchiveProject} 
-            className="w-full font-bold flex items-center justify-center space-x-2 pt-2.5 pb-2.5 text-center text-sm"
+            className="font-extrabold flex items-center justify-center space-x-1.5 pt-2 pb-2 px-5 text-center text-xs transition-all hover:scale-[1.02]"
             style={{
-              background: progressPercent === 100 ? 'linear-gradient(135deg, #ffd60a, #ccab00)' : 'rgba(255,255,255,0.05)',
-              borderRadius: '12px',
+              background: progressPercent === 100 ? 'linear-gradient(135deg, #ffd60a, #ccab00)' : 'rgba(255, 255, 255, 0.05)',
+              borderRadius: '20px',
               color: progressPercent === 100 ? '#000' : 'var(--t2)',
               border: progressPercent === 100 ? 'none' : '1px solid var(--b1)',
-              boxShadow: progressPercent === 100 ? '0 8px 25px rgba(255, 214, 10, 0.2)' : 'none',
+              boxShadow: progressPercent === 100 ? '0 8px 25px rgba(255, 214, 10, 0.15)' : 'none',
               cursor: 'pointer'
             }}
           >
             <span>🗂</span>
-            <span>{progressPercent === 100 ? 'Projekt Archiválása (100% Kész!)' : 'Projekt Archiválása (Lezárás)'}</span>
+            <span>{progressPercent === 100 ? 'Archiválás (100% Kész!)' : 'Projekt Lezárása'}</span>
           </button>
         </div>
       )}
