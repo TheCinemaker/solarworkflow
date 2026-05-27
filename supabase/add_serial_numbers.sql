@@ -13,6 +13,11 @@ ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();
 ALTER TABLE public.profiles
 ADD COLUMN IF NOT EXISTS serial_number TEXT;
 
+-- Munkalapok (worklogs) tábla bővítése a mettől-meddig adatokkal
+ALTER TABLE public.worklogs
+ADD COLUMN IF NOT EXISTS start_time TEXT,
+ADD COLUMN IF NOT EXISTS end_time TEXT;
+
 -- A régi auth trigger törlése és új létrehozása
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 DROP FUNCTION IF EXISTS public.handle_new_user();
@@ -36,7 +41,7 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
 -- 5. VALÓS IDEJŰ (REALTIME) SZINKRONIZÁCIÓ BEKAPCSOLÁSA A TÁBLÁKON
--- Ezzel engedélyezzük, hogy a Supabase azonnal értesítse az appot bármilyen változásról!
--- (Ha valamelyik tábla már fel van véve a publikációba, az SQL hibát dobhat rá, ami figyelmen kívül hagyható)
+-- (Ha a tábla már benne van, a hiba figyelmen kívül hagyható)
 ALTER PUBLICATION supabase_realtime ADD TABLE public.projects;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.worklogs;

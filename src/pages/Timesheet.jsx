@@ -1,11 +1,177 @@
 import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
 
 export default function Timesheet() {
   const navigate = useNavigate();
+  
+  // Űrlap állapotok
+  const [projects, setProjects] = useState([]);
+  const [selectedProjectId, setSelectedProjectId] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [startTime, setStartTime] = useState('08:00');
+  const [endTime, setEndTime] = useState('16:00');
+  const [description, setDescription] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
+  
+  // Adatlista állapotok
+  const [worklogs, setWorklogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Aktív projektek, a bejelentkezett felhasználó és a meglévő munkalapok betöltése
+  async function loadData() {
+    try {
+      // 1. Felhasználó lekérése
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUser(user);
+
+      // 2. Aktív projektek lekérése a legördülőhöz
+      const { data: projData } = await supabase
+        .from('projects')
+        .select('id, name, serial_number')
+        .order('name');
+      if (projData) setProjects(projData);
+
+      // 3. Munkalapok lekérése (dolgozó névvel és projekt névvel összekapcsolva)
+      const { data: logsData, error: logsErr } = await supabase
+        .from('worklogs')
+        .select(`
+          id,
+          date,
+          hours,
+          start_time,
+          end_time,
+          description,
+          created_at,
+          profiles (full_name, serial_number),
+          projects (name, serial_number)
+        `)
+        .order('date', { ascending: false })
+        .order('created_at', { ascending: false });
+
+      if (logsErr) throw logsErr;
+      if (logsData) setWorklogs(logsData);
+
+    } catch (err) {
+      console.error("Hiba az adatok betöltésekor:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadData();
+
+    // REALTIME SUBSCRIBER: Valós idejű szinkronizáció
+    const channel = supabase
+      .channel('worklogs-realtime-sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'worklogs' }, () => {
+        loadData();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  // Időtartam kiszámítása órában (pl. 08:00 és 16:30 között -> 8.5 óra)
+  const calculateHours = () => {
+    if (!startTime || !endTime) return 0;
+    const [startHour, startMin] = startTime.split(':').map(Number);
+    const [endHour, endMin] = endTime.split(':').map(Number);
+    
+    const startDecimal = startHour + startMin / 60;
+    const endDecimal = endHour + endMin / 60;
+    
+    const diff = endDecimal - startDecimal;
+    return diff > 0 ? parseFloat(diff.toFixed(2)) : 0;
+  };
+
+  const computedHours = calculateHours();
+
+  // Munkalap beküldése
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedProjectId) {
+      setError("Kérlek válassz egy projektet!");
+      return;
+    }
+    if (computedHours <= 0) {
+      setError("A befejezési időnek a kezdési idő után kell lennie!");
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const { error: insertErr } = await supabase
+        .from('worklogs')
+        .insert([{
+          project_id: selectedProjectId,
+          user_id: currentUser?.id,
+          date,
+          start_time: startTime,
+          end_time: endTime,
+          hours: computedHours,
+          description: description || 'Napi munkavégzés'
+        }]);
+
+      if (insertErr) throw insertErr;
+
+      // Sikeres beküldés után űrlap alaphelyzetbe
+      setDescription('');
+      setSelectedProjectId('');
+      alert("Munkalap sikeresen elmentve!");
+      
+      // Újratöltés
+      await loadData();
+    } catch (err) {
+      console.error("Hiba a mentés során:", err);
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inputStyle = {
+    background: 'var(--s1)',
+    border: '1px solid var(--b1)',
+    borderRadius: '10px',
+    padding: '7px 12px',
+    color: 'var(--t1)',
+    fontSize: '13px',
+    width: '100%',
+    outline: 'none',
+    transition: 'border-color 0.15s ease'
+  };
+
+  const labelStyle = {
+    color: 'var(--t2)',
+    fontSize: '13px',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    marginBottom: '6px',
+    display: 'block'
+  };
+
+  if (loading) {
+    return (
+      <div className="page active flex items-center justify-center h-screen text-slate-400">
+        Munkalapok betöltése...
+      </div>
+    );
+  }
 
   return (
-    <div className="page active" id="p-daily">
-      <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza</div>
+    <div className="page active scroll-area" id="p-daily">
+      <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
+      
       <div className="page-header fu">
         <div>
           <div className="pg-greet">{new Date().toLocaleDateString('hu-HU')}</div>
@@ -13,9 +179,160 @@ export default function Timesheet() {
         </div>
         <div className="hdr-btn">📋</div>
       </div>
-      
-      <div className="p-4 text-center text-slate-500 text-sm italic w-full">
-        Munkalap rögzítése modul fejlesztés alatt...
+
+      {error && (
+        <div className="mx-5 mt-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-xs">
+          {error}
+        </div>
+      )}
+
+      {/* 1. Munkalap rögzítése űrlap */}
+      <div className="shdr fu d1">
+        <div className="shdr-t">Új Munkalap Rögzítése</div>
+      </div>
+
+      <div className="gcard fu d1" style={{ background: 'var(--s1)', border: '1px solid var(--b1)' }}>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div>
+            <label style={labelStyle}>Projekt / Helyszín</label>
+            <select 
+              value={selectedProjectId} 
+              onChange={(e) => setSelectedProjectId(e.target.value)}
+              required 
+              style={inputStyle}
+            >
+              <option value="" style={{ background: '#07090f' }}>Válassz projektet...</option>
+              {projects.map(proj => (
+                <option key={proj.id} value={proj.id} style={{ background: '#07090f' }}>
+                  {proj.serial_number ? `[${proj.serial_number}] ` : ''}{proj.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2">
+            <div className="col-span-1">
+              <label style={labelStyle}>Dátum</label>
+              <input 
+                type="date" 
+                value={date} 
+                onChange={(e) => setDate(e.target.value)} 
+                required 
+                style={inputStyle} 
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Mettől</label>
+              <input 
+                type="time" 
+                value={startTime} 
+                onChange={(e) => setStartTime(e.target.value)} 
+                required 
+                style={inputStyle} 
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Meddig</label>
+              <input 
+                type="time" 
+                value={endTime} 
+                onChange={(e) => setEndTime(e.target.value)} 
+                required 
+                style={inputStyle} 
+              />
+            </div>
+          </div>
+
+          {computedHours > 0 && (
+            <div className="p-2 rounded-lg text-xs font-semibold text-center" style={{ background: 'rgba(46, 209, 88, 0.1)', border: '1px solid rgba(46, 209, 88, 0.2)', color: 'var(--green)' }}>
+              ⏱ Számolt munkaidő: {computedHours} óra
+            </div>
+          )}
+
+          <div>
+            <label style={labelStyle}>Rövid munkaleírás (opcionális)</label>
+            <textarea 
+              value={description} 
+              onChange={(e) => setDescription(e.target.value)} 
+              placeholder="pl. Napelemek felrakása a tetőre, inverter bekötése..."
+              style={{ ...inputStyle, minHeight: '60px', resize: 'vertical' }}
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={saving} 
+            className="w-full font-bold transition-all disabled:opacity-50 flex items-center justify-center pt-2.5 pb-2.5" 
+            style={{ 
+              background: 'linear-gradient(135deg, #4f8ef7, #2a5ccc)', 
+              border: 'none', 
+              borderRadius: '10px', 
+              color: '#fff', 
+              fontSize: '14px', 
+              boxShadow: '0 8px 25px rgba(79, 142, 247, 0.35)' 
+            }}
+          >
+            {saving ? 'Mentés...' : 'Munkalap Beküldése'}
+          </button>
+        </form>
+      </div>
+
+      {/* 2. Rögzített munkalapok listája */}
+      <div className="shdr fu d2">
+        <div className="shdr-t">Rögzített Munkalapok</div>
+        <div className="shdr-a">{worklogs.length} db</div>
+      </div>
+
+      <div className="space-y-3 px-5 pb-20 fu d2">
+        {worklogs.length === 0 ? (
+          <div className="text-center text-xs text-slate-400 italic py-8" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px' }}>
+            Még nincsenek rögzített munkalapok.
+          </div>
+        ) : (
+          worklogs.map(log => (
+            <div key={log.id} className="p-3.5 rounded-2xl flex flex-col space-y-2.5" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
+              {/* Fejléc: Ki és mikor */}
+              <div className="flex justify-between items-start">
+                <div>
+                  <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-0.5">Szerelő</div>
+                  <div className="font-semibold text-slate-200 text-sm">
+                    👷 {log.profiles?.full_name || 'Ismeretlen'} {log.profiles?.serial_number ? `[${log.profiles.serial_number}]` : ''}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[10px] text-blue-400 uppercase font-bold tracking-wider px-2 py-0.5 rounded-full" style={{ background: 'rgba(79, 142, 247, 0.1)', border: '1px solid rgba(79, 142, 247, 0.2)' }}>
+                    {log.date}
+                  </div>
+                </div>
+              </div>
+
+              {/* Projekt és Időtartam */}
+              <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-white/5">
+                <div>
+                  <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Projekt</div>
+                  <div className="font-semibold text-slate-200">
+                    ⚡ {log.projects?.name || 'Névtelen Projekt'}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Időtartam</div>
+                  <div className="font-semibold text-slate-200 flex items-center space-x-1.5">
+                    <span>⏱ {log.hours} óra</span>
+                    <span className="text-[10px] text-slate-400">({log.start_time} - {log.end_time})</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Leírás */}
+              <div className="pt-2 border-t border-white/5">
+                <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Munkaleírás</div>
+                <div className="text-xs text-slate-300 italic bg-white/5 p-2 rounded-lg leading-relaxed">
+                  {log.description}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
