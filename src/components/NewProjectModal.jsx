@@ -13,6 +13,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
   const [tasks, setTasks] = useState('');
   const [telegramLink, setTelegramLink] = useState('');
   const [clientPrice, setClientPrice] = useState('');
+  const [isSolar, setIsSolar] = useState(false); // Napelemes projekt jelző
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -35,7 +36,8 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
       important_info: importantInfo,
       tasks,
       telegram_link: telegramLink,
-      client_price: parseInt(clientPrice) || 0
+      client_price: parseInt(clientPrice) || 0,
+      is_solar: isSolar
     }]);
 
     if (insertError) {
@@ -60,6 +62,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
     setTasks('');
     setTelegramLink('');
     setClientPrice('');
+    setIsSolar(false);
   };
 
   const inputStyle = {
@@ -165,6 +168,23 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
               <label style={labelStyle}>Telegram Csoport Link</label>
               <input type="text" value={telegramLink} onChange={(e) => setTelegramLink(e.target.value)} placeholder="https://t.me/joinchat/..." style={inputStyle} />
             </div>
+          </div>
+
+          {/* Napelem projekt checkbox (Apple switch) */}
+          <div className="p-3 rounded-2xl border border-white/5 flex items-center justify-between" style={{ background: 'rgba(255, 255, 255, 0.02)' }}>
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-slate-300">☀️ Napelemes projekt?</span>
+              <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Inverter és távfelügyelet bekapcsolása</span>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input 
+                type="checkbox" 
+                checked={isSolar} 
+                onChange={(e) => setIsSolar(e.target.checked)} 
+                className="sr-only peer" 
+              />
+              <div className="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-400 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500 peer-checked:after:bg-white peer-checked:after:border-white"></div>
+            </label>
           </div>
 
           <div>

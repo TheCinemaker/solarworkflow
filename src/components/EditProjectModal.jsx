@@ -15,6 +15,7 @@ export default function EditProjectModal({ isOpen, onClose, project, onSuccess }
   const [clientPrice, setClientPrice] = useState('');
 
   // Napelem és inverter mezők
+  const [isSolar, setIsSolar] = useState(false);
   const [inverterBrand, setInverterBrand] = useState('');
   const [inverterId, setInverterId] = useState('');
   const [inverterApiKey, setInverterApiKey] = useState('');
@@ -35,6 +36,7 @@ export default function EditProjectModal({ isOpen, onClose, project, onSuccess }
       setTasks(project.tasks || '');
       setTelegramLink(project.telegram_link || '');
       setClientPrice(project.client_price || '');
+      setIsSolar(project.is_solar || false);
       setInverterBrand(project.inverter_brand || '');
       setInverterId(project.inverter_id || '');
       setInverterApiKey(project.inverter_api_key || '');
@@ -63,9 +65,10 @@ export default function EditProjectModal({ isOpen, onClose, project, onSuccess }
         tasks,
         telegram_link: telegramLink,
         client_price: parseInt(clientPrice) || 0,
-        inverter_brand: inverterBrand || null,
-        inverter_id: inverterId || null,
-        inverter_api_key: inverterApiKey || null
+        is_solar: isSolar,
+        inverter_brand: isSolar ? (inverterBrand || null) : null,
+        inverter_id: isSolar ? (inverterId || null) : null,
+        inverter_api_key: isSolar ? (inverterApiKey || null) : null
       })
       .eq('id', project.id);
 
@@ -174,23 +177,41 @@ export default function EditProjectModal({ isOpen, onClose, project, onSuccess }
 
             {/* Inverter és Napelem Telemetria Adatok */}
             <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/[0.04] space-y-3">
-              <span className="text-[10px] font-black uppercase tracking-wider text-yellow-400">☀️ Napelemes Inverter Integráció</span>
-              
-              <div>
-                <label style={labelStyle}>Inverter Márka (pl. Fronius, Huawei)</label>
-                <input type="text" value={inverterBrand} onChange={(e) => setInverterBrand(e.target.value)} placeholder="pl. Fronius" style={inputStyle} />
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold text-slate-300">☀️ Napelemes projekt?</span>
+                  <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Inverter és távfelügyelet bekapcsolása</span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={isSolar} 
+                    onChange={(e) => setIsSolar(e.target.checked)} 
+                    className="sr-only peer" 
+                  />
+                  <div className="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-400 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500 peer-checked:after:bg-white peer-checked:after:border-white"></div>
+                </label>
               </div>
               
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label style={labelStyle}>Készülék ID (Datalogger)</label>
-                  <input type="text" value={inverterId} onChange={(e) => setInverterId(e.target.value)} placeholder="1234567" style={inputStyle} />
+              {isSolar && (
+                <div className="space-y-3 pt-3 border-t border-white/5 animate-[fadeIn_0.2s_ease-out]">
+                  <div>
+                    <label style={labelStyle}>Inverter Márka (pl. Fronius, Huawei)</label>
+                    <input type="text" value={inverterBrand} onChange={(e) => setInverterBrand(e.target.value)} placeholder="pl. Fronius" style={inputStyle} />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label style={labelStyle}>Készülék ID (Datalogger)</label>
+                      <input type="text" value={inverterId} onChange={(e) => setInverterId(e.target.value)} placeholder="1234567" style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Inverter API Kulcs (Key)</label>
+                      <input type="password" value={inverterApiKey} onChange={(e) => setInverterApiKey(e.target.value)} placeholder="••••••••" style={inputStyle} />
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <label style={labelStyle}>Inverter API Kulcs (Key)</label>
-                  <input type="password" value={inverterApiKey} onChange={(e) => setInverterApiKey(e.target.value)} placeholder="••••••••" style={inputStyle} />
-                </div>
-              </div>
+              )}
             </div>
 
             {/* Kapcsolati és egyéb mezők */}
