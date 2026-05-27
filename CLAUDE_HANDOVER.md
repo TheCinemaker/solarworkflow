@@ -87,12 +87,12 @@ We recently updated the database tables to support the new modular forms. The us
 3. **Modals Redesigned**: `NewProjectModal.jsx` and `NewWorkerModal.jsx` are fully functioning, hook directly to Supabase, and implement the approved compact styling.
 4. **Dashboard List**: Displays real database projects dynamically, appending the user-facing serial number next to the tag (e.g., `⚡ Projekt · PRJ-01`).
 5. **Realtime Database Synchronization**: Configured full Supabase Realtime subscriptions in `Dashboard.jsx`, `ProjectList.jsx`, and `ProjectDetails.jsx`. Updates (like a worker checking a task or uploading a photo on the field) reflect instantly on the Admin's screen without reloading.
-6. **Isolated worker registration**: Resolved auth session hijacking by using a temporary standalone Supabase client (`persistSession: false`) for creating users.
-7. **Storage Photo Uploads**: Wired up robust, direct file uploads from the field to a public `project-photos` storage bucket inside `ProjectDetails.jsx`, complete with directory isolation per project UUID.
+8. **Daily Timesheets (Munkalapok)**: Fully implemented a premium daily work logging system inside `Timesheet.jsx` featuring dynamic project associations, automated decimal work hour calculations from time inputs (start/end times), and an isolated workflow tied to the logged-in user profile.
+9. **Full Realtime Sync for Timesheets**: Handled real-time updates for worklogs using Supabase postgres changes subscription, so new worker logs appear instantly on the Admin's listing.
 
 ---
 
-## 5. Next Steps & Todo list (Where you should pick up)
+## 5. Next Steps & Todo list for Claude (Where you should pick up)
 
 ### Task A: Role-Based Views (Admin vs. Worker)
 - **Problem**: Workers shouldn't see financial stats, editable forms, or admin actions.
@@ -101,18 +101,14 @@ We recently updated the database tables to support the new modular forms. The us
   - Financial page (`/finance`) access.
   - Workers' profiles edits.
 
-### Task B: Wire Up Project Details & Checklist
-- **File**: `src/pages/ProjectDetails.jsx`.
-- **Action**: Render the newly created `tasks` (feladatlista) as a checklist (with checkboxes). 
-- **Goal**: Electricians on the field should be able to toggle tasks, which updates the progress bar on the Dashboard card and saves state in the DB.
+### [COMPLETED] Task B: Wire Up Project Details & Checklist
+- **Done**: Rendered `tasks` as checklist checkboxes with Supabase saving and dynamic progress bar tracking.
 
-### Task C: Timesheet & Daily Logging
-- **File**: `src/pages/Timesheet.jsx`.
-- **Action**: Currently, timesheets are empty. We need to create a modal/form for workers to log their daily hours (Hours worked, description of work, selected project relation).
+### [COMPLETED] Task C: Timesheet & Daily Logging
+- **Done**: Workers can log daily hours, dates, descriptions, and times dynamically with auto-calculated hours.
 
-### Task D: Checkpoint Photo Tracking (Supabase Storage)
-- **Goal**: Workers need to take photos of finished meters/inverters on-site.
-- **Action**: Set up a Supabase Storage bucket called `project-photos` and implement image uploads within the project detail page.
+### [COMPLETED] Task D: Checkpoint Photo Tracking (Supabase Storage)
+- **Done**: Implemented direct file uploads and photo gallery rendering with project UUID folder isolation.
 
 ---
 
