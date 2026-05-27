@@ -45,9 +45,32 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
--- 5. VALÓS IDEJŰ (REALTIME) SZINKRONIZÁCIÓ BEKAPCSOLÁSA A TÁBLÁKON
--- (Ha a tábla már benne van, a hiba figyelmen kívül hagyható)
-ALTER PUBLICATION supabase_realtime ADD TABLE public.projects;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.worklogs;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.media;
+-- GOLYÓÁLLÓ REALTIME BEKAPCSOLÁS
+-- Ha egy tábla már tagja a publikációnak, a Postgres hibát dobna.
+-- Ezzel a PL/pgSQL blokkal elkapjuk és figyelmen kívül hagyjuk a hibát, így a futtatás sikeres lesz!
+DO $$
+BEGIN
+  BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.projects;
+  EXCEPTION WHEN others THEN
+    RAISE NOTICE 'projects már tagja, kihagyás...';
+  END;
+
+  BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.profiles;
+  EXCEPTION WHEN others THEN
+    RAISE NOTICE 'profiles már tagja, kihagyás...';
+  END;
+
+  BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.worklogs;
+  EXCEPTION WHEN others THEN
+    RAISE NOTICE 'worklogs már tagja, kihagyás...';
+  END;
+
+  BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.media;
+  EXCEPTION WHEN others THEN
+    RAISE NOTICE 'media már tagja, kihagyás...';
+  END;
+END $$;
