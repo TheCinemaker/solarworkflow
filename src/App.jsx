@@ -3,7 +3,12 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from './lib/supabase';
 
 import Login from './pages/Login';
-import AdminDashboard from './pages/AdminDashboard';
+import MainLayout from './layouts/MainLayout';
+import Dashboard from './pages/Dashboard';
+import ProjectDetails from './pages/ProjectDetails';
+import Timesheet from './pages/Timesheet';
+import Finance from './pages/Finance';
+import Issues from './pages/Issues';
 
 export default function App() {
   const [session, setSession] = useState(null);
@@ -26,7 +31,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
@@ -39,10 +44,17 @@ export default function App() {
           path="/login" 
           element={!session ? <Login /> : <Navigate to="/" />} 
         />
+        
         <Route 
           path="/" 
-          element={session ? <AdminDashboard /> : <Navigate to="/login" />} 
-        />
+          element={session ? <MainLayout /> : <Navigate to="/login" />} 
+        >
+          <Route index element={<Dashboard />} />
+          <Route path="project/:id" element={<ProjectDetails />} />
+          <Route path="timesheet" element={<Timesheet />} />
+          <Route path="finance" element={<Finance />} />
+          <Route path="issues" element={<Issues />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

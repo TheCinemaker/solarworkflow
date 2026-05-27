@@ -1,8 +1,14 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
+import NewWorkerModal from '../components/NewWorkerModal';
+import NewProjectModal from '../components/NewProjectModal';
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [stats, setStats] = useState({ projects: 0, workers: 0, worklogs: 0 });
+  const [isWorkerModalOpen, setIsWorkerModalOpen] = useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
 
   useEffect(() => {
     // Small animation effect for progress bars
@@ -15,8 +21,22 @@ export default function Dashboard() {
         }));
       });
     }, 100);
+
+    async function fetchStats() {
+      const { count: projectsCount } = await supabase.from('projects').select('*', { count: 'exact', head: true });
+      const { count: workersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+      const { count: worklogsCount } = await supabase.from('worklogs').select('*', { count: 'exact', head: true }).eq('date', new Date().toISOString().split('T')[0]);
+      
+      setStats({
+        projects: projectsCount || 0,
+        workers: workersCount || 0,
+        worklogs: worklogsCount || 0
+      });
+    }
+    fetchStats();
+
     return () => clearTimeout(timeout);
-  }, []);
+  }, [isWorkerModalOpen, isProjectModalOpen]);
 
   return (
     <div className="page active" id="p-home">
@@ -37,13 +57,13 @@ export default function Dashboard() {
       <div className="stats-grid fu d2">
         <div className="sc" onClick={() => navigate('/project/1')}>
           <div className="sc-lbl">Aktív projektek</div>
-          <div className="sc-val" style={{color:'#4f8ef7'}}>7</div>
-          <div className="sc-sub"><span className="sc-dot"></span>3 napelemes</div>
+          <div className="sc-val" style={{color:'#4f8ef7'}}>{stats.projects}</div>
+          <div className="sc-sub"><span className="sc-dot"></span>Összes db</div>
         </div>
         <div className="sc" onClick={() => navigate('/finance')}>
-          <div className="sc-lbl">Mai órák</div>
-          <div className="sc-val" style={{color:'#2ed158'}}>34h</div>
-          <div className="sc-sub">5 munkás terepen</div>
+          <div className="sc-lbl">Mai munkalapok</div>
+          <div className="sc-val" style={{color:'#2ed158'}}>{stats.worklogs}</div>
+          <div className="sc-sub">{stats.workers} munkás terepen</div>
         </div>
         <div className="sc">
           <div className="sc-lbl">Havi bevétel</div>
@@ -67,11 +87,11 @@ export default function Dashboard() {
         <div className="qa" onClick={() => navigate('/project/1')}>
           <span className="qa-i">📷</span><div className="qa-l">Fotó küld.</div>
         </div>
-        <div className="qa" onClick={() => navigate('/timesheet')}>
-          <span className="qa-i">⏱</span><div className="qa-l">Óra rögz.</div>
+        <div className="qa" onClick={() => setIsProjectModalOpen(true)}>
+          <span className="qa-i">➕</span><div className="qa-l">Új Projekt</div>
         </div>
-        <div className="qa" onClick={() => navigate('/issues')}>
-          <span className="qa-i">⚠️</span><div className="qa-l">Hiba jel.</div>
+        <div className="qa" onClick={() => setIsWorkerModalOpen(true)}>
+          <span className="qa-i">👷</span><div className="qa-l">Új Dolgozó</div>
         </div>
       </div>
 
@@ -136,14 +156,26 @@ export default function Dashboard() {
             <div class="act-time">Tegnap 17:23</div>
           </div>
         </div>
-        <div class="act">
-          <div class="act-ico" style={{background:'rgba(255,159,10,.12)'}}>🚚</div>
-          <div class="act-body">
-            <div class="act-txt"><b>Horváth porta</b> – anyagszállítás késik 2 napot</div>
-            <div class="act-time">Tegnap 15:10</div>
+        <div className="act">
+          <div className="act-ico" style={{background:'rgba(255,159,10,.12)'}}>🚚</div>
+          <div className="act-body">
+            <div className="act-txt"><b>Horváth porta</b> – anyagszállítás késik 2 napot</div>
+            <div className="act-time">Tegnap 15:10</div>
           </div>
         </div>
       </div>
+
+      <NewWorkerModal 
+        isOpen={isWorkerModalOpen} 
+        onClose={() => setIsWorkerModalOpen(false)} 
+        onSuccess={() => alert('Dolgozó sikeresen létrehozva!')} 
+      />
+
+      <NewProjectModal
+        isOpen={isProjectModalOpen}
+        onClose={() => setIsProjectModalOpen(false)}
+        onSuccess={() => alert('Projekt sikeresen létrehozva!')}
+      />
     </div>
   );
 }
