@@ -61,7 +61,8 @@ export default function Finance() {
 
       const { data: profiles, error: profErr } = await supabase
         .from('profiles')
-        .select('id, full_name, role, serial_number, address, phone, tax_id, tb_number, bank_account, id_card_number, emergency_phone, job_title, hourly_wage');
+        .select('id, full_name, role, serial_number, address, phone, tax_id, tb_number, bank_account, id_card_number, emergency_phone, job_title, hourly_wage')
+        .neq('role', 'admin');
       if (profErr) throw profErr;
 
       const { data: logs, error: logsErr } = await supabase
