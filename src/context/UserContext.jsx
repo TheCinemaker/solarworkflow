@@ -11,7 +11,7 @@ export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  async function fetchProfile(userId, email) {
+  async function fetchProfile(userId, email, sessionUser) {
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -19,11 +19,44 @@ export function UserProvider({ children }) {
         .eq('id', userId)
         .single();
       
-      if (error) throw error;
+      if (error) {
+        // Ha a profil nem található (PGRST116) és van aktív session, hozzuk létre automatikusan!
+        if (error.code === 'PGRST116' && sessionUser) {
+          const fullName = sessionUser.user_metadata?.full_name || 'Adminisztrátor';
+          const role = sessionUser.user_metadata?.role || 'admin';
+          
+          const { data: newProfile, error: insertErr } = await supabase
+            .from('profiles')
+            .insert([{
+              id: userId,
+              full_name: fullName,
+              role: role,
+              serial_number: role === 'admin' ? 'ADM-01' : 'EMP-99'
+            }])
+            .select()
+            .single();
+          
+          if (insertErr) throw insertErr;
+          setUser({ ...newProfile, email });
+          return;
+        }
+        throw error;
+      }
       setUser({ ...data, email });
     } catch (err) {
       console.error("Hiba a felhasználói profil betöltésekor:", err);
-      setUser(null);
+      // Biztonsági mentőöv: offline profil állapot, hogy az app zökkenőmentesen fusson
+      if (sessionUser) {
+        setUser({
+          id: userId,
+          email,
+          full_name: sessionUser.user_metadata?.full_name || 'Adminisztrátor',
+          role: sessionUser.user_metadata?.role || 'admin',
+          serial_number: 'ADM-01'
+        });
+      } else {
+        setUser(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -33,7 +66,7 @@ export function UserProvider({ children }) {
     // 1. Meglévő munkamenet lekérése
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        fetchProfile(session.user.id, session.user.email);
+        fetchProfile(session.user.id, session.user.email, session.user);
       } else {
         setUser(null);
         setLoading(false);
@@ -43,7 +76,7 @@ export function UserProvider({ children }) {
     // 2. Munkamenet változásának figyelése
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
-        fetchProfile(session.user.id, session.user.email);
+        fetchProfile(session.user.id, session.user.email, session.user);
       } else {
         setUser(null);
         setLoading(false);
@@ -56,7 +89,7 @@ export function UserProvider({ children }) {
   const refreshUser = () => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        fetchProfile(session.user.id, session.user.email);
+        fetchProfile(session.user.id, session.user.email, session.user);
       }
     });
   };

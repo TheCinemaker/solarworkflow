@@ -296,7 +296,7 @@ export default function Timesheet() {
                 <div>
                   <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Szerelő</div>
                   <div style={{ fontWeight: '600', color: 'var(--t1)', fontSize: '14px' }}>
-                    👷 {log.profiles?.full_name || 'Ismeretlen'} {log.profiles?.serial_number ? `[${log.profiles.serial_number}]` : ''}
+                    👷 {log.profiles?.full_name || (log.user_id === currentUser?.id ? (currentUser?.user_metadata?.full_name || currentUser?.full_name || 'Én') : 'Ismeretlen')} {log.profiles?.serial_number ? `[${log.profiles.serial_number}]` : (log.user_id === currentUser?.id && currentUser?.role === 'admin' ? '[ADM-01]' : '')}
                   </div>
                 </div>
                 <div style={{ fontSize: '10px', color: 'var(--blue)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '3px 9px', borderRadius: '20px', background: 'rgba(79,142,247,0.10)', border: '1px solid rgba(79,142,247,0.18)' }}>

@@ -269,8 +269,8 @@ export default function ProjectDetails() {
 
   return (
     <div className="page active" id="p-detail">
-      <div className="flex justify-between items-center px-[15px] mb-2.5 fu">
-        <div className="back-btn" style={{ margin: 0 }} onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
+      <div className="flex justify-between items-center px-[15px] mb-2.5 fu" style={{ paddingTop: '18px' }}>
+        <div className="back-btn" style={{ margin: 0, paddingTop: 0 }} onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
         {isAdmin && (
           <button 
             onClick={() => setIsEditModalOpen(true)}
