@@ -236,7 +236,7 @@ export default function Dashboard() {
       
       <div className="hscroll fu d4">
         {projects.length === 0 ? (
-          <div className="p-4 text-center text-slate-500 text-sm italic w-full">Nincsenek még projektek.</div>
+          <div className="p-4 text-center w-full" style={{ fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>Nincsenek még projektek.</div>
         ) : (
           projects.map(proj => {
             const tasksList = proj.tasks ? proj.tasks.split('\n').map(t => t.trim()).filter(Boolean) : [];
@@ -268,7 +268,7 @@ export default function Dashboard() {
       </div>
       <div className="act-list fu d5" style={{ paddingBottom: '80px' }}>
         {activities.length === 0 ? (
-          <div className="p-4 text-center text-slate-500 text-sm italic">Nincs még aktivitás rögzítve.</div>
+          <div className="p-4 text-center" style={{ fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>Nincs még aktivitás rögzítve.</div>
         ) : (
           activities.map(act => (
             <div key={act.id} className="act">

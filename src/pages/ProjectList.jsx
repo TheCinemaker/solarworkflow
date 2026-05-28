@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 export default function ProjectList() {
@@ -109,11 +109,12 @@ export default function ProjectList() {
             transition: 'all 0.15s ease'
           }}
         />
-        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" style={{ fontSize: '13px' }}>🔍</span>
+        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ fontSize: '13px', color: 'var(--t3)' }}>🔍</span>
         {searchQuery && (
           <button 
             onClick={() => setSearchQuery('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white/10 hover:bg-white/20 text-[8px] flex items-center justify-center text-slate-300 font-bold transition-all"
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full flex items-center justify-center font-bold transition-all"
+            style={{ background: 'var(--s2)', color: 'var(--t2)', fontSize: '8px' }}
           >
             ✕
           </button>
@@ -122,7 +123,7 @@ export default function ProjectList() {
 
       <div className="hscroll fu d3" style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '15px', paddingBottom: '100px' }}>
         {filteredProjects.length === 0 ? (
-          <div className="text-center text-slate-500 text-sm italic w-full mt-2 py-8" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px' }}>
+          <div className="text-center w-full mt-2 py-8" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
             {searchQuery ? 'Nincs a keresésnek megfelelő projekt.' : `Nincsenek ${activeTab === 'active' ? 'aktív' : 'archivált'} projektek.`}
           </div>
         ) : (
