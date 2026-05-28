@@ -91,3 +91,9 @@ CREATE POLICY "Enable insert for authenticated users" ON public.media FOR INSERT
 
 CREATE POLICY "Enable read for authenticated users" ON public.messages FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Enable insert for authenticated users" ON public.messages FOR INSERT TO authenticated WITH CHECK (true);
+
+-- 6. REALTIME REPLIKÁCIÓ ENGEDÉLYEZÉSE (Ezt a Supabase SQL Editor-ban is le kell futtatni!)
+-- Ha a publication nem létezik, hozzuk létre, különben adjuk hozzá a táblákat
+alter publication supabase_realtime add table public.projects;
+alter publication supabase_realtime add table public.media;
+alter publication supabase_realtime add table public.messages;
