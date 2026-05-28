@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 
 // Külön, ideiglenes Supabase kliens létrehozása session perzisztencia NÉLKÜL.
 // Ez azért kell, hogy ha az Admin új felhasználót regisztrál be a client-side signUp-pal,
@@ -32,6 +33,38 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
   const [emergencyPhone, setEmergencyPhone] = useState('');
   const [jobTitle, setJobTitle] = useState('');
   const [hourlyWage, setHourlyWage] = useState('3500');
+
+  useEffect(() => {
+    if (isOpen) {
+      async function generateNextSerial() {
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('serial_number');
+          
+          if (error) throw error;
+          
+          let maxNum = 0;
+          if (data && data.length > 0) {
+            data.forEach(p => {
+              const num = parseInt(p.serial_number);
+              if (!isNaN(num) && num > maxNum) {
+                maxNum = num;
+              }
+            });
+          }
+          
+          const nextNum = maxNum + 1;
+          const formattedSerial = String(nextNum).padStart(3, '0');
+          setSerialNumber(formattedSerial);
+        } catch (err) {
+          console.error("Nem sikerült a sorszám generálása:", err);
+          setSerialNumber('001');
+        }
+      }
+      generateNextSerial();
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

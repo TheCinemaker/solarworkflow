@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
 export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
@@ -16,6 +16,38 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
   const [isSolar, setIsSolar] = useState(false); // Napelemes projekt jelző
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      async function generateNextSerial() {
+        try {
+          const { data, error } = await supabase
+            .from('projects')
+            .select('serial_number');
+          
+          if (error) throw error;
+          
+          let maxNum = 0;
+          if (data && data.length > 0) {
+            data.forEach(p => {
+              const num = parseInt(p.serial_number);
+              if (!isNaN(num) && num > maxNum) {
+                maxNum = num;
+              }
+            });
+          }
+          
+          const nextNum = maxNum + 1;
+          const formattedSerial = String(nextNum).padStart(3, '0');
+          setSerialNumber(formattedSerial);
+        } catch (err) {
+          console.error("Nem sikerült a sorszám generálása:", err);
+          setSerialNumber('001');
+        }
+      }
+      generateNextSerial();
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
