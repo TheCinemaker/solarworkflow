@@ -21,6 +21,7 @@ export default function ProjectDetails() {
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null); // Feltöltendő fájl átmenetileg
   const [filePreview, setFilePreview] = useState(null); // Előnézet URL
+  const [previewImage, setPreviewImage] = useState(null); // Nagyított kép overlay-hez
   
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -287,7 +288,7 @@ export default function ProjectDetails() {
 
       {/* Archivált Banner */}
       {project?.archived && (
-        <div className="mx-5 mb-4 p-3 rounded-2xl flex items-center justify-between text-xs font-semibold" style={{ background: 'rgba(255, 214, 10, 0.12)', border: '1px solid rgba(255, 214, 10, 0.25)', color: '#ffd60a' }}>
+        <div className="mx-5 mb-4 p-3 rounded-md flex items-center justify-between text-xs font-semibold" style={{ background: 'rgba(255, 214, 10, 0.12)', border: '1px solid rgba(255, 214, 10, 0.25)', color: '#ffd60a' }}>
           <div className="flex items-center space-x-2">
             <span>🗂</span>
             <span>Ez egy lezárt, archivált projekt.</span>
@@ -295,7 +296,7 @@ export default function ProjectDetails() {
           {isAdmin && (
           <button 
             onClick={handleRestoreProject}
-            className="px-2.5 py-1 rounded-lg font-bold transition-all hover:scale-[1.03]"
+            className="px-2.5 py-1 rounded-md font-bold transition-all hover:scale-[1.03]"
             style={{ background: '#ffd60a', color: '#000', border: 'none' }}
           >
             Visszaállítás aktívvá
@@ -305,7 +306,7 @@ export default function ProjectDetails() {
       )}
       
       {/* Fő Kártya (Hero Panel) */}
-      <div className="dhero fu d1">
+      <div className="dhero fu d1" style={{ marginBottom: '15px' }}>
         <div className="dh-tag">⚡ Projekt Adatlap {project?.serial_number ? `· ${project.serial_number}` : ''}</div>
         <div className="dh-name">{project?.name || 'Névtelen Projekt'}</div>
         <div className="dh-addr">📍 {project?.address || 'Nincs cím megadva'}</div>
@@ -325,7 +326,7 @@ export default function ProjectDetails() {
       {/* NAPELEM ELEKTROMOS TELEMETRIA VAGY AKTIVÁLÓ GOMB (CSAK NAPELEMES PROJEKTEKNÉL) */}
       {project?.is_solar && (
         !project?.inverter_brand ? (
-          <div className="px-5 mt-3.5 fu d1">
+          <div className="gcard fu d1" style={{ padding: 0, border: 'none', background: 'transparent', marginTop: '15px', marginBottom: '15px' }}>
             <div 
               onClick={async () => {
                 const brand = window.prompt("Milyen invertert szereltek ezen a projekten?\n(pl. Fronius, SolarEdge, Huawei, Growatt)\n\nHa beírod a márkát, az app azonnal aktiválja az élő telemetria monitort!");
@@ -341,7 +342,7 @@ export default function ProjectDetails() {
                   }
                 }
               }}
-              className="p-3.5 rounded-3xl flex items-center justify-between cursor-pointer transition-all hover:bg-white/[0.02] active:scale-98"
+              className="p-3.5 rounded-md flex items-center justify-between cursor-pointer transition-all hover:bg-white/[0.02] active:scale-98"
               style={{
                 background: 'var(--s1)',
                 border: '1px dashed var(--b1)',
@@ -354,21 +355,18 @@ export default function ProjectDetails() {
                   <div className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Inverter API távoli elérés konfigurálása</div>
                 </div>
               </div>
-              <span className="text-[10px] bg-white/5 border border-white/10 px-2.5 py-1 rounded-full text-slate-400 font-black uppercase tracking-wider">Aktiválás ›</span>
+              <span className="text-[10px] bg-white/5 border border-white/10 px-2.5 py-1 rounded-md text-slate-400 font-black uppercase tracking-wider" style={{ marginRight: '15px' }}>Aktiválás ›</span>
             </div>
           </div>
         ) : (
-          <div className="px-5 mt-3.5 fu d1">
-            <div 
-              className="p-4 rounded-3xl overflow-hidden transition-all duration-300 relative"
-              style={{
-                background: 'linear-gradient(135deg, rgba(7, 9, 15, 0.9), rgba(15, 23, 42, 0.8))',
-                border: showLiveTelemetry ? '1px solid rgba(46, 209, 88, 0.3)' : '1px solid var(--b1)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                boxShadow: showLiveTelemetry ? '0 10px 30px rgba(46, 209, 88, 0.08)' : 'none'
-              }}
-            >
+          <div className="gcard fu d1" style={{ 
+            marginTop: '15px', 
+            marginBottom: '15px',
+            padding: '16px',
+            background: 'linear-gradient(135deg, rgba(7, 9, 15, 0.9), rgba(15, 23, 42, 0.8))',
+            border: showLiveTelemetry ? '1px solid rgba(46, 209, 88, 0.3)' : '1px solid var(--b1)',
+            boxShadow: showLiveTelemetry ? '0 10px 30px rgba(46, 209, 88, 0.08)' : 'none'
+          }}>
               {/* Felső információs sáv */}
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center space-x-2">
@@ -408,7 +406,7 @@ export default function ProjectDetails() {
                   {/* Telemetria Rács */}
                   <div className="grid grid-cols-2 gap-3.5">
                     {/* 1. kártya: Pillanatnyi teljesítmény */}
-                    <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/[0.04] flex flex-col justify-between">
+                    <div className="p-3 rounded-md bg-white/[0.02] border border-white/[0.04] flex flex-col justify-between">
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Aktuális erő</span>
                       <div className="flex items-baseline space-x-1 mt-1.5">
                         <span className="text-2xl font-black text-emerald-400 tracking-tight transition-all duration-300">
@@ -420,7 +418,7 @@ export default function ProjectDetails() {
                     </div>
 
                     {/* 2. kártya: Napi összes termelés */}
-                    <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/[0.04] flex flex-col justify-between">
+                    <div className="p-3 rounded-md bg-white/[0.02] border border-white/[0.04] flex flex-col justify-between">
                       <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Mai termelés</span>
                       <div className="flex items-baseline space-x-1 mt-1.5">
                         <span className="text-2xl font-black text-slate-200 tracking-tight">14.82</span>
@@ -431,7 +429,7 @@ export default function ProjectDetails() {
                   </div>
 
                   {/* Grafikon Zóna: Gyönyörű neon-zöld SVG szinusz hullám */}
-                  <div className="p-3.5 rounded-2xl bg-black/20 border border-white/[0.03] relative overflow-hidden">
+                  <div className="p-3.5 rounded-md bg-black/20 border border-white/[0.03] relative overflow-hidden">
                     <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Termelési görbe (Ma)</span>
                     
                     {/* Neon vonal diagram */}
@@ -488,13 +486,12 @@ export default function ProjectDetails() {
                 </div>
               )}
             </div>
-          </div>
         )
       )}
 
       {/* Telegram Csoport Link Gomb */}
       {project?.telegram_link && (
-        <div className="px-5 mt-3.5 fu d1">
+        <div className="gcard fu d1" style={{ padding: 0, border: 'none', background: 'transparent', marginTop: '15px', marginBottom: '15px' }}>
           <a 
             href={project.telegram_link} 
             target="_blank" 
@@ -516,13 +513,13 @@ export default function ProjectDetails() {
 
       {/* Archiválás Gomb (Csak ha még nincs lezárva és Admin) */}
       {!project?.archived && isAdmin && (
-        <div className="px-5 mt-3 fu d1 flex justify-center">
+        <div className="gcard fu d1" style={{ padding: 0, border: 'none', background: 'transparent', marginTop: '15px', marginBottom: '15px', display: 'flex', justifyContent: 'center' }}>
           <button 
             onClick={handleArchiveProject} 
-            className="font-extrabold flex items-center justify-center space-x-1.5 pt-2 pb-2 px-5 text-center text-xs transition-all hover:scale-[1.02]"
+            className="font-extrabold flex items-center justify-center space-x-2.5 pt-3 pb-3 px-8 text-center text-xs transition-all hover:scale-[1.02]"
             style={{
               background: progressPercent === 100 ? 'linear-gradient(135deg, #ffd60a, #ccab00)' : 'rgba(255, 255, 255, 0.05)',
-              borderRadius: '20px',
+              borderRadius: '6px',
               color: progressPercent === 100 ? '#000' : 'var(--t2)',
               border: progressPercent === 100 ? 'none' : '1px solid var(--b1)',
               boxShadow: progressPercent === 100 ? '0 8px 25px rgba(255, 214, 10, 0.15)' : 'none',
@@ -546,7 +543,7 @@ export default function ProjectDetails() {
         <div className="shdr-t">Megrendelő és Időtartam</div>
       </div>
 
-      <div className="gcard fu d2 space-y-3" style={{ background: 'var(--s1)', border: '1px solid var(--b1)' }}>
+      <div className="gcard fu d2 space-y-3" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginBottom: '15px' }}>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
             <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Megrendelő</div>
@@ -592,7 +589,7 @@ export default function ProjectDetails() {
         <div className="shdr-a">{completedTasks.length}/{tasks.length} kész</div>
       </div>
 
-      <div className="gcard fu d3" style={{ background: 'var(--s1)', border: '1px solid var(--b1)' }}>
+      <div className="gcard fu d3" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginBottom: '15px' }}>
         {tasks.length === 0 ? (
           <div className="text-center text-xs text-slate-400 italic py-3">
             Ehhez a projekthez nincs feladatlista megadva.
@@ -628,8 +625,8 @@ export default function ProjectDetails() {
       </div>
 
       {/* Kép feltöltése zóna */}
-      <div className="px-5 fu d4">
-        <label className="upload-area block relative overflow-hidden" style={{ background: 'var(--s1)', border: '1.5px dashed var(--b2)', borderRadius: '22px' }}>
+      <div className="gcard fu d4" style={{ padding: 0, border: 'none', background: 'transparent', marginBottom: '15px' }}>
+        <label className="upload-area block relative overflow-hidden" style={{ background: 'var(--s1)', border: '1.5px dashed var(--b2)', borderRadius: '6px' }}>
           <input 
             type="file" 
             accept="image/*" 
@@ -667,7 +664,7 @@ export default function ProjectDetails() {
             style={{ 
               background: 'var(--s1)', 
               border: '1px solid var(--b1)', 
-              borderRadius: '24px', 
+              borderRadius: '6px', 
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' 
             }}
           >
@@ -784,7 +781,7 @@ export default function ProjectDetails() {
       )}
 
       {/* Galéria Rács (Modern 2-oszlopos Kártyarendszer megjegyzésekkel) */}
-      <div className="px-5 mt-4 pb-20 fu d5">
+      <div className="gcard mt-4 pb-20 fu d5" style={{ padding: 0, border: 'none', background: 'transparent' }}>
         {photos.length === 0 ? (
           <div className="text-center text-xs text-slate-400 italic py-6" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px' }}>
             Még nincs feltöltött fotó ehhez a projekthez.
@@ -802,7 +799,7 @@ export default function ProjectDetails() {
               return (
                 <div 
                   key={photo.id || index} 
-                  className="rounded-2xl overflow-hidden flex flex-col relative"
+                  className="rounded-md overflow-hidden flex flex-col relative"
                   style={{
                     background: 'var(--s1)',
                     border: photo.resolved 
@@ -812,12 +809,10 @@ export default function ProjectDetails() {
                     WebkitBackdropFilter: 'blur(8px)'
                   }}
                 >
-                  {/* Kép kattintható változata nagyban megnyitáshoz */}
-                  <a 
-                    href={photo.file_path} 
-                    target="_blank" 
-                    rel="noreferrer" 
-                    className="block aspect-video relative"
+                  {/* Kép kattintható változata nagyban megnyitáshoz (in-app overlay) */}
+                  <div 
+                    onClick={() => setPreviewImage(photo)}
+                    className="block aspect-video relative cursor-pointer"
                     style={{
                       backgroundImage: `url(${photo.file_path})`,
                       backgroundSize: 'cover',
@@ -835,7 +830,7 @@ export default function ProjectDetails() {
                     }}>
                       {photo.resolved ? '🟢 Kijavítva' : (photo.is_issue ? '⚠️ Hiba' : '🟢 Haladás')}
                     </div>
-                  </a>
+                  </div>
                   
                   {/* Kártya alsó rész: Feltöltő + Időpont + Megjegyzés */}
                   <div className="p-2.5 flex flex-col space-y-1 text-[11px] leading-tight">
@@ -867,11 +862,14 @@ export default function ProjectDetails() {
                       <div className="mt-2 pt-2 border-t border-white/5 space-y-1.5">
                         <div className="text-[9px] text-emerald-400 font-extrabold uppercase tracking-wider">✅ Javítás Igazolása:</div>
                         {photo.resolved_file_path && (
-                          <a 
-                            href={photo.resolved_file_path} 
-                            target="_blank" 
-                            rel="noreferrer" 
-                            className="block aspect-video rounded-lg overflow-hidden border border-emerald-500/20 relative"
+                          <div 
+                            onClick={() => setPreviewImage({
+                              file_path: photo.resolved_file_path,
+                              description: `Javítás igazolása: ${photo.resolved_comment || 'Sikeresen javítva.'}`,
+                              profiles: photo.profiles,
+                              created_at: photo.resolved_at || photo.created_at
+                            })}
+                            className="block aspect-video rounded-lg overflow-hidden border border-emerald-500/20 relative cursor-pointer"
                             style={{
                               backgroundImage: `url(${photo.resolved_file_path})`,
                               backgroundSize: 'cover',
@@ -880,7 +878,7 @@ export default function ProjectDetails() {
                             }}
                           >
                             <div className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-emerald-500/80 text-[7px] text-white font-bold">Nagyítás</div>
-                          </a>
+                          </div>
                         )}
                         <div className="text-[10px] text-slate-300 italic p-1.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 leading-snug">
                           🛠️ {photo.resolved_comment || 'Sikeresen javítva.'}
@@ -894,6 +892,80 @@ export default function ProjectDetails() {
           </div>
         )}
       </div>
+
+      {/* 🖼️ IN-APP APPLE STÍLUSÚ IMMERZÍV FÉNYKÉP NÉZEGETŐ OVERLAY */}
+      {previewImage && (
+        <div 
+          className="fixed inset-0 z-[2000] flex flex-col items-center justify-center p-4" 
+          style={{ 
+            background: 'rgba(7, 9, 15, 0.96)', 
+            backdropFilter: 'blur(25px)', 
+            WebkitBackdropFilter: 'blur(25px)',
+            animation: 'fadeIn 0.25s ease-out'
+          }}
+        >
+          {/* Felső Vissza navigációs sáv */}
+          <div className="absolute top-5 left-5 right-5 flex justify-between items-center z-[2010]">
+            <button 
+              onClick={() => setPreviewImage(null)}
+              className="px-4 py-2 rounded-full font-bold text-xs flex items-center space-x-1 transition-all active:scale-95"
+              style={{ 
+                background: 'rgba(255, 255, 255, 0.08)', 
+                border: '1px solid rgba(255, 255, 255, 0.15)', 
+                color: '#fff',
+                cursor: 'pointer'
+              }}
+            >
+              <span>‹ Bezárás</span>
+            </button>
+            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">VoltDesk Képnézegető</span>
+          </div>
+
+          <div 
+            className="w-full max-w-lg flex items-center justify-center relative rounded-md overflow-hidden" 
+            style={{ 
+              maxHeight: '70vh', 
+              boxShadow: '0 20px 50px rgba(0,0,0,0.8)',
+              border: '1px solid rgba(255,255,255,0.05)'
+            }}
+          >
+            <img 
+              src={previewImage.file_path} 
+              alt={previewImage.description || 'Fénykép'} 
+              className="max-w-full max-h-[70vh] object-contain rounded-md"
+            />
+          </div>
+
+          {/* Alsó Adatlap Kártya (Információk a képről) */}
+          <div 
+            className="w-full max-w-sm mt-6 p-4 rounded-md flex flex-col space-y-2 text-left"
+            style={{ 
+              background: 'rgba(255,255,255,0.02)', 
+              border: '1px solid rgba(255,255,255,0.06)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)'
+            }}
+          >
+            <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+              <span>👷 Feltöltötte: {previewImage.profiles?.full_name || 'Dolgozó'}</span>
+              <span>{previewImage.created_at && new Date(previewImage.created_at).toLocaleDateString('hu-HU', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}</span>
+            </div>
+            
+            {previewImage.description ? (
+              <div className="text-xs font-semibold text-slate-100 leading-snug pt-1">
+                💬 {previewImage.description}
+              </div>
+            ) : (
+              <div className="text-xs text-slate-500 italic pt-1">Nincs megjegyzés ehhez a képhez.</div>
+            )}
+          </div>
+        </div>
+      )}
 
       <EditProjectModal
         isOpen={isEditModalOpen}

@@ -129,7 +129,7 @@ export default function ProjectList() {
         )}
       </div>
 
-      <div className="fu d3 px-5" style={{ display: 'flex', flexDirection: 'column', gap: '15px', paddingBottom: '100px' }}>
+      <div className="fu d3" style={{ padding: '0 20px 100px' }}>
         {filteredProjects.length === 0 ? (
           <div className="text-center w-full mt-2 py-8" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
             {searchQuery ? 'Nincs a keresésnek megfelelő projekt.' : `Nincsenek ${activeTab === 'active' ? 'aktív' : 'archivált'} projektek.`}
@@ -143,16 +143,15 @@ export default function ProjectList() {
             const progress = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
             
             return (
-              <div 
-                key={proj.id} 
-                className="pc animate-[fadeIn_0.2s_ease-out]" 
-                style={{ 
+              <div
+                key={proj.id}
+                className="pc animate-[fadeIn_0.2s_ease-out]"
+                style={{
                   width: '100%',
-                  flexShrink: 0,
-                  marginBottom: '15px',
+                  marginBottom: '14px',
                   border: proj.archived ? '1px solid rgba(255,255,255,0.05)' : '1px solid var(--b1)',
                   background: proj.archived ? 'rgba(7, 9, 15, 0.4)' : 'var(--s1)'
-                }} 
+                }}
                 onClick={() => navigate(`/project/${proj.id}`)}
               >
                 <div className="pc-tag" style={{

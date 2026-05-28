@@ -29,9 +29,9 @@ body{
   --yellow:#ffd60a;
   --tg:#2AABEE;
   /* Design tokens */
-  --btn-r:12px;
-  --card-r:16px;
-  --input-r:8px;
+  --btn-r:6px;
+  --card-r:6px;
+  --input-r:6px;
 }
 
 input,select,textarea{transition:border-color .15s ease}
