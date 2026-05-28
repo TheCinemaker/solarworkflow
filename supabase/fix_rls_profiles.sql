@@ -11,6 +11,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- 2. A korábbi szigorú módosítási policy törlése
 DROP POLICY IF EXISTS "Enable update for users based on id" ON public.profiles;
+DROP POLICY IF EXISTS "Enable update for users and admins" ON public.profiles;
 
 -- 3. Új policy létrehozása, amely engedi a saját profil szerkesztését, VAGY ha a bejelentkezett felhasználó Admin
 CREATE POLICY "Enable update for users and admins" ON public.profiles
