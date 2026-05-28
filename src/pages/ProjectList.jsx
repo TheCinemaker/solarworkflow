@@ -149,6 +149,7 @@ export default function ProjectList() {
                 style={{ 
                   width: '100%',
                   flexShrink: 0,
+                  marginBottom: '15px',
                   border: proj.archived ? '1px solid rgba(255,255,255,0.05)' : '1px solid var(--b1)',
                   background: proj.archived ? 'rgba(7, 9, 15, 0.4)' : 'var(--s1)'
                 }} 
