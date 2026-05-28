@@ -10,8 +10,8 @@ export default function MainLayout() {
     { to: '/', icon: '⬡', label: 'Főoldal' },
     { to: '/projects', icon: '📁', label: 'Projektek' },
     { to: '/calendar', icon: '📅', label: 'Naptár' },
-    { to: '/timesheet', icon: '📋', label: 'Napi lap' },
-    ...(user?.role === 'admin' ? [{ to: '/finance', icon: '👷', label: 'Munkások' }] : []),
+    { to: '/timesheet', icon: '📋', label: 'Munkalapok' },
+    ...(user?.role === 'admin' ? [{ to: '/finance', icon: '👷', label: 'Dolgozók' }] : []),
   ];
 
   return (

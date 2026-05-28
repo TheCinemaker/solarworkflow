@@ -39,7 +39,7 @@ export default function Dashboard() {
 
       // 1. Általános statisztikák
       const { count: projectsCount } = await supabase.from('projects').select('*', { count: 'exact', head: true }).eq('archived', false);
-      const { count: workersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+      const { count: workersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).neq('role', 'admin');
       const { count: worklogsCount } = await supabase.from('worklogs').select('*', { count: 'exact', head: true }).eq('date', new Date().toISOString().split('T')[0]);
       const { count: issuesCount } = await supabase.from('media').select('*', { count: 'exact', head: true }).eq('is_issue', true).eq('resolved', false);
       
@@ -138,10 +138,10 @@ export default function Dashboard() {
     <div className="page active" id="p-home">
       <div className="page-header fu">
         <div>
-          <div className="pg-greet">{greeting.text}, {name}! {greeting.emoji}</div>
+          <div className="pg-greet">{greeting.text}, {name}!</div>
           <div className="pg-title">{isAdmin ? 'Adminisztráció' : 'VoltDesk dashboard'}</div>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center" style={{ gap: '5px' }}>
           <div className="hdr-btn" onClick={() => navigate('/calendar')} title="Naptár">📅</div>
           <div 
             className="hdr-btn" 
@@ -172,17 +172,17 @@ export default function Dashboard() {
             <div className="sc" onClick={() => navigate('/timesheet')}>
               <div className="sc-lbl">Mai munkalapok</div>
               <div className="sc-val" style={{color:'#2ed158'}}>{stats.worklogs}</div>
-              <div className="sc-sub">{stats.workers} munkás terepen</div>
+              <div className="sc-sub">{stats.workers} dolgozó terepen</div>
             </div>
             <div className="sc cursor-pointer" onClick={() => navigate('/finance')}>
               <div className="sc-lbl">Havi bevétel</div>
               <div className="sc-val" style={{color:'#ffd60a'}}>{(stats.income || 0).toLocaleString('hu-HU')} Ft</div>
-              <div className="sc-sub">Részletes könyvelés →</div>
+              <div className="sc-sub" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Részletes könyvelés →</div>
             </div>
             <div className="sc" onClick={() => navigate('/issues')}>
-              <div className="sc-lbl">Nyitott hibák</div>
+              <div className="sc-lbl">Aktív hibák</div>
               <div className="sc-val" style={{color:'#ff3b30'}}>{stats.issues}</div>
-              <div className="sc-sub">⚠️ Aktív akadályok</div>
+              <div className="sc-sub">Javításra váró hibák</div>
             </div>
           </>
         ) : (
@@ -204,11 +204,11 @@ export default function Dashboard() {
 
       {/* GYORS MŰVELETEK (Szerepkör alapú gomb elrejtéssel) */}
       <div className="shdr fu d3">
-        <div className="shdr-t">Gyors műveletek</div>
+        <div className="shdr-t">Gyorsműveletek</div>
       </div>
       <div className="qa-row fu d3">
         <div className="qa" onClick={() => navigate('/timesheet')}>
-          <span className="qa-i">📋</span><div className="qa-l">Napi lap</div>
+          <span className="qa-i">📋</span><div className="qa-l">Munkalapok</div>
         </div>
         <div className="qa" onClick={() => navigate('/calendar')}>
           <span className="qa-i">📅</span><div className="qa-l">Naptár</div>
