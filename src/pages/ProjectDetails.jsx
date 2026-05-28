@@ -269,7 +269,7 @@ export default function ProjectDetails() {
 
   return (
     <div className="page active scroll-area" id="p-detail">
-      <div className="flex justify-between items-center px-5 mb-2.5 fu">
+      <div className="flex justify-between items-center px-[15px] mb-2.5 fu">
         <div className="back-btn" style={{ margin: 0 }} onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
         {isAdmin && (
           <button 
@@ -288,7 +288,7 @@ export default function ProjectDetails() {
 
       {/* Archivált Banner */}
       {project?.archived && (
-        <div className="mx-5 mb-4 p-3 rounded-md flex items-center justify-between text-xs font-semibold" style={{ background: 'rgba(255, 214, 10, 0.12)', border: '1px solid rgba(255, 214, 10, 0.25)', color: '#ffd60a' }}>
+        <div className="mx-[15px] mb-4 p-3 rounded-md flex items-center justify-between text-xs font-semibold" style={{ background: 'rgba(255, 214, 10, 0.12)', border: '1px solid rgba(255, 214, 10, 0.25)', color: '#ffd60a' }}>
           <div className="flex items-center space-x-2">
             <span>🗂</span>
             <span>Ez egy lezárt, archivált projekt.</span>
@@ -533,7 +533,7 @@ export default function ProjectDetails() {
       )}
 
       {error && (
-        <div className="mx-5 mt-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-xs">
+        <div className="mx-[15px] mt-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-xs">
           {error}
         </div>
       )}
