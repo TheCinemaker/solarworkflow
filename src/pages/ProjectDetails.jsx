@@ -27,7 +27,7 @@ export default function ProjectDetails() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [sendingMsg, setSendingMsg] = useState(false);
-  const chatEndRef = useRef(null);
+  const chatContainerRef = useRef(null);
 
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -180,10 +180,10 @@ export default function ProjectDetails() {
     };
   }, [id]);
 
-  // Görgetés a legújabb chat üzenethez
+  // Görgetés a legújabb chat üzenethez (csak a chat dobozon belül)
   useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [messages]);
 
@@ -693,6 +693,7 @@ export default function ProjectDetails() {
       <div className="gcard fu d2_5 flex flex-col" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginBottom: '15px', padding: '12px' }}>
         {/* Üzenetek görgethető doboza */}
         <div 
+          ref={chatContainerRef}
           className="scroll-area flex flex-col space-y-2 mb-3 pr-1"
           style={{ 
             maxHeight: '260px', 
@@ -742,7 +743,6 @@ export default function ProjectDetails() {
                   </div>
                 );
               })}
-              <div ref={chatEndRef} />
             </div>
           )}
         </div>
