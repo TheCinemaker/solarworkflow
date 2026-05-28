@@ -762,7 +762,8 @@ export default function ProjectDetails() {
                       alignSelf: isOwn ? 'flex-end' : 'flex-start',
                       background: isOwn ? 'linear-gradient(135deg, #0088cc, #005580)' : 'rgba(255, 255, 255, 0.05)',
                       border: isOwn ? '1px solid rgba(0, 136, 204, 0.2)' : '1px solid var(--b1)',
-                      borderRadius: '6px'
+                      borderRadius: '6px',
+                      padding: '8px 12px'
                     }}
                   >
                     <div className="flex items-center space-x-1.5 mb-1 opacity-75 font-bold text-[9px] uppercase tracking-wider">
