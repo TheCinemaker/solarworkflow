@@ -25,7 +25,7 @@ export default function Login() {
   const inputStyle = {
     background: 'var(--s1)',
     border: '1px solid var(--b1)',
-    borderRadius: '8px',
+    borderRadius: 'var(--input-r)',
     padding: '11px 14px',
     color: 'var(--t1)',
     fontSize: '15px',
@@ -64,7 +64,7 @@ export default function Login() {
         maxWidth: '360px',
         background: 'var(--s1)',
         border: '1px solid var(--b1)',
-        borderRadius: '20px',
+        borderRadius: 'var(--card-r)',
         padding: '36px 28px 32px',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
@@ -76,7 +76,7 @@ export default function Login() {
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0, height: '1px',
           background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent)',
-          borderRadius: '20px 20px 0 0',
+          borderRadius: 'var(--card-r) var(--card-r) 0 0',
         }} />
 
         {/* Logo & Title */}
@@ -84,7 +84,7 @@ export default function Login() {
           <div style={{
             width: '54px',
             height: '54px',
-            borderRadius: '14px',
+            borderRadius: 'var(--card-r)',
             background: 'rgba(79,142,247,0.10)',
             border: '1px solid rgba(79,142,247,0.22)',
             display: 'flex',
@@ -110,7 +110,7 @@ export default function Login() {
           <div style={{
             background: 'rgba(255,59,48,0.08)',
             border: '1px solid rgba(255,59,48,0.20)',
-            borderRadius: '8px',
+            borderRadius: 'var(--card-r)',
             padding: '10px 14px',
             marginBottom: '20px',
             fontSize: '13px',
@@ -155,7 +155,7 @@ export default function Login() {
             style={{
               background: loading ? 'rgba(79,142,247,0.45)' : 'linear-gradient(135deg,#4f8ef7,#2a5ccc)',
               border: 'none',
-              borderRadius: '12px',
+              borderRadius: 'var(--btn-r)',
               padding: '14px',
               color: '#fff',
               fontSize: '15px',

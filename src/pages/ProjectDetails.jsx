@@ -360,7 +360,7 @@ export default function ProjectDetails() {
 
   if (loading) {
     return (
-      <div className="page active flex items-center justify-center h-screen text-slate-400">
+      <div className="page active flex items-center justify-center h-screen text-[var(--t3)]">
         Adatok betöltése...
       </div>
     );
@@ -415,7 +415,7 @@ export default function ProjectDetails() {
         
         {/* Készültségi sáv */}
         <div className="mt-4">
-          <div className="flex justify-between items-center text-xs text-slate-300 mb-1.5 font-semibold">
+          <div className="flex justify-between items-center text-xs text-[var(--t2)] mb-1.5 font-semibold">
             <span>Készültségi szint</span>
             <span>{progressPercent}%</span>
           </div>
@@ -453,11 +453,11 @@ export default function ProjectDetails() {
               <div className="flex items-center space-x-3">
                 <span className="text-xl">☀️</span>
                 <div className="text-left">
-                  <div className="text-xs font-black text-slate-300 tracking-tight">Napelemes távfelügyelet beállítása</div>
-                  <div className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Inverter API távoli elérés konfigurálása</div>
+                  <div className="text-xs font-black text-[var(--t2)] tracking-tight">Napelemes távfelügyelet beállítása</div>
+                  <div className="text-[9px] text-[var(--t3)] font-bold uppercase tracking-wider mt-0.5">Inverter API távoli elérés konfigurálása</div>
                 </div>
               </div>
-              <span className="text-[10px] bg-white/5 border border-white/10 px-2.5 py-1 rounded-md text-slate-400 font-black uppercase tracking-wider" style={{ marginRight: '15px' }}>Aktiválás ›</span>
+              <span className="text-[10px] bg-white/5 border border-white/10 px-2.5 py-1 rounded-md text-[var(--t3)] font-black uppercase tracking-wider" style={{ marginRight: '15px' }}>Aktiválás ›</span>
             </div>
           </div>
         ) : (
@@ -473,7 +473,7 @@ export default function ProjectDetails() {
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center space-x-2">
                   <span className="text-base">⚡</span>
-                  <span className="text-xs font-extrabold uppercase tracking-wider text-slate-200">
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-[var(--t1)]">
                     {showLiveTelemetry ? 'Élő Termelés Követés' : 'Inverter Telemetria'}
                   </span>
                 </div>
@@ -487,8 +487,8 @@ export default function ProjectDetails() {
               {!showLiveTelemetry ? (
                 // Összecsukott, tiszta állapot
                 <div className="flex justify-between items-center">
-                  <div className="text-xs text-slate-400 font-medium">
-                    Készülék: <span className="text-slate-200 font-bold">{project.inverter_brand} (3-fázis)</span>
+                  <div className="text-xs text-[var(--t3)] font-medium">
+                    Készülék: <span className="text-[var(--t1)] font-bold">{project.inverter_brand} (3-fázis)</span>
                   </div>
                   <button 
                     onClick={() => setShowLiveTelemetry(true)}
@@ -509,30 +509,30 @@ export default function ProjectDetails() {
                   <div className="grid grid-cols-2 gap-3.5">
                     {/* 1. kártya: Pillanatnyi teljesítmény */}
                     <div className="p-3 rounded-md bg-white/[0.02] border border-white/[0.04] flex flex-col justify-between">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Aktuális erő</span>
+                      <span className="text-[9px] font-bold text-[var(--t3)] uppercase tracking-wider">Aktuális erő</span>
                       <div className="flex items-baseline space-x-1 mt-1.5">
                         <span className="text-2xl font-black text-emerald-400 tracking-tight transition-all duration-300">
                           {simulatedPower}
                         </span>
-                        <span className="text-xs font-bold text-slate-400">kW</span>
+                        <span className="text-xs font-bold text-[var(--t3)]">kW</span>
                       </div>
                       <span className="text-[8px] text-emerald-500/80 font-bold mt-1">● Élő adás a tetőről</span>
                     </div>
 
                     {/* 2. kártya: Napi összes termelés */}
                     <div className="p-3 rounded-md bg-white/[0.02] border border-white/[0.04] flex flex-col justify-between">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Mai termelés</span>
+                      <span className="text-[9px] font-bold text-[var(--t3)] uppercase tracking-wider">Mai termelés</span>
                       <div className="flex items-baseline space-x-1 mt-1.5">
-                        <span className="text-2xl font-black text-slate-200 tracking-tight">14.82</span>
-                        <span className="text-xs font-bold text-slate-400">kWh</span>
+                        <span className="text-2xl font-black text-[var(--t1)] tracking-tight">14.82</span>
+                        <span className="text-xs font-bold text-[var(--t3)]">kWh</span>
                       </div>
-                      <span className="text-[8px] text-slate-500 font-medium mt-1">Összesített napi hozam</span>
+                      <span className="text-[8px] text-[var(--t3)] font-medium mt-1">Összesített napi hozam</span>
                     </div>
                   </div>
 
                   {/* Grafikon Zóna: Gyönyörű neon-zöld SVG szinusz hullám */}
                   <div className="p-3.5 rounded-md bg-black/20 border border-white/[0.03] relative overflow-hidden">
-                    <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Termelési görbe (Ma)</span>
+                    <span className="text-[8px] font-bold text-[var(--t3)] uppercase tracking-wider block mb-2">Termelési görbe (Ma)</span>
                     
                     {/* Neon vonal diagram */}
                     <div className="w-full h-16 flex items-end">
@@ -561,7 +561,7 @@ export default function ProjectDetails() {
                         <circle cx="65" cy="8" r="1.5" fill="#10b981" />
                       </svg>
                     </div>
-                    <div className="flex justify-between items-center text-[7px] text-slate-500 font-bold uppercase tracking-wider mt-2.5">
+                    <div className="flex justify-between items-center text-[7px] text-[var(--t3)] font-bold uppercase tracking-wider mt-2.5">
                       <span>06:00 (Napfelkelte)</span>
                       <span className="text-emerald-400 font-extrabold">12:35 (Most)</span>
                       <span>20:00 (Naplemente)</span>
@@ -570,8 +570,8 @@ export default function ProjectDetails() {
 
                   {/* Részletek és Összecsukás */}
                   <div className="flex justify-between items-center pt-1">
-                    <div className="text-[10px] text-slate-400">
-                      IP: <span className="text-slate-300 font-bold">192.168.1.185</span> · {project.inverter_brand} API v2
+                    <div className="text-[10px] text-[var(--t3)]">
+                      IP: <span className="text-[var(--t2)] font-bold">192.168.1.185</span> · {project.inverter_brand} API v2
                     </div>
                     <button 
                       onClick={() => setShowLiveTelemetry(false)}
@@ -648,29 +648,29 @@ export default function ProjectDetails() {
       <div className="gcard fu d2 space-y-3" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginBottom: '15px' }}>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
-            <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Megrendelő</div>
-            <div className="font-semibold text-slate-100">{project?.client_name || 'Nincs megadva'}</div>
+            <div className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-0.5">Megrendelő</div>
+            <div className="font-semibold text-[var(--t1)]">{project?.client_name || 'Nincs megadva'}</div>
           </div>
           <div>
-            <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Telefonszám</div>
+            <div className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-0.5">Telefonszám</div>
             {project?.client_phone ? (
               <a href={`tel:${project.client_phone}`} className="font-semibold text-blue-400 hover:underline">
                 📱 {project.client_phone}
               </a>
             ) : (
-              <div className="text-slate-400 italic">Nincs megadva</div>
+              <div className="text-[var(--t3)] italic">Nincs megadva</div>
             )}
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3 text-sm pt-2 border-t border-white/5">
           <div>
-            <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Kezdési Dátum</div>
-            <div className="font-semibold text-slate-100">{project?.start_time || 'Nincs megadva'}</div>
+            <div className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-0.5">Kezdési Dátum</div>
+            <div className="font-semibold text-[var(--t1)]">{project?.start_time || 'Nincs megadva'}</div>
           </div>
           <div>
-            <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Befejezési Dátum</div>
-            <div className="font-semibold text-slate-100">{project?.end_time || 'Nincs megadva'}</div>
+            <div className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-0.5">Befejezési Dátum</div>
+            <div className="font-semibold text-[var(--t1)]">{project?.end_time || 'Nincs megadva'}</div>
           </div>
         </div>
 
@@ -705,7 +705,7 @@ export default function ProjectDetails() {
           }}
         >
           {messages.length === 0 ? (
-            <div className="text-center text-xs text-slate-400 italic my-auto py-6">
+            <div className="text-center text-xs text-[var(--t3)] italic my-auto py-6">
               Nincsenek még üzenetek ebben a chatben.<br/>Küldd el az első bejegyzést!
             </div>
           ) : (
@@ -722,7 +722,7 @@ export default function ProjectDetails() {
                     className={`flex flex-col max-w-[85%] rounded-[6px] p-2.5 text-xs transition-all ${
                       isOwn 
                         ? 'self-end bg-gradient-to-br from-[#0088cc] to-[#005580] text-white border border-[#0088cc]/20 shadow-md shadow-[#0088cc]/10' 
-                        : 'self-start bg-white/5 text-slate-100 border border-white/5'
+                        : 'self-start bg-white/5 text-[var(--t1)] border border-white/5'
                     }`}
                     style={{
                       alignSelf: isOwn ? 'flex-end' : 'flex-start',
@@ -793,7 +793,7 @@ export default function ProjectDetails() {
 
       <div className="gcard fu d3" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginBottom: '15px' }}>
         {tasks.length === 0 ? (
-          <div className="text-center text-xs text-slate-400 italic py-3">
+          <div className="text-center text-xs text-[var(--t3)] italic py-3">
             Ehhez a projekthez nincs feladatlista megadva.
           </div>
         ) : (
@@ -809,7 +809,7 @@ export default function ProjectDetails() {
                     }}>
                       {isDone && <span className="text-white text-xs">✓</span>}
                     </div>
-                    <span className={`text-sm font-medium transition-all ${isDone ? 'text-slate-500 line-through' : 'text-slate-200'}`}>
+                    <span className={`text-sm font-medium transition-all ${isDone ? 'text-[var(--t3)] line-through' : 'text-[var(--t1)]'}`}>
                       {task}
                     </span>
                   </div>
@@ -844,8 +844,8 @@ export default function ProjectDetails() {
           ) : (
             <div className="py-4 text-center cursor-pointer">
               <span className="ua-ico text-3xl block mb-1">📸</span>
-              <span className="ua-t text-sm font-bold text-slate-200">Fénykép készítése és beküldése</span>
-              <span className="ua-s text-[10px] text-slate-400 block mt-1">Kattints a kamera megnyitásához</span>
+              <span className="ua-t text-sm font-bold text-[var(--t1)]">Fénykép készítése és beküldése</span>
+              <span className="ua-s text-[10px] text-[var(--t3)] block mt-1">Kattints a kamera megnyitásához</span>
             </div>
           )}
         </label>
@@ -872,8 +872,8 @@ export default function ProjectDetails() {
           >
             {/* Modal Fejléc */}
             <div className="p-4 border-b border-white/5 flex justify-between items-center">
-              <span className="text-xs font-bold text-slate-100">📸 Fénykép ellenőrzése</span>
-              <button type="button" onClick={cancelPhotoUpload} className="text-slate-400 hover:text-white text-xs">Bezárás</button>
+              <span className="text-xs font-bold text-[var(--t1)]">📸 Fénykép ellenőrzése</span>
+              <button type="button" onClick={cancelPhotoUpload} className="text-[var(--t3)] hover:text-white text-xs">Bezárás</button>
             </div>
 
             <form onSubmit={submitPhotoUpload} className="p-4 space-y-4">
@@ -893,7 +893,7 @@ export default function ProjectDetails() {
 
               {/* TÍPUS KIVÁLASZTÁSA (2 hatalmas, gyönyörű Apple kártya egymás mellett) */}
               <div>
-                <label className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-2 block">Mi látható ezen a képen?</label>
+                <label className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-2 block">Mi látható ezen a képen?</label>
                 <div className="grid grid-cols-2 gap-3">
                   {/* Kártya 1: Munkafolyamat */}
                   <div 
@@ -906,7 +906,7 @@ export default function ProjectDetails() {
                     }}
                   >
                     <span className="text-xl">🟢</span>
-                    <span className="text-[11px] font-bold text-slate-200">Munkafolyamat</span>
+                    <span className="text-[11px] font-bold text-[var(--t1)]">Munkafolyamat</span>
                   </div>
 
                   {/* Kártya 2: Hiba */}
@@ -920,14 +920,14 @@ export default function ProjectDetails() {
                     }}
                   >
                     <span className="text-xl">⚠️</span>
-                    <span className="text-[11px] font-bold text-slate-200">Hiba / Akadály</span>
+                    <span className="text-[11px] font-bold text-[var(--t1)]">Hiba / Akadály</span>
                   </div>
                 </div>
               </div>
 
               {/* MEGJEGYZÉS (Ha hiba, akkor KÖTELEZŐ) */}
               <div>
-                <label className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1 block">
+                <label className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-1 block">
                   {isIssue ? '🔴 Probléma leírása (KÖTELEZŐ)' : 'Megjegyzés a képhez (Opcionális)'}
                 </label>
                 <input 
@@ -985,7 +985,7 @@ export default function ProjectDetails() {
       {/* Galéria Rács (Modern 2-oszlopos Kártyarendszer megjegyzésekkel) */}
       <div className="gcard mt-4 pb-20 fu d5" style={{ padding: 0, border: 'none', background: 'transparent' }}>
         {photos.length === 0 ? (
-          <div className="text-center text-xs text-slate-400 italic py-6" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px' }}>
+          <div className="text-center text-xs text-[var(--t3)] italic py-6" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px' }}>
             Még nincs feltöltött fotó ehhez a projekthez.
           </div>
         ) : (
@@ -1036,10 +1036,10 @@ export default function ProjectDetails() {
                   
                   {/* Kártya alsó rész: Feltöltő + Időpont + Megjegyzés */}
                   <div className="p-2.5 flex flex-col space-y-1 text-[11px] leading-tight">
-                    <div className="flex justify-between items-center text-[9px] text-slate-400 font-semibold uppercase tracking-wider">
+                    <div className="flex justify-between items-center text-[9px] text-[var(--t3)] font-semibold uppercase tracking-wider">
                       <span>👷 {photo.profiles?.full_name || 'Szerelő'}</span>
                     </div>
-                    <div className="text-[9px] text-slate-500">{formattedDate}</div>
+                    <div className="text-[9px] text-[var(--t3)]">{formattedDate}</div>
                     
                     {photo.description ? (
                       <div className="text-xs font-medium italic mt-1.5 p-1.5 rounded-lg border leading-snug" style={{ 
@@ -1056,7 +1056,7 @@ export default function ProjectDetails() {
                         💬 {photo.description}
                       </div>
                     ) : (
-                      <div className="text-[10px] text-slate-500 italic mt-1">Nincs leírás</div>
+                      <div className="text-[10px] text-[var(--t3)] italic mt-1">Nincs leírás</div>
                     )}
 
                     {/* JAVÍTÁS KÉPE ÉS LEÍRÁSA (Ha van) */}
@@ -1082,7 +1082,7 @@ export default function ProjectDetails() {
                             <div className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-emerald-500/80 text-[7px] text-white font-bold">Nagyítás</div>
                           </div>
                         )}
-                        <div className="text-[10px] text-slate-300 italic p-1.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 leading-snug">
+                        <div className="text-[10px] text-[var(--t2)] italic p-1.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 leading-snug">
                           🛠️ {photo.resolved_comment || 'Sikeresen javítva.'}
                         </div>
                       </div>
@@ -1120,7 +1120,7 @@ export default function ProjectDetails() {
             >
               <span>‹ Bezárás</span>
             </button>
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">VoltDesk Képnézegető</span>
+            <span className="text-[10px] font-black uppercase tracking-wider text-[var(--t3)]">VoltDesk Képnézegető</span>
           </div>
 
           <div 
@@ -1148,7 +1148,7 @@ export default function ProjectDetails() {
               WebkitBackdropFilter: 'blur(10px)'
             }}
           >
-            <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+            <div className="flex justify-between items-center text-[10px] text-[var(--t3)] font-bold uppercase tracking-wider">
               <span>👷 Feltöltötte: {previewImage.profiles?.full_name || 'Dolgozó'}</span>
               <span>{previewImage.created_at && new Date(previewImage.created_at).toLocaleDateString('hu-HU', {
                 month: 'short',
@@ -1159,11 +1159,11 @@ export default function ProjectDetails() {
             </div>
             
             {previewImage.description ? (
-              <div className="text-xs font-semibold text-slate-100 leading-snug pt-1">
+              <div className="text-xs font-semibold text-[var(--t1)] leading-snug pt-1">
                 💬 {previewImage.description}
               </div>
             ) : (
-              <div className="text-xs text-slate-500 italic pt-1">Nincs megjegyzés ehhez a képhez.</div>
+              <div className="text-xs text-[var(--t3)] italic pt-1">Nincs megjegyzés ehhez a képhez.</div>
             )}
           </div>
         </div>

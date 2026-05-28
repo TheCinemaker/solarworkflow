@@ -340,5 +340,5 @@ select option{background:#07090f}
 
 @keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 .fu{animation:fu .32s ease both}
-.d1{animation-delay:.05s}.d2{animation-delay:.10s}.d3{animation-delay:.16s}.d4{animation-delay:.22s}.d5{animation-delay:.28s}
+.d1{animation-delay:.05s}.d2{animation-delay:.10s}.d2_5{animation-delay:.13s}.d3{animation-delay:.16s}.d4{animation-delay:.22s}.d5{animation-delay:.28s}
 

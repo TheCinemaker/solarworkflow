@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
 export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
@@ -100,7 +100,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
   const inputStyle = {
     background: 'var(--s1)',
     border: '1px solid var(--b1)',
-    borderRadius: '10px',
+    borderRadius: 'var(--input-r)',
     padding: '7px 12px',
     color: 'var(--t1)',
     fontSize: '13px',
@@ -121,7 +121,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-4" style={{ background: 'rgba(7, 9, 15, 0.85)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
-      <div className="w-full max-w-md relative my-auto" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px', padding: '20px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+      <div className="w-full max-w-md relative my-auto" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: 'var(--card-r)', padding: '20px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
         <button 
           onClick={onClose}
           className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-full"
@@ -133,7 +133,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
         </button>
         
         <div className="flex items-center space-x-3 mb-4">
-          <div className="w-8 h-8 rounded-[8px] flex items-center justify-center" style={{ background: 'rgba(79, 142, 247, 0.15)', border: '1px solid rgba(79, 142, 247, 0.3)' }}>
+          <div className="w-8 h-8 rounded-[6px] flex items-center justify-center" style={{ background: 'rgba(79, 142, 247, 0.15)', border: '1px solid rgba(79, 142, 247, 0.3)' }}>
             <span style={{ fontSize: '16px' }}>⚡</span>
           </div>
           <div>
@@ -142,7 +142,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
         </div>
         
         {error && (
-          <div className="p-2 mb-3 rounded-lg text-xs" style={{ background: 'rgba(255, 59, 48, 0.1)', border: '1px solid rgba(255, 59, 48, 0.2)', color: 'var(--red)' }}>
+          <div className="p-2 mb-3 rounded-[6px] text-xs" style={{ background: 'rgba(255, 59, 48, 0.1)', border: '1px solid rgba(255, 59, 48, 0.2)', color: 'var(--red)' }}>
             {error}
           </div>
         )}
@@ -203,10 +203,10 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
           </div>
 
           {/* Napelem projekt checkbox (Apple switch) */}
-          <div className="p-3 rounded-2xl border border-white/5 flex items-center justify-between" style={{ background: 'rgba(255, 255, 255, 0.02)' }}>
+          <div className="p-3 rounded-[6px] border border-white/5 flex items-center justify-between" style={{ background: 'rgba(255, 255, 255, 0.02)' }}>
             <div className="flex flex-col">
-              <span className="text-xs font-bold text-slate-300">☀️ Napelemes projekt?</span>
-              <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Inverter és távfelügyelet bekapcsolása</span>
+              <span className="text-xs font-bold text-[var(--t2)]">☀️ Napelemes projekt?</span>
+              <span className="text-[9px] text-[var(--t3)] font-bold uppercase tracking-wider mt-0.5">Inverter és távfelügyelet bekapcsolása</span>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input 
@@ -215,7 +215,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
                 onChange={(e) => setIsSolar(e.target.checked)} 
                 className="sr-only peer" 
               />
-              <div className="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-400 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500 peer-checked:after:bg-white peer-checked:after:border-white"></div>
+              <div className="w-9 h-5 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white/60 after:border-white/60 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500 peer-checked:after:bg-white peer-checked:after:border-white"></div>
             </label>
           </div>
 
@@ -225,7 +225,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
           </div>
           
           <div className="pt-1">
-            <button type="submit" disabled={loading} className="w-full font-bold transition-all disabled:opacity-50 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #4f8ef7, #2a5ccc)', border: 'none', borderRadius: '10px', padding: '10px', color: '#fff', fontSize: '14px', boxShadow: '0 8px 25px rgba(79, 142, 247, 0.35)' }}>
+            <button type="submit" disabled={loading} className="w-full font-bold transition-all disabled:opacity-50 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #4f8ef7, #2a5ccc)', border: 'none', borderRadius: 'var(--btn-r)', padding: '10px', color: '#fff', fontSize: '14px', boxShadow: '0 8px 25px rgba(79, 142, 247, 0.35)' }}>
               {loading ? 'Mentés...' : 'Hozzáadás'}
             </button>
           </div>

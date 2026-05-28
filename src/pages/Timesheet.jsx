@@ -162,7 +162,7 @@ export default function Timesheet() {
 
   if (loading) {
     return (
-      <div className="page active flex items-center justify-center h-screen text-slate-400">
+      <div className="page active flex items-center justify-center h-screen text-[var(--t3)]">
         Munkalapok betöltése...
       </div>
     );
