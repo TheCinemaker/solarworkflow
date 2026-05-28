@@ -233,7 +233,7 @@ select option{background:#07090f}
 .dhero{
   margin:14px 20px 0;
   background:var(--s1);border:1px solid var(--b1);
-  border-radius:24px;padding:20px;
+  border-radius:var(--card-r);padding:18px;
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   position:relative;overflow:hidden;
 }
@@ -269,20 +269,20 @@ select option{background:#07090f}
   margin:0 20px;
   background:rgba(42,171,238,.07);
   border:1px solid rgba(42,171,238,.20);
-  border-radius:22px;padding:16px;
+  border-radius:var(--card-r);padding:16px;
 }
 .tg-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 .tg-groups{display:flex;flex-direction:column;gap:8px}
-.tgg{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border-radius:12px;padding:11px 12px;cursor:pointer;transition:background .15s}
+.tgg{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border-radius:10px;padding:11px 12px;cursor:pointer;transition:background .15s}
 .tgg:active{background:rgba(255,255,255,.09)}
 .tgg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .tgg-n{font-size:13px;font-weight:500;color:var(--t1);flex:1}
 .tgg-c{font-size:11px;color:var(--t3)}
 
 .wlist{padding:0 20px}
-.wrow{display:flex;align-items:center;gap:12px;padding:14px;border-radius:20px;background:var(--s1);border:1px solid var(--b1);margin-bottom:10px;cursor:pointer;transition:transform .15s;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.wrow{display:flex;align-items:center;gap:12px;padding:14px;border-radius:var(--card-r);background:var(--s1);border:1px solid var(--b1);margin-bottom:10px;cursor:pointer;transition:transform .15s;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .wrow:active{transform:scale(.98)}
-.wav{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
+.wav{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
 .wname{font-size:14px;font-weight:600;color:var(--t1)}
 .wrole{font-size:11px;color:var(--t3);margin-top:2px}
 .wright{margin-left:auto;text-align:right}
@@ -293,19 +293,19 @@ select option{background:#07090f}
   margin:16px 20px 0;
   background:linear-gradient(135deg,rgba(79,142,247,.14),rgba(79,142,247,.04));
   border:1px solid rgba(79,142,247,.22);
-  border-radius:24px;padding:20px;
+  border-radius:var(--card-r);padding:18px;
   position:relative;overflow:hidden;
 }
 .daily-top::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(79,142,247,.5),transparent)}
 .dt-date{font-size:12px;color:var(--blue);font-weight:700;margin-bottom:6px;letter-spacing:.02em}
 .dt-title{font-size:18px;font-weight:700;color:var(--t1);margin-bottom:14px}
 .dt-chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border:1px solid var(--b1);border-radius:12px;padding:7px 12px;font-size:12px;font-weight:500;color:var(--t1)}
+.chip{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border:1px solid var(--b1);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:500;color:var(--t1)}
 .chip-dot{width:7px;height:7px;border-radius:50%}
 
 .irow{padding:0 20px;margin-bottom:12px}
 .ilbl{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
-.ifield{background:var(--s1);border:1px solid var(--b1);border-radius:15px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .15s;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.ifield{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .15s;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .ifield:active{border-color:var(--blue)}
 .ival{font-size:14px;color:var(--t2)}
 .iarr{font-size:16px;color:var(--t3)}
@@ -313,7 +313,7 @@ select option{background:#07090f}
 .upload-area{
   margin:0 20px 14px;
   background:var(--s1);border:1.5px dashed var(--b2);
-  border-radius:22px;padding:30px;
+  border-radius:var(--card-r);padding:28px;
   text-align:center;cursor:pointer;
   transition:border-color .15s,background .15s;
 }

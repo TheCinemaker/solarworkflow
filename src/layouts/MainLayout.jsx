@@ -23,8 +23,6 @@ export default function MainLayout() {
         <Outlet />
       </div>
 
-      <div className="fab" onClick={() => navigate('/timesheet')}>+</div>
-
       <div className="bnav">
         {navItems.map((item) => (
           <NavLink
