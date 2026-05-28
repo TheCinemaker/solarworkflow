@@ -169,7 +169,7 @@ export default function Timesheet() {
   }
 
   return (
-    <div className="page active scroll-area" id="p-daily">
+    <div className="page active" id="p-daily">
       <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
       
       <div className="page-header fu">

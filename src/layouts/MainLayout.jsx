@@ -1,10 +1,20 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import clsx from 'clsx';
 import { useUser } from '../context/UserContext';
 
 export default function MainLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useUser();
+
+  // Ha az útvonal (oldal) változik, görgessük a közös görgetési konténert (#SA) a legtetejére!
+  useEffect(() => {
+    const scrollContainer = document.getElementById('SA');
+    if (scrollContainer) {
+      scrollContainer.scrollTop = 0;
+    }
+  }, [location.pathname]);
 
   const navItems = [
     { to: '/', icon: '⬡', label: 'Főoldal' },

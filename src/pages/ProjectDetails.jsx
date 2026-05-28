@@ -268,7 +268,7 @@ export default function ProjectDetails() {
   const progressPercent = tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0;
 
   return (
-    <div className="page active scroll-area" id="p-detail">
+    <div className="page active" id="p-detail">
       <div className="flex justify-between items-center px-[15px] mb-2.5 fu">
         <div className="back-btn" style={{ margin: 0 }} onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
         {isAdmin && (

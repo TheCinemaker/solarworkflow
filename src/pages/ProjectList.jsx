@@ -46,7 +46,7 @@ export default function ProjectList() {
   });
 
   return (
-    <div className="page active scroll-area">
+    <div className="page active">
       <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
       
       <div className="page-header fu">

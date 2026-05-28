@@ -116,7 +116,7 @@ export default function CalendarView() {
   };
 
   return (
-    <div className="page active scroll-area" id="p-calendar">
+    <div className="page active" id="p-calendar">
       <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
       
       {/* Fejléc Hónapválasztóval */}

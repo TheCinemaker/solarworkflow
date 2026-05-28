@@ -103,7 +103,7 @@ export default function Issues() {
   }
 
   return (
-    <div className="page active scroll-area" id="p-issues">
+    <div className="page active" id="p-issues">
       <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
 
       <div className="page-header fu">
