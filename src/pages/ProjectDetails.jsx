@@ -684,48 +684,13 @@ export default function ProjectDetails() {
           </div>
         )}
       </div>
-
-      {/* Feladatlista Teendők */}
-      <div className="shdr fu d3">
-        <div className="shdr-t">Teendők / Munkalap</div>
-        <div className="shdr-a">{completedTasks.length}/{tasks.length} kész</div>
-      </div>
-
-      <div className="gcard fu d3" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginBottom: '15px' }}>
-        {tasks.length === 0 ? (
-          <div className="text-center text-xs text-slate-400 italic py-3">
-            Ehhez a projekthez nincs feladatlista megadva.
-          </div>
-        ) : (
-          <div className="divide-y divide-white/5">
-            {tasks.map((task, idx) => {
-              const isDone = completedTasks.includes(task);
-              return (
-                <div key={idx} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0 cursor-pointer" onClick={() => handleToggleTask(task)}>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-5 h-5 rounded-md flex items-center justify-center border transition-all" style={{
-                      background: isDone ? 'var(--green)' : 'rgba(255,255,255,0.05)',
-                      borderColor: isDone ? 'var(--green)' : 'rgba(255,255,255,0.2)'
-                    }}>
-                      {isDone && <span className="text-white text-xs">✓</span>}
-                    </div>
-                    <span className={`text-sm font-medium transition-all ${isDone ? 'text-slate-500 line-through' : 'text-slate-200'}`}>
-                      {task}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
       {/* Belső Projekt Chat Szakasz */}
-      <div className="shdr fu d3_5">
+      <div className="shdr fu d2_5">
         <div className="shdr-t">💬 Belső Projekt Chat</div>
         <div className="shdr-a">{messages.length} üzenet</div>
       </div>
 
-      <div className="gcard fu d3_5 flex flex-col" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginBottom: '15px', padding: '12px' }}>
+      <div className="gcard fu d2_5 flex flex-col" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginBottom: '15px', padding: '12px' }}>
         {/* Üzenetek görgethető doboza */}
         <div 
           className="scroll-area flex flex-col space-y-2 mb-3 pr-1"
@@ -818,6 +783,41 @@ export default function ProjectDetails() {
             ✈️
           </button>
         </form>
+      </div>
+
+      {/* Feladatlista Teendők */}
+      <div className="shdr fu d3">
+        <div className="shdr-t">Teendők / Munkalap</div>
+        <div className="shdr-a">{completedTasks.length}/{tasks.length} kész</div>
+      </div>
+
+      <div className="gcard fu d3" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginBottom: '15px' }}>
+        {tasks.length === 0 ? (
+          <div className="text-center text-xs text-slate-400 italic py-3">
+            Ehhez a projekthez nincs feladatlista megadva.
+          </div>
+        ) : (
+          <div className="divide-y divide-white/5">
+            {tasks.map((task, idx) => {
+              const isDone = completedTasks.includes(task);
+              return (
+                <div key={idx} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0 cursor-pointer" onClick={() => handleToggleTask(task)}>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-5 h-5 rounded-md flex items-center justify-center border transition-all" style={{
+                      background: isDone ? 'var(--green)' : 'rgba(255,255,255,0.05)',
+                      borderColor: isDone ? 'var(--green)' : 'rgba(255,255,255,0.2)'
+                    }}>
+                      {isDone && <span className="text-white text-xs">✓</span>}
+                    </div>
+                    <span className={`text-sm font-medium transition-all ${isDone ? 'text-slate-500 line-through' : 'text-slate-200'}`}>
+                      {task}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Fényképek Galéria */}
