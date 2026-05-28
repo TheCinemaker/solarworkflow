@@ -10,6 +10,7 @@ import ProjectDetails from './pages/ProjectDetails';
 import Timesheet from './pages/Timesheet';
 import Finance from './pages/Finance';
 import Issues from './pages/Issues';
+import CalendarView from './pages/CalendarView';
 
 export default function App() {
   const [session, setSession] = useState(null);
@@ -56,6 +57,7 @@ export default function App() {
           <Route path="timesheet" element={<Timesheet />} />
           <Route path="finance" element={<Finance />} />
           <Route path="issues" element={<Issues />} />
+          <Route path="calendar" element={<CalendarView />} />
         </Route>
       </Routes>
     </BrowserRouter>

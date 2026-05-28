@@ -134,6 +134,9 @@ export default function Dashboard() {
         <div className="qa" onClick={() => navigate('/timesheet')}>
           <span className="qa-i">📋</span><div className="qa-l">Napi lap</div>
         </div>
+        <div className="qa" onClick={() => navigate('/calendar')}>
+          <span className="qa-i">📅</span><div className="qa-l">Naptár</div>
+        </div>
         <div className="qa" onClick={() => navigate('/projects')}>
           <span className="qa-i">📷</span><div className="qa-l">Fotó küld.</div>
         </div>

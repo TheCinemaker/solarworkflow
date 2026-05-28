@@ -7,6 +7,7 @@ export default function MainLayout() {
   const navItems = [
     { to: '/', icon: '⬡', label: 'Főoldal' },
     { to: '/projects', icon: '📁', label: 'Projektek' },
+    { to: '/calendar', icon: '📅', label: 'Naptár' },
     { to: '/timesheet', icon: '📋', label: 'Napi lap' },
     { to: '/finance', icon: '👷', label: 'Munkások' },
   ];
