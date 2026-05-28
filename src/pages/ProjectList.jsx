@@ -148,7 +148,7 @@ export default function ProjectList() {
                 className="pc animate-[fadeIn_0.2s_ease-out]"
                 style={{
                   width: '100%',
-                  marginBottom: '14px',
+                  marginBottom: '15px',
                   border: proj.archived ? '1px solid rgba(255,255,255,0.05)' : '1px solid var(--b1)',
                   background: proj.archived ? 'rgba(7, 9, 15, 0.4)' : 'var(--s1)'
                 }}

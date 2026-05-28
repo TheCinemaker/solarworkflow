@@ -159,10 +159,12 @@ select option{background:#07090f}
   -webkit-overflow-scrolling:touch;
 }
 .hscroll::-webkit-scrollbar{display:none}
+.hscroll .pc{width:240px;scroll-snap-align:start;}
 .pc{
-  flex-shrink:0;width:240px;
+  flex-shrink:0;
   background:var(--s1);border:1px solid var(--b1);
-  border-radius:var(--card-r);padding:16px;scroll-snap-align:start;
+  border-radius:var(--card-r);padding:16px;
+  box-sizing:border-box;
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   position:relative;overflow:hidden;cursor:pointer;
   transition:transform .15s;

@@ -141,8 +141,8 @@ export default function Timesheet() {
   const inputStyle = {
     background: 'var(--s1)',
     border: '1px solid var(--b1)',
-    borderRadius: '10px',
-    padding: '7px 12px',
+    borderRadius: 'var(--input-r)',
+    padding: '9px 12px',
     color: 'var(--t1)',
     fontSize: '13px',
     width: '100%',
@@ -151,12 +151,12 @@ export default function Timesheet() {
   };
 
   const labelStyle = {
-    color: 'var(--t2)',
-    fontSize: '13px',
-    fontWeight: '600',
+    color: 'var(--t3)',
+    fontSize: '11px',
+    fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    marginBottom: '6px',
+    letterSpacing: '0.07em',
+    marginBottom: '8px',
     display: 'block'
   };
 
@@ -181,7 +181,7 @@ export default function Timesheet() {
       </div>
 
       {error && (
-        <div className="mx-5 mt-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-xs">
+        <div style={{ marginLeft: '15px', marginRight: '15px', marginTop: '16px', padding: '12px', background: 'rgba(255, 59, 48, 0.1)', border: '1px solid rgba(255, 59, 48, 0.2)', color: 'var(--red)', borderRadius: 'var(--card-r)', fontSize: '12px' }}>
           {error}
         </div>
       )}
@@ -192,7 +192,7 @@ export default function Timesheet() {
       </div>
 
       <div className="gcard fu d1" style={{ background: 'var(--s1)', border: '1px solid var(--b1)' }}>
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label style={labelStyle}>Projekt / Helyszín</label>
             <select 
@@ -210,19 +210,20 @@ export default function Timesheet() {
             </select>
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
-            <div className="col-span-1">
-              <label style={labelStyle}>Dátum</label>
-              <input 
-                type="date" 
-                value={date} 
-                onChange={(e) => setDate(e.target.value)} 
-                required 
-                style={inputStyle} 
-              />
-            </div>
+          <div>
+            <label style={labelStyle}>Dátum</label>
+            <input 
+              type="date" 
+              value={date} 
+              onChange={(e) => setDate(e.target.value)} 
+              required 
+              style={inputStyle} 
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label style={labelStyle}>Mettől</label>
+              <label style={labelStyle}>Kezdés (Mettől)</label>
               <input 
                 type="time" 
                 value={startTime} 
@@ -232,7 +233,7 @@ export default function Timesheet() {
               />
             </div>
             <div>
-              <label style={labelStyle}>Meddig</label>
+              <label style={labelStyle}>Befejezés (Meddig)</label>
               <input 
                 type="time" 
                 value={endTime} 
@@ -244,7 +245,7 @@ export default function Timesheet() {
           </div>
 
           {computedHours > 0 && (
-            <div className="p-2 rounded-lg text-xs font-semibold text-center" style={{ background: 'rgba(46, 209, 88, 0.1)', border: '1px solid rgba(46, 209, 88, 0.2)', color: 'var(--green)' }}>
+            <div className="p-2.5 text-xs font-semibold text-center" style={{ background: 'rgba(46, 209, 88, 0.1)', border: '1px solid rgba(46, 209, 88, 0.2)', color: 'var(--green)', borderRadius: 'var(--card-r)' }}>
               ⏱ Számolt munkaidő: {computedHours} óra
             </div>
           )}
@@ -262,14 +263,14 @@ export default function Timesheet() {
           <button 
             type="submit" 
             disabled={saving} 
-            className="w-full font-bold transition-all disabled:opacity-50 flex items-center justify-center pt-2.5 pb-2.5" 
+            className="w-full font-bold transition-all disabled:opacity-50 flex items-center justify-center pt-3 pb-3" 
             style={{ 
               background: 'linear-gradient(135deg, #4f8ef7, #2a5ccc)', 
               border: 'none', 
-              borderRadius: '10px', 
+              borderRadius: 'var(--btn-r)', 
               color: '#fff', 
               fontSize: '14px', 
-              boxShadow: '0 8px 25px rgba(79, 142, 247, 0.35)' 
+              boxShadow: '0 6px 20px rgba(79, 142, 247, 0.30)' 
             }}
           >
             {saving ? 'Mentés...' : 'Munkalap Beküldése'}
@@ -283,17 +284,17 @@ export default function Timesheet() {
         <div className="shdr-a">{worklogs.length} db</div>
       </div>
 
-      <div className="space-y-3 px-5 pb-20 fu d2">
+      <div className="space-y-4 pb-20 fu d2" style={{ paddingLeft: '15px', paddingRight: '15px' }}>
         {worklogs.length === 0 ? (
-          <div className="text-center py-8" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
+          <div className="text-center py-8" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: 'var(--card-r)', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
             Még nincsenek rögzített munkalapok.
           </div>
         ) : (
           worklogs.map(log => (
-            <div key={log.id} className="p-3.5 flex flex-col space-y-2.5" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
+            <div key={log.id} className="p-4 flex flex-col space-y-3" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: 'var(--card-r)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
               <div className="flex justify-between items-start">
                 <div>
-                  <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '3px' }}>Szerelő</div>
+                  <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Szerelő</div>
                   <div style={{ fontWeight: '600', color: 'var(--t1)', fontSize: '14px' }}>
                     👷 {log.profiles?.full_name || 'Ismeretlen'} {log.profiles?.serial_number ? `[${log.profiles.serial_number}]` : ''}
                   </div>
@@ -303,15 +304,15 @@ export default function Timesheet() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 pt-2" style={{ borderTop: '1px solid var(--b1)' }}>
+              <div className="grid grid-cols-2 gap-3 pt-3" style={{ borderTop: '1px solid var(--b1)' }}>
                 <div>
-                  <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '3px' }}>Projekt</div>
+                  <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Projekt</div>
                   <div style={{ fontWeight: '600', color: 'var(--t1)', fontSize: '13px' }}>
                     ⚡ {log.projects?.name || 'Névtelen Projekt'}
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '3px' }}>Időtartam</div>
+                  <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Időtartam</div>
                   <div style={{ fontWeight: '600', color: 'var(--t1)', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span>⏱ {log.hours} óra</span>
                     <span style={{ fontSize: '10px', color: 'var(--t3)' }}>({log.start_time} – {log.end_time})</span>
@@ -319,9 +320,9 @@ export default function Timesheet() {
                 </div>
               </div>
 
-              <div className="pt-2" style={{ borderTop: '1px solid var(--b1)' }}>
-                <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '5px' }}>Munkaleírás</div>
-                <div style={{ fontSize: '12px', color: 'var(--t2)', fontStyle: 'italic', background: 'var(--s1)', padding: '8px 10px', borderRadius: '8px', lineHeight: '1.5' }}>
+              <div className="pt-3" style={{ borderTop: '1px solid var(--b1)' }}>
+                <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>Munkaleírás</div>
+                <div style={{ fontSize: '12px', color: 'var(--t2)', fontStyle: 'italic', background: 'var(--s2)', padding: '10px 12px', borderRadius: 'var(--card-r)', border: '1px solid var(--b1)', lineHeight: '1.5' }}>
                   {log.description}
                 </div>
               </div>
