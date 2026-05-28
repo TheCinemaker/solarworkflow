@@ -125,21 +125,19 @@ export default function CalendarView() {
           <div className="pg-greet">{currentYear}</div>
           <div className="pg-title">{HUNGARIAN_MONTHS[currentMonth]}</div>
         </div>
-        <div className="flex items-center space-x-1">
-          <button 
-            onClick={prevMonth} 
-            className="w-8 h-8 rounded-xl flex items-center justify-center transition-all hover:bg-white/5 active:scale-95 text-base font-bold"
-            style={{ background: 'var(--s1)', border: '1px solid var(--b1)', color: 'var(--t1)' }}
-          >
-            ‹
-          </button>
-          <button 
-            onClick={nextMonth} 
-            className="w-8 h-8 rounded-xl flex items-center justify-center transition-all hover:bg-white/5 active:scale-95 text-base font-bold"
-            style={{ background: 'var(--s1)', border: '1px solid var(--b1)', color: 'var(--t1)' }}
-          >
-            ›
-          </button>
+        <div style={{ display: 'flex', gap: '6px' }}>
+          {[['‹', prevMonth], ['›', nextMonth]].map(([label, handler]) => (
+            <button
+              key={label}
+              onClick={handler}
+              style={{
+                width: '32px', height: '32px', borderRadius: '8px', display: 'flex',
+                alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: '700',
+                background: 'var(--s1)', border: '1px solid var(--b1)', color: 'var(--t1)',
+                cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.15s',
+              }}
+            >{label}</button>
+          ))}
         </div>
       </div>
 

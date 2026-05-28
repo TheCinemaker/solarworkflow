@@ -46,6 +46,7 @@ export default function Finance() {
   const [editBankAccount, setEditBankAccount] = useState('');
   const [editIdCard, setEditIdCard] = useState('');
   const [editEmergency, setEditEmergency] = useState('');
+  const [editFullName, setEditFullName] = useState('');
   const [activeTab, setActiveTab] = useState('projects');
 
   async function loadFinanceData() {
@@ -97,6 +98,7 @@ export default function Finance() {
   async function saveWorkerEdit(workerId) {
     try {
       await supabase.from('profiles').update({
+        full_name: editFullName,
         hourly_wage: parseInt(editWage) || 3500,
         job_title: editJobTitle,
         phone: editPhone,
@@ -116,6 +118,7 @@ export default function Finance() {
 
   function startEditing(worker) {
     setEditingWorkerId(worker.id);
+    setEditFullName(worker.full_name || '');
     setEditWage(worker.hourly_wage || 3500);
     setEditJobTitle(worker.job_title || '');
     setEditPhone(worker.phone || '');
@@ -454,6 +457,7 @@ export default function Finance() {
                         </div>
                       ) : (
                         <div className="space-y-3 pt-1">
+                          <div><label style={labelXs}>Teljes Név</label><input type="text" value={editFullName} onChange={(e) => setEditFullName(e.target.value)} style={inputStyle} /></div>
                           <div className="grid grid-cols-2 gap-2">
                             <div><label style={labelXs}>Órabér (Ft)</label><input type="number" value={editWage} onChange={(e) => setEditWage(e.target.value)} style={inputStyle} /></div>
                             <div><label style={labelXs}>Munkakör</label><input type="text" value={editJobTitle} onChange={(e) => setEditJobTitle(e.target.value)} style={inputStyle} /></div>
