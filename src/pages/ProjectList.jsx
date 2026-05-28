@@ -129,7 +129,7 @@ export default function ProjectList() {
         )}
       </div>
 
-      <div className="fu d3 flex flex-col px-5" style={{ gap: '12px', paddingBottom: '100px' }}>
+      <div className="fu d3 px-5" style={{ display: 'flex', flexDirection: 'column', gap: '15px', paddingBottom: '100px' }}>
         {filteredProjects.length === 0 ? (
           <div className="text-center w-full mt-2 py-8" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
             {searchQuery ? 'Nincs a keresésnek megfelelő projekt.' : `Nincsenek ${activeTab === 'active' ? 'aktív' : 'archivált'} projektek.`}
