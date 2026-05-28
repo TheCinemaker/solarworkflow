@@ -61,7 +61,7 @@ export default function Finance() {
 
       const { data: profiles, error: profErr } = await supabase
         .from('profiles')
-        .select('id, full_name, role, serial_number, address, phone, tax_id, tb_number, bank_account, id_card_number, emergency_phone, job_title, hourly_wage')
+        .select('id, full_name, email, role, serial_number, address, phone, tax_id, tb_number, bank_account, id_card_number, emergency_phone, job_title, hourly_wage')
         .neq('role', 'admin');
       if (profErr) throw profErr;
 
@@ -114,6 +114,28 @@ export default function Finance() {
       loadFinanceData();
     } catch (err) {
       setError(err.message);
+    }
+  }
+
+  async function handleDeleteWorker(workerId, workerName) {
+    const confirmDelete = window.confirm(`Biztosan véglegesen törölni szeretnéd ${workerName || 'ezt a dolgozót'}? Minden adata (profil, időlapok, rögzítések) véglegesen törlődni fog!`);
+    if (!confirmDelete) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+      const { error: deleteErr } = await supabase.rpc('delete_user_by_admin', { 
+        target_user_id: workerId 
+      });
+      if (deleteErr) throw deleteErr;
+      setExpandedWorkerId(null);
+      loadFinanceData();
+      alert(`Sikeresen törölted ${workerName || 'a dolgozót'} a rendszerből.`);
+    } catch (err) {
+      console.error("Hiba a dolgozó törlésekor:", err);
+      setError("Hiba a törlés során: " + err.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -402,12 +424,20 @@ export default function Finance() {
                           🔒 Bizalmas adatok
                         </span>
                         {!isEditing ? (
-                          <button onClick={() => startEditing(worker)} style={{
-                            padding: '5px 12px', borderRadius: '8px', fontWeight: '700', fontSize: '10px',
-                            textTransform: 'uppercase', letterSpacing: '0.04em', cursor: 'pointer',
-                            background: 'var(--s1)', color: 'var(--t1)', border: '1px solid var(--b1)',
-                            fontFamily: 'inherit',
-                          }}>✏️ Szerkesztés</button>
+                          <div className="flex space-x-2">
+                            <button onClick={() => startEditing(worker)} style={{
+                              padding: '5px 12px', borderRadius: '8px', fontWeight: '700', fontSize: '10px',
+                              textTransform: 'uppercase', letterSpacing: '0.04em', cursor: 'pointer',
+                              background: 'var(--s1)', color: 'var(--t1)', border: '1px solid var(--b1)',
+                              fontFamily: 'inherit',
+                            }}>✏️ Szerkesztés</button>
+                            <button onClick={() => handleDeleteWorker(worker.id, worker.full_name)} style={{
+                              padding: '5px 12px', borderRadius: '8px', fontWeight: '700', fontSize: '10px',
+                              textTransform: 'uppercase', letterSpacing: '0.04em', cursor: 'pointer',
+                              background: 'rgba(255, 59, 48, 0.08)', color: 'var(--red)', border: '1px solid rgba(255, 59, 48, 0.15)',
+                              fontFamily: 'inherit',
+                            }}>🗑️ Törlés</button>
+                          </div>
                         ) : (
                           <div className="flex space-x-2">
                             <button onClick={() => setEditingWorkerId(null)} style={{
@@ -428,6 +458,7 @@ export default function Finance() {
                         <div className="grid grid-cols-2 gap-y-3 gap-x-4 pt-1">
                           {[
                             ['Szerződéses órabér', `${(worker.hourly_wage || 3500).toLocaleString('hu-HU')} Ft / óra`],
+                            ['E-mail cím', worker.email || '—'],
                             ['Munkakör', worker.job_title || '—'],
                             ['Telefonszám', worker.phone || '—'],
                             ['Vészhelyzeti', worker.emergency_phone || '—'],
