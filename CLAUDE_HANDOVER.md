@@ -104,6 +104,10 @@ We recently updated the database tables to support the new modular forms. The us
 16. **Instant Multi-parameter Search Bar (`ProjectList.jsx`)**: Integrated a highly responsive, Apple-style instant search bar that searches by project name, address/street, and serial number.
 17. **Conditional Solar Checkbox & Filtered Displays**: Tied inverter telemetries and configuring triggers to only show when the new `is_solar` toggle is checked.
 18. **Fully Dynamic Scheduling Calendar (`CalendarView.jsx`)**: Designed a premium, interactive monthly grid calendar showing glowing status dots under days with active project assignments and daily schedule lists, linked as a primary bottom-navigation tab.
+19. **Strict 15px Mobile Margin Standardization**: Normalized layout widths across all key pages (`ProjectList.jsx` and `Timesheet.jsx`), replacing buggy Tailwind JIT compiler classes with explicit, robust inline styles (`marginLeft: '15px'`, `marginRight: '15px'`) to prevent horizontal layout drift on mobile devices.
+20. **6px Standard Rounded Corner System**: Enforced professional Apple-style visual tokens for border radii across all panels, filter tabs, inputs, and buttons using standard CSS variables (`var(--card-r)`, `var(--btn-r)`, `var(--input-r)` resulting in precisely `6px` rounding).
+21. **Timesheet UX and Grid Reform**: Transformed `Timesheet.jsx` to resolve crowded field input layouts on mobile viewports. Placed the Date selector in its own row and set Start/End times side-by-side in a spacious 2-column grid. Set label spacing tightly to `2px` above inputs for a premium fit.
+22. **Self-Healing database profiles system**: Built an automatic Profile Sync mechanism inside `UserContext.jsx` that automatically inserts a profile row into `public.profiles` from the active `auth.users` session metadata if missing (which immediately fixed the "Ismeretlen" / Unknown author issue for the logged-in admin user), supported by a safe UI display fallback.
 
 ---
 
