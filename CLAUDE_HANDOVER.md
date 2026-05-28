@@ -18,7 +18,7 @@ The app is designed to replace paper/Google Sheets tracking for electricians out
 ### Directory Structure:
 - `src/components/`: Modular elements (Modals, Form inputs, navigation bars).
 - `src/layouts/`: Layout wraps like `MainLayout.jsx` (which contains the bottom navigation and top header).
-- `src/pages/`: Page containers (Dashboard, ProjectList, ProjectDetails, Timesheet, Finance, Issues).
+- `src/pages/`: Page containers (Dashboard, ProjectList, ProjectDetails, Timesheet, Finance, Issues, CalendarView).
 - `src/lib/`: Lib helper config files (specifically `supabase.js`).
 - `supabase/`: Database schema alterations and scripts.
 
@@ -70,6 +70,10 @@ We recently updated the database tables to support the new modular forms. The us
    - `end_time`: `TEXT` (Stores End Date as text string).
    - `important_info`: `TEXT` (e.g. key placement or door codes).
    - `tasks`: `TEXT` (Newline-separated task list).
+   - `is_solar`: `BOOLEAN` (Type of project, true for solar, false for regular).
+   - `inverter_brand`: `TEXT` (Fronius, Huawei, etc).
+   - `inverter_id`: `TEXT` (Datalogger ID).
+   - `inverter_api_key`: `TEXT`.
    - `created_at`: `TIMESTAMPTZ`.
 
 2. **`profiles`** (Users and roles):
@@ -87,15 +91,19 @@ We recently updated the database tables to support the new modular forms. The us
 3. **Modals Redesigned**: `NewProjectModal.jsx` and `NewWorkerModal.jsx` are fully functioning, hook directly to Supabase, and implement the approved compact styling.
 4. **Dashboard List**: Displays real database projects dynamically, appending the user-facing serial number next to the tag (e.g., `⚡ Projekt · PRJ-01`).
 5. **Realtime Database Synchronization**: Configured full Supabase Realtime subscriptions in `Dashboard.jsx`, `ProjectList.jsx`, and `ProjectDetails.jsx`. Updates (like a worker checking a task or uploading a photo on the field) reflect instantly on the Admin's screen without reloading.
-8. **Daily Timesheets (Munkalapok)**: Fully implemented a premium daily work logging system inside `Timesheet.jsx` featuring dynamic project associations, automated decimal work hour calculations from time inputs (start/end times), and an isolated workflow tied to the logged-in user profile.
-9. **Full Realtime Sync for Timesheets**: Handled real-time updates for worklogs using Supabase postgres changes subscription, so new worker logs appear instantly on the Admin's listing.
-10. **Worker Pay & Hour Tracker (Finance.jsx)**: Completed the full finance view! It queries profiles and worklogs to aggregate total hours worked and estimated payouts dynamically (Hungarian standard 3,500 Ft/hr basis) with real-time sync.
-11. **Centralized Visual Issue Feed (Issues.jsx)**: Implemented the visual "Hibák és Visszajárás" dashboard. It queries all site checkpoint photos with descriptions to form a real-time central feed of construction blockers and client remarks, linking directly to each project detail view.
-12. **Telegram Project Association**: Added a `telegram_link` field to `NewProjectModal.jsx` and built a gorgeous, custom glowing blue button in `ProjectDetails.jsx` linking directly to the project's Telegram group for instant on-site team communication.
-13. **Before / After Defect Resolution**: Designed and coded a complete visual defect resolution lifecycle! Workers can mark open issues as fixed by providing a mandatory resolution photo and description. The database automatically logs the resolver, resolution timestamp, and photo. Resolved issues display in a stunning side-by-side Before/After comparison card.
-14. **Apple-style Redesigns & Realtime Dashboard**: Redesigned the "Projekt Archiválása" button to be a centered, compact Apple-style capsule button. Connected the Dashboard "Nyitott hibák" card to query the real media database count and sync in realtime.
-15. **Photo Upload Wizard Modal**: Created a robust, field-proof 2-step Photo Upload Wizard Modal that displays a live image preview and offers two card buttons to classify the photo (🟢 Munkafolyamat or ⚠️ Hiba/Akadály). If a defect/blocker is selected, the description is **strictly mandatory** to submit.
-16. **PostgREST Relationship & RLS Fixes**: Resolved the `profiles` table ambiguity crash in both `ProjectDetails.jsx` and `Issues.jsx` using explicit foreign key bindings. Added a database update policy (`Enable update for authenticated users` FOR UPDATE) to the RLS schema to allow workers to resolve and close issues successfully.
+6. **Daily Timesheets (Munkalapok)**: Fully implemented a premium daily work logging system inside `Timesheet.jsx` featuring dynamic project associations, automated decimal work hour calculations from time inputs (start/end times), and an isolated workflow tied to the logged-in user profile.
+7. **Full Realtime Sync for Timesheets**: Handled real-time updates for worklogs using Supabase postgres changes subscription, so new worker logs appear instantly on the Admin's listing.
+8. **Worker Pay & Hour Tracker (Finance.jsx)**: Completed the full finance view! It queries profiles and worklogs to aggregate total hours worked and estimated payouts dynamically (Hungarian standard 3,500 Ft/hr basis) with real-time sync.
+9. **Centralized Visual Issue Feed (Issues.jsx)**: Implemented the visual "Hibák és Visszajárás" dashboard. It queries all site checkpoint photos with descriptions to form a real-time central feed of construction blockers and client remarks, linking directly to each project detail view.
+10. **Telegram Project Association**: Added a `telegram_link` field to `NewProjectModal.jsx` and built a gorgeous, custom glowing blue button in `ProjectDetails.jsx` linking directly to the project's Telegram group for instant on-site team communication.
+11. **Before / After Defect Resolution**: Designed and coded a complete visual defect resolution lifecycle! Workers can mark open issues as fixed by providing a mandatory resolution photo and description. The database automatically logs the resolver, resolution timestamp, and photo. Resolved issues display in a stunning side-by-side Before/After comparison card.
+12. **Apple-style Redesigns & Realtime Dashboard**: Redesigned the "Projekt Archiválása" button to be a centered, compact Apple-style capsule button. Connected the Dashboard "Nyitott hibák" card to query the real media database count and sync in realtime.
+13. **Photo Upload Wizard Modal**: Created a robust, field-proof 2-step Photo Upload Wizard Modal that displays a live image preview and offers two card buttons to classify the photo (🟢 Munkafolyamat or ⚠️ Hiba/Akadály). If a defect/blocker is selected, the description is **strictly mandatory** to submit.
+14. **PostgREST Relationship & RLS Fixes**: Resolved the `profiles` table ambiguity crash in both `ProjectDetails.jsx` and `Issues.jsx` using explicit foreign key bindings. Added a database update policy (`Enable update for authenticated users` FOR UPDATE) to the RLS schema to allow workers to resolve and close issues successfully.
+15. **Full Administrative Project Editor (`EditProjectModal.jsx`)**: Created a gorgeous, interactive modal permitting real-time updates to client prices, task checklists, and inverter API details.
+16. **Instant Multi-parameter Search Bar (`ProjectList.jsx`)**: Integrated a highly responsive, Apple-style instant search bar that searches by project name, address/street, and serial number.
+17. **Conditional Solar Checkbox & Filtered Displays**: Tied inverter telemetries and configuring triggers to only show when the new `is_solar` toggle is checked.
+18. **Fully Dynamic Scheduling Calendar (`CalendarView.jsx`)**: Designed a premium, interactive monthly grid calendar showing glowing status dots under days with active project assignments and daily schedule lists, linked as a primary bottom-navigation tab.
 
 ---
 
@@ -108,19 +116,9 @@ We recently updated the database tables to support the new modular forms. The us
   - Financial page (`/finance`) access.
   - Workers' profiles edits.
 
-### [COMPLETED] Task B: Wire Up Project Details & Checklist
-- **Done**: Rendered `tasks` as checklist checkboxes with Supabase saving and dynamic progress bar tracking.
-
-### [COMPLETED] Task C: Timesheet & Daily Logging
-- **Done**: Workers can log daily hours, dates, descriptions, and times dynamically with auto-calculated hours.
-
-### [COMPLETED] Task D: Checkpoint Photo Tracking (Supabase Storage)
-- **Done**: Implemented direct file uploads and photo gallery rendering with project UUID folder isolation.
-
-### Task E: Telegram Webhooks Integration
+### Task B: Telegram Webhooks Integration
 - **Action**: Configure automatic Telegram webhook alerts when a new blocker/defect is uploaded or an issue is resolved, providing rapid alert synchronization to the field chat.
 
 ---
 
 Good luck! Let's build a stunning, lightning-fast application together! 🚀☀️
-
