@@ -56,7 +56,7 @@ export default function ProjectList() {
       </div>
 
       {/* TABS (Aktív / Archivált szűrő) */}
-      <div className="mx-[15px] mb-4 flex items-center fu" style={{ gap: '10px' }}>
+      <div className="flex items-center fu" style={{ marginLeft: '15px', marginRight: '15px', marginBottom: '16px', gap: '10px' }}>
         <div 
           onClick={() => {
             setActiveTab('active');
@@ -100,7 +100,7 @@ export default function ProjectList() {
       </div>
 
       {/* 🔍 MODERNEBB APPLE STÍLUSÚ VALÓS IDEJŰ KERESŐ */}
-      <div className="mx-[15px] mb-4 relative fu d2">
+      <div className="relative fu d2" style={{ marginLeft: '15px', marginRight: '15px', marginBottom: '16px' }}>
         <input 
           type="text" 
           value={searchQuery}
@@ -129,7 +129,7 @@ export default function ProjectList() {
         )}
       </div>
 
-      <div className="fu d3" style={{ padding: '0 15px 100px' }}>
+      <div className="fu d3" style={{ paddingLeft: '15px', paddingRight: '15px', paddingBottom: '100px' }}>
         {filteredProjects.length === 0 ? (
           <div className="text-center w-full mt-2 py-8" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: 'var(--card-r)', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
             {searchQuery ? 'Nincs a keresésnek megfelelő projekt.' : `Nincsenek ${activeTab === 'active' ? 'aktív' : 'archivált'} projektek.`}
