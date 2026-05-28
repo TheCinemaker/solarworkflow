@@ -11,7 +11,7 @@ export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  async function fetchProfile(userId) {
+  async function fetchProfile(userId, email) {
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -20,7 +20,7 @@ export function UserProvider({ children }) {
         .single();
       
       if (error) throw error;
-      setUser(data);
+      setUser({ ...data, email });
     } catch (err) {
       console.error("Hiba a felhasználói profil betöltésekor:", err);
       setUser(null);
@@ -33,7 +33,7 @@ export function UserProvider({ children }) {
     // 1. Meglévő munkamenet lekérése
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        fetchProfile(session.user.id);
+        fetchProfile(session.user.id, session.user.email);
       } else {
         setUser(null);
         setLoading(false);
@@ -43,7 +43,7 @@ export function UserProvider({ children }) {
     // 2. Munkamenet változásának figyelése
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
-        fetchProfile(session.user.id);
+        fetchProfile(session.user.id, session.user.email);
       } else {
         setUser(null);
         setLoading(false);
@@ -56,7 +56,7 @@ export function UserProvider({ children }) {
   const refreshUser = () => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        fetchProfile(session.user.id);
+        fetchProfile(session.user.id, session.user.email);
       }
     });
   };

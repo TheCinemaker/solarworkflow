@@ -206,48 +206,45 @@ export default function CalendarView() {
 
       <div className="act-list fu d3" style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '12px', paddingBottom: '90px' }}>
         {selectedDayProjects.length === 0 ? (
-          <div className="p-6 text-center text-slate-500 text-sm italic w-full rounded-2xl" style={{ background: 'var(--s1)', border: '1px dashed var(--b1)' }}>
+          <div className="p-6 text-center w-full" style={{ background: 'var(--s1)', border: '1px dashed var(--b2)', borderRadius: '16px', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
             🍀 Nincs ütemezett munka mára.
           </div>
         ) : (
           selectedDayProjects.map(proj => {
-            // Haladás százalék számolása
             const tasksList = proj.tasks ? proj.tasks.split('\n').map(t => t.trim()).filter(Boolean) : [];
             const totalTasks = tasksList.length;
             const completedCount = proj.completed_tasks ? proj.completed_tasks.length : 0;
             const progress = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
 
             return (
-              <div 
-                key={proj.id} 
-                className="p-3.5 rounded-2xl flex items-center justify-between cursor-pointer transition-all hover:bg-white/[0.02] active:scale-99"
-                style={{ background: 'var(--s1)', border: '1px solid var(--b1)' }}
+              <div
+                key={proj.id}
+                className="p-3.5 flex items-center justify-between cursor-pointer transition-all"
+                style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px' }}
                 onClick={() => navigate(`/project/${proj.id}`)}
               >
                 <div className="flex items-center space-x-3.5 text-left">
-                  <div 
-                    className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs uppercase"
-                    style={{ 
-                      background: proj.is_solar ? 'rgba(255, 214, 10, 0.12)' : 'rgba(79, 142, 247, 0.12)', 
-                      color: proj.is_solar ? '#ffd60a' : '#4f8ef7',
-                      border: proj.is_solar ? '1px solid rgba(255, 214, 10, 0.2)' : '1px solid rgba(79, 142, 247, 0.2)'
-                    }}
-                  >
+                  <div style={{
+                    width: '40px', height: '40px', borderRadius: '10px', flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px',
+                    background: proj.is_solar ? 'rgba(255,214,10,0.12)' : 'rgba(79,142,247,0.12)',
+                    border: proj.is_solar ? '1px solid rgba(255,214,10,0.20)' : '1px solid rgba(79,142,247,0.20)',
+                  }}>
                     {proj.is_solar ? '☀️' : '⚡'}
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-slate-200">{proj.name}</div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">📍 {proj.address}</div>
-                    <div className="text-[9px] text-slate-500 font-semibold mt-1">
-                      Ütemezés: {proj.start_time} - {proj.end_time}
+                    <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--t1)' }}>{proj.name}</div>
+                    <div style={{ fontSize: '10px', color: 'var(--t3)', marginTop: '2px' }}>📍 {proj.address}</div>
+                    <div style={{ fontSize: '9px', color: 'var(--t3)', fontWeight: '600', marginTop: '3px' }}>
+                      Ütemezés: {proj.start_time} – {proj.end_time}
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="text-right flex flex-col items-end">
-                  <span className="text-[10px] font-black text-slate-300">{progress}% kész</span>
-                  <div className="w-12 bg-white/5 h-1 rounded-full overflow-hidden mt-1" style={{ border: '1px solid rgba(255,255,255,0.05)' }}>
-                    <div className="h-full rounded-full" style={{ width: `${progress}%`, background: proj.is_solar ? '#ffd60a' : 'var(--blue)' }}></div>
+                  <span style={{ fontSize: '10px', fontWeight: '700', color: 'var(--t2)' }}>{progress}% kész</span>
+                  <div style={{ width: '48px', background: 'var(--s2)', height: '3px', borderRadius: '4px', overflow: 'hidden', marginTop: '5px' }}>
+                    <div style={{ height: '100%', borderRadius: '4px', width: `${progress}%`, background: proj.is_solar ? 'var(--yellow)' : 'var(--blue)' }} />
                   </div>
                 </div>
               </div>
