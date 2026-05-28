@@ -285,48 +285,43 @@ export default function Timesheet() {
 
       <div className="space-y-3 px-5 pb-20 fu d2">
         {worklogs.length === 0 ? (
-          <div className="text-center text-xs text-slate-400 italic py-8" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px' }}>
+          <div className="text-center py-8" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
             Még nincsenek rögzített munkalapok.
           </div>
         ) : (
           worklogs.map(log => (
-            <div key={log.id} className="p-3.5 rounded-2xl flex flex-col space-y-2.5" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
-              {/* Fejléc: Ki és mikor */}
+            <div key={log.id} className="p-3.5 flex flex-col space-y-2.5" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
               <div className="flex justify-between items-start">
                 <div>
-                  <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-0.5">Szerelő</div>
-                  <div className="font-semibold text-slate-200 text-sm">
+                  <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '3px' }}>Szerelő</div>
+                  <div style={{ fontWeight: '600', color: 'var(--t1)', fontSize: '14px' }}>
                     👷 {log.profiles?.full_name || 'Ismeretlen'} {log.profiles?.serial_number ? `[${log.profiles.serial_number}]` : ''}
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-[10px] text-blue-400 uppercase font-bold tracking-wider px-2 py-0.5 rounded-full" style={{ background: 'rgba(79, 142, 247, 0.1)', border: '1px solid rgba(79, 142, 247, 0.2)' }}>
-                    {log.date}
-                  </div>
+                <div style={{ fontSize: '10px', color: 'var(--blue)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '3px 9px', borderRadius: '20px', background: 'rgba(79,142,247,0.10)', border: '1px solid rgba(79,142,247,0.18)' }}>
+                  {log.date}
                 </div>
               </div>
 
-              {/* Projekt és Időtartam */}
-              <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-white/5">
+              <div className="grid grid-cols-2 gap-2 pt-2" style={{ borderTop: '1px solid var(--b1)' }}>
                 <div>
-                  <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Projekt</div>
-                  <div className="font-semibold text-slate-200">
+                  <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '3px' }}>Projekt</div>
+                  <div style={{ fontWeight: '600', color: 'var(--t1)', fontSize: '13px' }}>
                     ⚡ {log.projects?.name || 'Névtelen Projekt'}
                   </div>
                 </div>
                 <div>
-                  <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Időtartam</div>
-                  <div className="font-semibold text-slate-200 flex items-center space-x-1.5">
+                  <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '3px' }}>Időtartam</div>
+                  <div style={{ fontWeight: '600', color: 'var(--t1)', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span>⏱ {log.hours} óra</span>
-                    <span className="text-[10px] text-slate-400">({log.start_time} - {log.end_time})</span>
+                    <span style={{ fontSize: '10px', color: 'var(--t3)' }}>({log.start_time} – {log.end_time})</span>
                   </div>
                 </div>
               </div>
 
-              {/* Leírás */}
-              <div className="pt-2 border-t border-white/5">
-                <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider mb-1">Munkaleírás</div>
-                <div className="text-xs text-slate-300 italic bg-white/5 p-2 rounded-lg leading-relaxed">
+              <div className="pt-2" style={{ borderTop: '1px solid var(--b1)' }}>
+                <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '5px' }}>Munkaleírás</div>
+                <div style={{ fontSize: '12px', color: 'var(--t2)', fontStyle: 'italic', background: 'var(--s1)', padding: '8px 10px', borderRadius: '8px', lineHeight: '1.5' }}>
                   {log.description}
                 </div>
               </div>

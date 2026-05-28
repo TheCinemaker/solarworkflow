@@ -144,11 +144,11 @@ export default function CalendarView() {
       </div>
 
       {/* 📅 NAPTÁR GRID */}
-      <div className="mx-5 mb-5 p-4 rounded-3xl fu d1" style={{ background: 'var(--s1)', border: '1px solid var(--b1)' }}>
+      <div className="mx-5 mb-5 p-4 fu d1" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px' }}>
         {/* Hét napjai fejléc */}
         <div className="grid grid-cols-7 gap-1 text-center mb-2">
           {['H', 'K', 'Sze', 'Cs', 'P', 'Szo', 'V'].map((d, i) => (
-            <div key={i} className="text-[10px] font-black uppercase text-slate-500 tracking-wider py-1">
+            <div key={i} style={{ fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', color: 'var(--t3)', letterSpacing: '0.06em', padding: '4px 0' }}>
               {d}
             </div>
           ))}
@@ -198,7 +198,7 @@ export default function CalendarView() {
           {HUNGARIAN_MONTHS[currentMonth]} {selectedDay}. ({selectedDayOfWeekName}) Beosztás
         </div>
         {selectedDayProjects.length > 0 && (
-          <span className="text-[9px] font-black uppercase tracking-wider text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+          <span style={{ fontSize: '9px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--green)', padding: '3px 9px', borderRadius: '20px', background: 'rgba(46,209,88,0.10)', border: '1px solid rgba(46,209,88,0.20)' }}>
             {selectedDayProjects.length} munka
           </span>
         )}

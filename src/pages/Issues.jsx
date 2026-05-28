@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 export default function Issues() {
@@ -7,10 +7,8 @@ export default function Issues() {
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  // Állapotok a szűréshez és a javítás beküldéshez
-  const [activeTab, setActiveTab] = useState('open'); // 'open' vagy 'resolved'
-  const [expandedIssueId, setExpandedIssueId] = useState(null); // melyik kártya van nyitva javításra
+  const [activeTab, setActiveTab] = useState('open');
+  const [expandedIssueId, setExpandedIssueId] = useState(null);
   const [fixComment, setFixComment] = useState('');
   const [fixFile, setFixFile] = useState(null);
   const [savingFix, setSavingFix] = useState(false);
@@ -18,25 +16,14 @@ export default function Issues() {
 
   async function loadIssues() {
     try {
-      // 1. Jelenlegi felhasználó betöltése
       const { data: { user } } = await supabase.auth.getUser();
       setCurrentUser(user);
 
-      // 2. Minden hiba lekérése (is_issue = true) a projekt és profil adatokkal együtt
-      // resolved_by kapcsolatot külön profiles_resolver névvel kérjük be a Supabase-ből a duplikáció elkerülésére
       const { data, error: issuesErr } = await supabase
         .from('media')
         .select(`
-          id,
-          file_path,
-          description,
-          is_issue,
-          resolved,
-          resolved_at,
-          resolved_comment,
-          resolved_file_path,
-          project_id,
-          created_at,
+          id, file_path, description, is_issue, resolved, resolved_at,
+          resolved_comment, resolved_file_path, project_id, created_at,
           profiles:profiles!user_id (full_name, serial_number),
           projects (name, serial_number),
           resolved_by_profile:profiles!media_resolved_by_fkey (full_name, serial_number)
@@ -45,11 +32,8 @@ export default function Issues() {
         .order('created_at', { ascending: false });
 
       if (issuesErr) throw issuesErr;
-      if (data) {
-        setIssues(data);
-      }
+      if (data) setIssues(data);
     } catch (err) {
-      console.error("Hiba a hibák betöltésekor:", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -58,141 +42,91 @@ export default function Issues() {
 
   useEffect(() => {
     loadIssues();
-
-    // REALTIME SUBSCRIBER: Valós idejű frissülés, ha egy hibát beküldenek vagy javítanak
     const channel = supabase
       .channel('issues-realtime-sync')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'media' }, () => {
-        loadIssues();
-      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'media' }, () => loadIssues())
       .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
-  // Javítás mentése
   const handleResolveIssue = async (e, issue) => {
     e.preventDefault();
-    if (!fixFile) {
-      alert("A javításról készült fotó feltöltése kötelező!");
-      return;
-    }
-
+    if (!fixFile) { alert("A javításról készült fotó feltöltése kötelező!"); return; }
     setSavingFix(true);
     setError(null);
-
     try {
-      // 1. Fájl feltöltése a Supabase Storage-ba
       const fileExt = fixFile.name.split('.').pop();
-      const fileName = `resolved_${Date.now()}.${fileExt}`;
-      const filePath = `${issue.project_id}/${fileName}`;
-
-      const { error: uploadErr } = await supabase.storage
-        .from('project-photos')
-        .upload(filePath, fixFile);
-
+      const filePath = `${issue.project_id}/resolved_${Date.now()}.${fileExt}`;
+      const { error: uploadErr } = await supabase.storage.from('project-photos').upload(filePath, fixFile);
       if (uploadErr) throw uploadErr;
-
-      // 2. Publikus URL lekérése
-      const { data: urlData } = supabase.storage
-        .from('project-photos')
-        .getPublicUrl(filePath);
-
-      const publicUrl = urlData.publicUrl;
-
-      // 3. Rekord frissítése a media táblában a javítási információkkal
-      const { error: updateErr } = await supabase
-        .from('media')
-        .update({
-          resolved: true,
-          resolved_at: new Date().toISOString(),
-          resolved_by: currentUser?.id,
-          resolved_file_path: publicUrl,
-          resolved_comment: fixComment || 'Hiba sikeresen javítva.'
-        })
-        .eq('id', issue.id);
-
-      if (updateErr) throw updateErr;
-
-      // 4. "Megbökjük" a projekt tábla updated_at mezőjét a valós idejű frissülésért
-      await supabase
-        .from('projects')
-        .update({ updated_at: new Date().toISOString() })
-        .eq('id', issue.project_id);
-
-      // Siker!
+      const { data: urlData } = supabase.storage.from('project-photos').getPublicUrl(filePath);
+      await supabase.from('media').update({
+        resolved: true,
+        resolved_at: new Date().toISOString(),
+        resolved_by: currentUser?.id,
+        resolved_file_path: urlData.publicUrl,
+        resolved_comment: fixComment || 'Hiba sikeresen javítva.'
+      }).eq('id', issue.id);
+      await supabase.from('projects').update({ updated_at: new Date().toISOString() }).eq('id', issue.project_id);
       setFixComment('');
       setFixFile(null);
       setExpandedIssueId(null);
       await loadIssues();
       alert("Javítás sikeresen rögzítve! Köszönjük a munkádat! 👍");
     } catch (err) {
-      console.error("Hiba a javítás mentésekor:", err);
       setError("Hiba történt: " + err.message);
     } finally {
       setSavingFix(false);
     }
   };
 
-  // Kiszűrjük a nyitott és a javított hibákat
   const openIssues = issues.filter(i => !i.resolved);
   const resolvedIssues = issues.filter(i => i.resolved);
   const displayedIssues = activeTab === 'open' ? openIssues : resolvedIssues;
 
+  const tabStyle = (tabName) => ({
+    flex: 1, padding: '9px 0', textAlign: 'center', fontSize: '12px', fontWeight: '700',
+    borderRadius: '10px', border: activeTab === tabName ? '1px solid var(--b1)' : '1px solid transparent',
+    cursor: 'pointer', transition: 'all 0.2s ease',
+    background: activeTab === tabName ? 'var(--s2)' : 'transparent',
+    color: activeTab === tabName ? 'var(--t1)' : 'var(--t3)',
+  });
+
   if (loading) {
     return (
-      <div className="page active flex items-center justify-center h-screen text-slate-400">
-        Hibajegyek betöltése...
+      <div className="page active flex items-center justify-center h-screen">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="2.5" className="spinner">
+          <path d="M21 12a9 9 0 11-6.219-8.56" />
+        </svg>
       </div>
     );
   }
 
-  const tabStyle = (tabName) => ({
-    flex: 1,
-    padding: '8px 0',
-    textAlign: 'center',
-    fontSize: '12px',
-    fontWeight: 'bold',
-    borderRadius: '10px',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
-    background: activeTab === tabName ? 'var(--s2)' : 'transparent',
-    border: activeTab === tabName ? '1px solid var(--b1)' : '1px solid transparent',
-    color: activeTab === tabName ? 'var(--t1)' : 'var(--t2)'
-  });
-
   return (
     <div className="page active scroll-area" id="p-issues">
       <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
-      
+
       <div className="page-header fu">
         <div>
           <div className="pg-greet">Központi hibajegy követés</div>
           <div className="pg-title">Hibák / Visszajárás</div>
         </div>
-        <div className="hdr-btn" style={{ background: 'rgba(255, 59, 48, 0.15)', color: 'var(--red)', border: '1px solid rgba(255, 59, 48, 0.25)' }}>⚠️</div>
+        <div className="hdr-btn" style={{ background: 'rgba(255,59,48,0.10)', color: 'var(--red)', border: '1px solid rgba(255,59,48,0.22)' }}>⚠️</div>
       </div>
 
       {error && (
-        <div className="mx-5 mt-4 p-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl text-xs">
+        <div className="mx-5 mt-4 p-3 rounded-xl text-xs"
+          style={{ background: 'rgba(255,59,48,0.08)', border: '1px solid rgba(255,59,48,0.18)', color: 'var(--red)' }}>
           {error}
         </div>
       )}
 
-      {/* FÜLEK (Nyitott / Javított szűrő) */}
+      {/* Tab selector */}
       <div className="mx-5 my-3 p-1 rounded-xl flex items-center" style={{ background: 'var(--s1)', border: '1px solid var(--b1)' }}>
-        <div 
-          onClick={() => { setActiveTab('open'); setExpandedIssueId(null); }} 
-          style={tabStyle('open')}
-        >
+        <div onClick={() => { setActiveTab('open'); setExpandedIssueId(null); }} style={tabStyle('open')}>
           🔴 Nyitott hibák ({openIssues.length})
         </div>
-        <div 
-          onClick={() => { setActiveTab('resolved'); setExpandedIssueId(null); }} 
-          style={tabStyle('resolved')}
-        >
+        <div onClick={() => { setActiveTab('resolved'); setExpandedIssueId(null); }} style={tabStyle('resolved')}>
           🟢 Javított ({resolvedIssues.length})
         </div>
       </div>
@@ -202,143 +136,132 @@ export default function Issues() {
         <div className="shdr-a">{displayedIssues.length} db</div>
       </div>
 
-      {/* Hibák listája */}
       <div className="space-y-4 px-5 pb-20 fu d2">
         {displayedIssues.length === 0 ? (
-          <div className="text-center text-xs text-slate-400 italic py-10" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px' }}>
+          <div className="text-center py-10" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
             Nincsenek {activeTab === 'open' ? 'aktív hibák' : 'javított hibajegyek'} a rendszerben.
           </div>
         ) : (
           displayedIssues.map(issue => {
             const formattedDate = new Date(issue.created_at).toLocaleDateString('hu-HU', {
-              month: 'short',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
+              month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
             });
 
             return (
-              <div 
-                key={issue.id} 
-                className="p-3.5 rounded-2xl flex flex-col space-y-3 relative"
-                style={{ 
-                  background: 'var(--s1)', 
-                  border: issue.resolved ? '1px solid rgba(46, 209, 88, 0.3)' : '1px solid rgba(255, 59, 48, 0.3)', 
-                  backdropFilter: 'blur(8px)', 
-                  WebkitBackdropFilter: 'blur(8px)' 
-                }}
-              >
-                {/* 1. Projekt Fejléc */}
+              <div key={issue.id} className="p-3.5 flex flex-col space-y-3 relative" style={{
+                background: 'var(--s1)',
+                border: issue.resolved ? '1px solid rgba(46,209,88,0.25)' : '1px solid rgba(255,59,48,0.25)',
+                borderRadius: '16px',
+                backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+              }}>
+                {/* Fejléc */}
                 <div className="flex justify-between items-start cursor-pointer" onClick={() => navigate(`/project/${issue.project_id}`)}>
                   <div>
-                    <span className="pc-tag text-[9px] px-2 py-0.5 rounded-full" style={{ 
-                      background: issue.resolved ? 'rgba(46, 209, 88, 0.15)' : 'rgba(255, 59, 48, 0.15)', 
-                      color: issue.resolved ? 'var(--green)' : 'var(--red)', 
-                      border: issue.resolved ? '1px solid rgba(46, 209, 88, 0.25)' : '1px solid rgba(255, 59, 48, 0.25)' 
+                    <span style={{
+                      display: 'inline-block', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase',
+                      letterSpacing: '0.05em', padding: '3px 8px', borderRadius: '20px',
+                      background: issue.resolved ? 'rgba(46,209,88,0.12)' : 'rgba(255,59,48,0.12)',
+                      color: issue.resolved ? 'var(--green)' : 'var(--red)',
+                      border: issue.resolved ? '1px solid rgba(46,209,88,0.22)' : '1px solid rgba(255,59,48,0.22)',
                     }}>
                       ⚡ {issue.projects?.serial_number || 'Projekt'}
                     </span>
-                    <h3 className="font-bold text-slate-100 text-sm mt-1">{issue.projects?.name || 'Névtelen Projekt'}</h3>
+                    <div style={{ fontWeight: '700', color: 'var(--t1)', fontSize: '14px', marginTop: '5px' }}>
+                      {issue.projects?.name || 'Névtelen Projekt'}
+                    </div>
                   </div>
-                  <div className="text-right text-[10px] text-slate-400">
-                    {formattedDate}
-                  </div>
+                  <div style={{ fontSize: '10px', color: 'var(--t3)', textAlign: 'right' }}>{formattedDate}</div>
                 </div>
 
-                {/* 2. NYITOTT HIBA NÉZET */}
+                {/* NYITOTT HIBA */}
                 {!issue.resolved && (
                   <>
-                    <div className="flex space-x-3 items-start pt-2 border-t border-white/5">
+                    <div className="flex space-x-3 items-start pt-2" style={{ borderTop: '1px solid var(--b1)' }}>
                       {issue.file_path && (
-                        <a 
-                          href={issue.file_path} 
-                          target="_blank" 
-                          rel="noreferrer"
-                          className="w-20 h-20 rounded-xl flex-shrink-0 block"
+                        <a href={issue.file_path} target="_blank" rel="noreferrer"
                           style={{
-                            backgroundImage: `url(${issue.file_path})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            border: '1px solid var(--b1)'
+                            width: '76px', height: '76px', borderRadius: '10px', flexShrink: 0, display: 'block',
+                            backgroundImage: `url(${issue.file_path})`, backgroundSize: 'cover', backgroundPosition: 'center',
+                            border: '1px solid var(--b1)',
                           }}
                         />
                       )}
-                      <div className="flex-1">
-                        <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Eredeti Probléma</div>
-                        <div className="text-xs text-red-300 font-medium leading-snug italic bg-red-500/5 p-2.5 rounded-lg border border-red-500/10">
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '5px' }}>Eredeti Probléma</div>
+                        <div style={{
+                          fontSize: '12px', color: 'var(--red)', fontWeight: '500', lineHeight: '1.45',
+                          fontStyle: 'italic', background: 'rgba(255,59,48,0.06)', padding: '8px 10px',
+                          borderRadius: '8px', border: '1px solid rgba(255,59,48,0.10)',
+                        }}>
                           ⚠️ {issue.description || 'Hiba leírás nélkül feltöltve.'}
                         </div>
                       </div>
                     </div>
 
-                    {/* Lábjegyzet és Javítás rögzítése gomb */}
-                    <div className="flex justify-between items-center pt-2.5 border-t border-white/5 text-[10px] text-slate-400">
-                      <span>Bejelentette: <b>👷 {issue.profiles?.full_name || 'Szerelő'}</b></span>
-                      
-                      <button 
+                    <div className="flex justify-between items-center pt-2" style={{ borderTop: '1px solid var(--b1)' }}>
+                      <span style={{ fontSize: '10px', color: 'var(--t3)' }}>
+                        Bejelentette: <b style={{ color: 'var(--t2)' }}>👷 {issue.profiles?.full_name || 'Szerelő'}</b>
+                      </span>
+                      <button
                         onClick={() => setExpandedIssueId(expandedIssueId === issue.id ? null : issue.id)}
-                        className="px-2.5 py-1.5 rounded-lg font-bold text-[10px] transition-all"
                         style={{
-                          background: 'linear-gradient(135deg, #ffd60a, #ccab00)',
-                          border: 'none',
-                          color: '#000',
-                          boxShadow: '0 4px 12px rgba(255, 214, 10, 0.2)'
+                          padding: '6px 12px', borderRadius: '8px', fontWeight: '700', fontSize: '10px',
+                          cursor: 'pointer', border: 'none', fontFamily: 'inherit',
+                          background: 'linear-gradient(135deg,#ffd60a,#ccab00)',
+                          color: '#000', boxShadow: '0 4px 12px rgba(255,214,10,0.2)',
                         }}
                       >
                         {expandedIssueId === issue.id ? 'Mégsem' : '🔧 Javítás rögzítése'}
                       </button>
                     </div>
 
-                    {/* JAVÍTÁS RÖGZÍTÉSE LENYÍLÓ PANEL */}
+                    {/* Javítás panel */}
                     {expandedIssueId === issue.id && (
-                      <div className="mt-3 p-3 rounded-xl space-y-3 border border-white/5" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                        <div className="text-xs font-bold text-amber-300 flex items-center space-x-1">
-                          <span>🔧</span>
-                          <span>Hiba elhárításának rögzítése</span>
+                      <div className="mt-2 p-3 space-y-3" style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--b1)' }}>
+                        <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--yellow)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          🔧 Hiba elhárításának rögzítése
                         </div>
-
                         <form onSubmit={(e) => handleResolveIssue(e, issue)} className="space-y-3">
-                          {/* Fotó feltöltés (KÖTELEZŐ) */}
                           <div>
-                            <label className="text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-1 block">Fénykép a javításról (KÖTELEZŐ)</label>
-                            <input 
-                              type="file" 
+                            <label style={{ display: 'block', fontSize: '9px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '5px' }}>
+                              Fénykép a javításról (KÖTELEZŐ)
+                            </label>
+                            <input
+                              type="file"
                               accept="image/*"
                               onChange={(e) => setFixFile(e.target.files?.[0] || null)}
                               required
-                              className="w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-blue-500/10 file:text-blue-400 file:cursor-pointer hover:file:bg-blue-500/20"
-                            />
-                          </div>
-
-                          {/* Megjegyzés */}
-                          <div>
-                            <label className="text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-1 block">Rövid leírás a javításról (Opcionális)</label>
-                            <input 
-                              type="text" 
-                              value={fixComment}
-                              onChange={(e) => setFixComment(e.target.value)}
-                              placeholder="pl. Kicseréltem a kábelt, most már szuperál..."
-                              className="w-full text-xs"
                               style={{
-                                background: 'var(--s1)',
-                                border: '1px solid var(--b1)',
-                                borderRadius: '8px',
-                                padding: '6px 10px',
-                                color: 'var(--t1)',
-                                outline: 'none'
+                                width: '100%', fontSize: '12px', color: 'var(--t2)',
+                                background: 'var(--s1)', border: '1px solid var(--b1)',
+                                borderRadius: '8px', padding: '7px 10px',
                               }}
                             />
                           </div>
-
-                          <button 
-                            type="submit" 
+                          <div>
+                            <label style={{ display: 'block', fontSize: '9px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '5px' }}>
+                              Rövid leírás (opcionális)
+                            </label>
+                            <input
+                              type="text"
+                              value={fixComment}
+                              onChange={(e) => setFixComment(e.target.value)}
+                              placeholder="pl. Kicseréltem a kábelt..."
+                              style={{
+                                background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '8px',
+                                padding: '7px 10px', color: 'var(--t1)', fontSize: '12px',
+                                width: '100%', outline: 'none', fontFamily: 'inherit',
+                              }}
+                            />
+                          </div>
+                          <button
+                            type="submit"
                             disabled={savingFix}
-                            className="w-full py-2 font-bold text-xs rounded-lg transition-all"
                             style={{
-                              background: 'linear-gradient(135deg, #2ed158, #1ca542)',
-                              border: 'none',
-                              color: '#fff',
-                              boxShadow: '0 6px 15px rgba(46, 209, 88, 0.25)'
+                              width: '100%', padding: '10px', borderRadius: '10px', fontWeight: '700',
+                              fontSize: '13px', cursor: savingFix ? 'default' : 'pointer', border: 'none',
+                              fontFamily: 'inherit', background: 'linear-gradient(135deg,#2ed158,#1ca542)',
+                              color: '#fff', boxShadow: '0 6px 15px rgba(46,209,88,0.25)',
                             }}
                           >
                             {savingFix ? 'Mentés folyamatban...' : 'Javítás Mentése és Lezárás'}
@@ -349,59 +272,40 @@ export default function Issues() {
                   </>
                 )}
 
-                {/* 3. JAVÍTOTT HIBA NÉZET (BEFORE / AFTER ELRENDEZÉS) */}
+                {/* JAVÍTOTT HIBA - BEFORE / AFTER */}
                 {issue.resolved && (
                   <>
-                    {/* Before/After rács */}
-                    <div className="grid grid-cols-2 gap-3 pt-2.5 border-t border-white/5">
-                      {/* BAL: BEFORE (Hiba) */}
+                    <div className="grid grid-cols-2 gap-3 pt-2" style={{ borderTop: '1px solid var(--b1)' }}>
                       <div className="flex flex-col space-y-1.5">
-                        <div className="text-[9px] text-red-400 font-extrabold uppercase tracking-wider">🔴 Eredeti hiba</div>
-                        <a 
-                          href={issue.file_path} 
-                          target="_blank" 
-                          rel="noreferrer"
-                          className="aspect-video w-full rounded-lg block relative"
-                          style={{
-                            backgroundImage: `url(${issue.file_path})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            border: '1px solid rgba(255, 59, 48, 0.2)',
-                            aspectRatio: '4 / 3'
-                          }}
-                        />
-                        <div className="text-[10px] text-slate-300 italic leading-tight p-1.5 rounded bg-white/5 border border-white/5">
+                        <div style={{ fontSize: '9px', color: 'var(--red)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em' }}>🔴 Eredeti hiba</div>
+                        <a href={issue.file_path} target="_blank" rel="noreferrer" style={{
+                          display: 'block', aspectRatio: '4/3', borderRadius: '8px',
+                          backgroundImage: `url(${issue.file_path})`, backgroundSize: 'cover', backgroundPosition: 'center',
+                          border: '1px solid rgba(255,59,48,0.18)',
+                        }} />
+                        <div style={{ fontSize: '10px', color: 'var(--t2)', fontStyle: 'italic', lineHeight: '1.3', padding: '6px 8px', borderRadius: '6px', background: 'var(--s1)', border: '1px solid var(--b1)' }}>
                           {issue.description || 'Nem volt leírás.'}
                         </div>
                       </div>
-
-                      {/* JOBB: AFTER (Javítás) */}
                       <div className="flex flex-col space-y-1.5">
-                        <div className="text-[9px] text-green-400 font-extrabold uppercase tracking-wider">🟢 Elvégzett javítás</div>
-                        <a 
-                          href={issue.resolved_file_path} 
-                          target="_blank" 
-                          rel="noreferrer"
-                          className="aspect-video w-full rounded-lg block relative"
-                          style={{
-                            backgroundImage: `url(${issue.resolved_file_path})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            border: '1px solid rgba(46, 209, 88, 0.2)',
-                            aspectRatio: '4 / 3'
-                          }}
-                        />
-                        <div className="text-[10px] text-emerald-300 italic leading-tight p-1.5 rounded border" style={{ background: 'rgba(46, 209, 88, 0.05)', borderColor: 'rgba(46, 209, 88, 0.1)' }}>
+                        <div style={{ fontSize: '9px', color: 'var(--green)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em' }}>🟢 Elvégzett javítás</div>
+                        <a href={issue.resolved_file_path} target="_blank" rel="noreferrer" style={{
+                          display: 'block', aspectRatio: '4/3', borderRadius: '8px',
+                          backgroundImage: `url(${issue.resolved_file_path})`, backgroundSize: 'cover', backgroundPosition: 'center',
+                          border: '1px solid rgba(46,209,88,0.18)',
+                        }} />
+                        <div style={{ fontSize: '10px', color: 'var(--green)', fontStyle: 'italic', lineHeight: '1.3', padding: '6px 8px', borderRadius: '6px', background: 'rgba(46,209,88,0.05)', border: '1px solid rgba(46,209,88,0.10)' }}>
                           {issue.resolved_comment || 'Javítva.'}
                         </div>
                       </div>
                     </div>
 
-                    {/* Lábjegyzet: Ki és mikor javította */}
-                    <div className="flex justify-between items-center pt-2.5 border-t border-white/5 text-[9px] text-slate-400">
-                      <span>Jelentette: <b>{issue.profiles?.full_name || 'Ismeretlen'}</b></span>
-                      <span className="text-green-400 font-semibold flex items-center space-x-1">
-                        <span>✅ Javította: <b>{issue.resolved_by_profile?.full_name || 'Szerelő'}</b></span>
+                    <div className="flex justify-between items-center pt-2" style={{ borderTop: '1px solid var(--b1)' }}>
+                      <span style={{ fontSize: '9px', color: 'var(--t3)' }}>
+                        Jelentette: <b style={{ color: 'var(--t2)' }}>{issue.profiles?.full_name || 'Ismeretlen'}</b>
+                      </span>
+                      <span style={{ fontSize: '9px', color: 'var(--green)', fontWeight: '600' }}>
+                        ✅ Javította: <b>{issue.resolved_by_profile?.full_name || 'Szerelő'}</b>
                       </span>
                     </div>
                   </>

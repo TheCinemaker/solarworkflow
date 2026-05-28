@@ -109,11 +109,36 @@ export default function Dashboard() {
 
   const isAdmin = user?.role === 'admin';
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 10) return { text: 'Jó reggelt', emoji: '🌅' };
+    if (hour >= 10 && hour < 18) return { text: 'Szép napot', emoji: '☀️' };
+    if (hour >= 18 && hour < 22) return { text: 'Szép estét', emoji: '🌆' };
+    return { text: 'Szép éjszakát', emoji: '🌙' };
+  };
+
+  const greeting = getGreeting();
+  
+  let rawName = user?.full_name || '';
+  if (!rawName && user?.email) {
+    const emailPrefix = user.email.split('@')[0];
+    const parts = emailPrefix.split('.');
+    if (parts.length > 1) {
+      rawName = parts[1];
+    } else {
+      rawName = parts[0];
+    }
+  }
+  
+  const name = rawName 
+    ? rawName.trim().split(' ')[0].charAt(0).toUpperCase() + rawName.trim().split(' ')[0].slice(1)
+    : 'Dolgozó';
+
   return (
     <div className="page active" id="p-home">
       <div className="page-header fu">
         <div>
-          <div className="pg-greet">Szia {user?.full_name?.split(' ')[0] || 'Dolgozó'}! 👋</div>
+          <div className="pg-greet">{greeting.text}, {name}! {greeting.emoji}</div>
           <div className="pg-title">{isAdmin ? 'Adminisztráció' : 'Saját Fiók'}</div>
         </div>
         <div className="flex items-center space-x-2">
