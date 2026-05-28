@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import EditProjectModal from '../components/EditProjectModal';
 import { useUser } from '../context/UserContext';
@@ -23,6 +23,12 @@ export default function ProjectDetails() {
   const [filePreview, setFilePreview] = useState(null); // Előnézet URL
   const [previewImage, setPreviewImage] = useState(null); // Nagyított kép overlay-hez
   
+  // Belső Chat állapotok
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [sendingMsg, setSendingMsg] = useState(false);
+  const chatEndRef = useRef(null);
+
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -94,6 +100,24 @@ export default function ProjectDetails() {
       if (mediaData) {
         setPhotos(mediaData);
       }
+
+      // 4. Belső chat üzenetek betöltése
+      const { data: messagesData, error: messagesErr } = await supabase
+        .from('messages')
+        .select(`
+          id,
+          content,
+          created_at,
+          user_id,
+          profiles:profiles!user_id (full_name, role, serial_number)
+        `)
+        .eq('project_id', id)
+        .order('created_at', { ascending: true });
+
+      if (messagesErr) throw messagesErr;
+      if (messagesData) {
+        setMessages(messagesData);
+      }
     } catch (err) {
       console.error("Hiba az adatok betöltésekor:", err);
       setError(err.message);
@@ -124,12 +148,90 @@ export default function ProjectDetails() {
       }, () => {
         loadData();
       })
+      .on('postgres_changes', { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'messages', 
+        filter: `project_id=eq.${id}` 
+      }, async (payload) => {
+        const { data: fullMsg } = await supabase
+          .from('messages')
+          .select(`
+            id,
+            content,
+            created_at,
+            user_id,
+            profiles:profiles!user_id (full_name, role, serial_number)
+          `)
+          .eq('id', payload.new.id)
+          .single();
+        
+        if (fullMsg) {
+          setMessages(prev => {
+            if (prev.some(m => m.id === fullMsg.id)) return prev;
+            return [...prev, fullMsg];
+          });
+        }
+      })
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
   }, [id]);
+
+  // Görgetés a legújabb chat üzenethez
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
+  // Belső chat üzenet elküldése
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !currentUser) return;
+
+    setSendingMsg(true);
+    try {
+      const { data, error: sendErr } = await supabase
+        .from('messages')
+        .insert([{
+          project_id: id,
+          user_id: currentUser.id,
+          content: newMessage.trim()
+        }])
+        .select()
+        .single();
+
+      if (sendErr) throw sendErr;
+      setNewMessage('');
+      
+      // Frissítsük a chat feedet a profil adatokkal együtt
+      const { data: fullMsg } = await supabase
+        .from('messages')
+        .select(`
+          id,
+          content,
+          created_at,
+          user_id,
+          profiles:profiles!user_id (full_name, role, serial_number)
+        `)
+        .eq('id', data.id)
+        .single();
+      
+      if (fullMsg) {
+        setMessages(prev => {
+          if (prev.some(m => m.id === fullMsg.id)) return prev;
+          return [...prev, fullMsg];
+        });
+      }
+    } catch (err) {
+      console.error("Nem sikerült elküldeni az üzenetet:", err);
+    } finally {
+      setSendingMsg(false);
+    }
+  };
 
   // Feladat befejezésének mentése
   const handleToggleTask = async (taskName) => {
@@ -616,6 +718,105 @@ export default function ProjectDetails() {
             })}
           </div>
         )}
+      </div>
+      {/* Belső Projekt Chat Szakasz */}
+      <div className="shdr fu d3_5">
+        <div className="shdr-t">💬 Belső Projekt Chat</div>
+        <div className="shdr-a">{messages.length} üzenet</div>
+      </div>
+
+      <div className="gcard fu d3_5 flex flex-col" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginBottom: '15px', padding: '12px' }}>
+        {/* Üzenetek görgethető doboza */}
+        <div 
+          className="scroll-area flex flex-col space-y-2 mb-3 pr-1"
+          style={{ 
+            maxHeight: '260px', 
+            overflowY: 'auto', 
+            minHeight: '120px',
+            scrollBehavior: 'smooth',
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+        >
+          {messages.length === 0 ? (
+            <div className="text-center text-xs text-slate-400 italic my-auto py-6">
+              Nincsenek még üzenetek ebben a chatben.<br/>Küldd el az első bejegyzést!
+            </div>
+          ) : (
+            <div className="flex flex-col space-y-2">
+              {messages.map(msg => {
+                const isOwn = msg.user_id === currentUser?.id;
+                const senderName = msg.profiles?.full_name || 'Ismeretlen';
+                const senderRole = msg.profiles?.role === 'admin' ? 'Admin' : 'Szerelő';
+                const senderSerial = msg.profiles?.serial_number ? `[${msg.profiles.serial_number}]` : '';
+
+                return (
+                  <div 
+                    key={msg.id} 
+                    className={`flex flex-col max-w-[85%] rounded-[6px] p-2.5 text-xs transition-all ${
+                      isOwn 
+                        ? 'self-end bg-gradient-to-br from-[#0088cc] to-[#005580] text-white border border-[#0088cc]/20 shadow-md shadow-[#0088cc]/10' 
+                        : 'self-start bg-white/5 text-slate-100 border border-white/5'
+                    }`}
+                    style={{
+                      alignSelf: isOwn ? 'flex-end' : 'flex-start',
+                      background: isOwn ? 'linear-gradient(135deg, #0088cc, #005580)' : 'rgba(255, 255, 255, 0.05)',
+                      border: isOwn ? '1px solid rgba(0, 136, 204, 0.2)' : '1px solid var(--b1)',
+                      borderRadius: '6px'
+                    }}
+                  >
+                    <div className="flex items-center space-x-1.5 mb-1 opacity-75 font-bold text-[9px] uppercase tracking-wider">
+                      <span style={{ color: isOwn ? '#fff' : 'var(--blue)' }}>{senderName}</span>
+                      <span className="opacity-60">{senderRole} {senderSerial}</span>
+                    </div>
+                    <div className="whitespace-pre-wrap leading-relaxed">{msg.content}</div>
+                    <div className="text-[8px] text-right mt-1 opacity-50">
+                      {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </div>
+                );
+              })}
+              <div ref={chatEndRef} />
+            </div>
+          )}
+        </div>
+
+        {/* Üzenet küldő sáv */}
+        <form onSubmit={handleSendMessage} className="flex items-center space-x-2 pt-2 border-t border-white/5">
+          <input 
+            type="text" 
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Írj egy belső üzenetet a csapatnak..."
+            disabled={sendingMsg}
+            style={{
+              background: 'var(--s2)',
+              border: '1px solid var(--b1)',
+              borderRadius: '6px',
+              padding: '8px 12px',
+              color: 'var(--t1)',
+              fontSize: '12px',
+              width: '100%',
+              outline: 'none'
+            }}
+          />
+          <button 
+            type="submit" 
+            disabled={sendingMsg || !newMessage.trim()}
+            className="flex items-center justify-center p-2 rounded-[6px] transition-all disabled:opacity-50"
+            style={{ 
+              background: 'linear-gradient(135deg, #0088cc, #005580)', 
+              color: '#fff',
+              border: 'none',
+              width: '35px',
+              height: '35px',
+              cursor: 'pointer',
+              borderRadius: '6px'
+            }}
+          >
+            ✈️
+          </button>
+        </form>
       </div>
 
       {/* Fényképek Galéria */}
