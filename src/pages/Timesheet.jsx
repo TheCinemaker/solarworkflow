@@ -156,7 +156,7 @@ export default function Timesheet() {
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: '0.07em',
-    marginBottom: '8px',
+    marginBottom: '4px',
     display: 'block'
   };
 
