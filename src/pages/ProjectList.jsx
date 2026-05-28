@@ -56,7 +56,7 @@ export default function ProjectList() {
       </div>
 
       {/* TABS (Aktív / Archivált szűrő) */}
-      <div className="mx-5 mb-4 flex items-center fu" style={{ gap: '10px' }}>
+      <div className="mx-[15px] mb-4 flex items-center fu" style={{ gap: '10px' }}>
         <div 
           onClick={() => {
             setActiveTab('active');
@@ -69,7 +69,7 @@ export default function ProjectList() {
             textAlign: 'center',
             fontSize: '12px',
             fontWeight: 'bold',
-            borderRadius: '12px',
+            borderRadius: 'var(--btn-r)',
             background: activeTab === 'active' ? 'rgba(79, 142, 247, 0.15)' : 'var(--s1)',
             border: activeTab === 'active' ? '1px solid rgba(79, 142, 247, 0.35)' : '1px solid var(--b1)',
             color: activeTab === 'active' ? 'var(--blue)' : 'var(--t2)',
@@ -89,7 +89,7 @@ export default function ProjectList() {
             textAlign: 'center',
             fontSize: '12px',
             fontWeight: 'bold',
-            borderRadius: '12px',
+            borderRadius: 'var(--btn-r)',
             background: activeTab === 'archived' ? 'rgba(255, 214, 10, 0.15)' : 'var(--s1)',
             border: activeTab === 'archived' ? '1px solid rgba(255, 214, 10, 0.35)' : '1px solid var(--b1)',
             color: activeTab === 'archived' ? '#ffd60a' : 'var(--t2)',
@@ -100,7 +100,7 @@ export default function ProjectList() {
       </div>
 
       {/* 🔍 MODERNEBB APPLE STÍLUSÚ VALÓS IDEJŰ KERESŐ */}
-      <div className="mx-5 mb-4 relative fu d2">
+      <div className="mx-[15px] mb-4 relative fu d2">
         <input 
           type="text" 
           value={searchQuery}
@@ -110,7 +110,7 @@ export default function ProjectList() {
           style={{
             background: 'var(--s1)',
             border: '1px solid var(--b1)',
-            borderRadius: '12px',
+            borderRadius: 'var(--input-r)',
             padding: '10px 14px 10px 36px',
             color: 'var(--t1)',
             outline: 'none',
@@ -129,9 +129,9 @@ export default function ProjectList() {
         )}
       </div>
 
-      <div className="fu d3" style={{ padding: '0 20px 100px' }}>
+      <div className="fu d3" style={{ padding: '0 15px 100px' }}>
         {filteredProjects.length === 0 ? (
-          <div className="text-center w-full mt-2 py-8" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
+          <div className="text-center w-full mt-2 py-8" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: 'var(--card-r)', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
             {searchQuery ? 'Nincs a keresésnek megfelelő projekt.' : `Nincsenek ${activeTab === 'active' ? 'aktív' : 'archivált'} projektek.`}
           </div>
         ) : (
