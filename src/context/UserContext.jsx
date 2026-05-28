@@ -13,7 +13,7 @@ export function UserProvider({ children }) {
 
   async function fetchProfile(userId, email, sessionUser) {
     try {
-      const isAdminEmail = email === 'admin@thecinemaker.hu' || email === 'avar.szilveszter@gmail.com';
+      const isAdminEmail = email === 'admin@voltdesk.hu' || email === 'avar.szilveszter@gmail.com';
       const enforcedRole = isAdminEmail ? 'admin' : 'worker';
 
       const { data, error } = await supabase
@@ -49,7 +49,7 @@ export function UserProvider({ children }) {
       console.error("Hiba a felhasználói profil betöltésekor:", err);
       // Biztonsági mentőöv: offline profil állapot, hogy az app zökkenőmentesen fusson
       if (sessionUser) {
-        const isAdminEmail = email === 'admin@thecinemaker.hu' || email === 'avar.szilveszter@gmail.com';
+        const isAdminEmail = email === 'admin@voltdesk.hu' || email === 'avar.szilveszter@gmail.com';
         const enforcedRole = isAdminEmail ? 'admin' : 'worker';
         setUser({
           id: userId,
