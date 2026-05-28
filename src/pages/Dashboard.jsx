@@ -139,7 +139,7 @@ export default function Dashboard() {
       <div className="page-header fu">
         <div>
           <div className="pg-greet">{greeting.text}, {name}! {greeting.emoji}</div>
-          <div className="pg-title">{isAdmin ? 'Adminisztráció' : 'Saját Fiók'}</div>
+          <div className="pg-title">{isAdmin ? 'Adminisztráció' : 'VoltDesk dashboard'}</div>
         </div>
         <div className="flex items-center space-x-2">
           <div className="hdr-btn" onClick={() => navigate('/calendar')} title="Naptár">📅</div>
