@@ -54,12 +54,6 @@ export default function MainLayout() {
               senderName: fullMsg.profiles?.full_name || 'Munkatárs',
               content: fullMsg.content.length > 45 ? fullMsg.content.substring(0, 45) + '...' : fullMsg.content
             });
-
-            // 5 másodperc után automatikusan elrejti
-            const timer = setTimeout(() => {
-              setToast(null);
-            }, 5000);
-            return () => clearTimeout(timer);
           }
         } catch (err) {
           console.error("Global toast helper error:", err);
@@ -129,6 +123,23 @@ export default function MainLayout() {
               </div>
             </div>
             <div style={{ fontSize: '14px', color: 'var(--blue)', marginLeft: '10px', fontWeight: 'bold' }}>➔</div>
+            <div 
+              onClick={(e) => {
+                e.stopPropagation();
+                setToast(null);
+              }}
+              style={{
+                fontSize: '16px',
+                color: 'rgba(255, 59, 48, 0.85)',
+                marginLeft: '15px',
+                padding: '4px 8px',
+                lineHeight: 1,
+                cursor: 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              ✕
+            </div>
           </div>
         </>
       )}
