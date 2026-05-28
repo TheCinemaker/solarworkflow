@@ -1,15 +1,17 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
+import { useUser } from '../context/UserContext';
 
 export default function MainLayout() {
   const navigate = useNavigate();
+  const { user } = useUser();
 
   const navItems = [
     { to: '/', icon: '⬡', label: 'Főoldal' },
     { to: '/projects', icon: '📁', label: 'Projektek' },
     { to: '/calendar', icon: '📅', label: 'Naptár' },
     { to: '/timesheet', icon: '📋', label: 'Napi lap' },
-    { to: '/finance', icon: '👷', label: 'Munkások' },
+    ...(user?.role === 'admin' ? [{ to: '/finance', icon: '👷', label: 'Munkások' }] : []),
   ];
 
   return (

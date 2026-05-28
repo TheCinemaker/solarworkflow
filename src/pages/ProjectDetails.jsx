@@ -2,10 +2,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import EditProjectModal from '../components/EditProjectModal';
+import { useUser } from '../context/UserContext';
 
 export default function ProjectDetails() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { user: profile } = useUser();
+  const isAdmin = profile?.role === 'admin';
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [completedTasks, setCompletedTasks] = useState([]);
@@ -267,17 +270,19 @@ export default function ProjectDetails() {
     <div className="page active scroll-area" id="p-detail">
       <div className="flex justify-between items-center px-5 mb-2.5 fu">
         <div className="back-btn" style={{ margin: 0 }} onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
-        <button 
-          onClick={() => setIsEditModalOpen(true)}
-          className="px-3.5 py-1.5 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all hover:scale-[1.03] active:scale-97 flex items-center space-x-1"
-          style={{
-            background: 'rgba(79, 142, 247, 0.12)',
-            color: 'var(--blue)',
-            border: '1px solid rgba(79, 142, 247, 0.25)'
-          }}
-        >
-          <span>✏️ Projekt Szerkesztése</span>
-        </button>
+        {isAdmin && (
+          <button 
+            onClick={() => setIsEditModalOpen(true)}
+            className="px-3.5 py-1.5 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all hover:scale-[1.03] active:scale-97 flex items-center space-x-1"
+            style={{
+              background: 'rgba(79, 142, 247, 0.12)',
+              color: 'var(--blue)',
+              border: '1px solid rgba(79, 142, 247, 0.25)'
+            }}
+          >
+            <span>✏️ Projekt Szerkesztése</span>
+          </button>
+        )}
       </div>
 
       {/* Archivált Banner */}
@@ -287,6 +292,7 @@ export default function ProjectDetails() {
             <span>🗂</span>
             <span>Ez egy lezárt, archivált projekt.</span>
           </div>
+          {isAdmin && (
           <button 
             onClick={handleRestoreProject}
             className="px-2.5 py-1 rounded-lg font-bold transition-all hover:scale-[1.03]"
@@ -294,6 +300,7 @@ export default function ProjectDetails() {
           >
             Visszaállítás aktívvá
           </button>
+        )}
         </div>
       )}
       
@@ -507,8 +514,8 @@ export default function ProjectDetails() {
         </div>
       )}
 
-      {/* Archiválás Gomb (Csak ha még nincs lezárva) */}
-      {!project?.archived && (
+      {/* Archiválás Gomb (Csak ha még nincs lezárva és Admin) */}
+      {!project?.archived && isAdmin && (
         <div className="px-5 mt-3 fu d1 flex justify-center">
           <button 
             onClick={handleArchiveProject} 

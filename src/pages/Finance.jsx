@@ -1,13 +1,38 @@
 import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { useUser } from '../context/UserContext';
 
 export default function Finance() {
   const navigate = useNavigate();
+  const { user } = useUser();
   const [projects, setProjects] = useState([]);
   const [workersData, setWorkersData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  if (user?.role !== 'admin') {
+    return (
+      <div className="page active flex flex-col items-center justify-center h-screen px-6 text-center">
+        <div className="p-8 rounded-[24px] shadow-2xl relative" style={{ background: 'var(--s1)', border: '1px solid rgba(255, 69, 58, 0.2)', backdropFilter: 'blur(20px)', maxWidth: '380px' }}>
+          <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-red-500/20">
+            <span className="text-3xl">🔒</span>
+          </div>
+          <h2 className="text-lg font-black text-white uppercase tracking-tight">Hozzáférés megtagadva</h2>
+          <p className="text-xs text-slate-400 mt-2.5 leading-relaxed">
+            Ez a felület bizalmas bérszámfejtési és HR adatokat tartalmaz, ezért kizárólag adminisztrátorok számára érhető el.
+          </p>
+          <button 
+            onClick={() => navigate('/')} 
+            className="mt-6 w-full text-xs font-black uppercase tracking-widest text-white py-3 px-4 rounded-xl active:scale-95 transition-all cursor-pointer"
+            style={{ background: 'linear-gradient(135deg, #4f8ef7, #2a5ccc)' }}
+          >
+            Vissza a Főoldalra
+          </button>
+        </div>
+      </div>
+    );
+  }
   
   // Kiválasztott dolgozó az adó/bérlap részletes megtekintéséhez
   const [expandedWorkerId, setExpandedWorkerId] = useState(null);

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { supabase } from './lib/supabase';
+import { useUser } from './context/UserContext';
 
 import Login from './pages/Login';
 import MainLayout from './layouts/MainLayout';
@@ -13,27 +13,11 @@ import Issues from './pages/Issues';
 import CalendarView from './pages/CalendarView';
 
 export default function App() {
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  const { user, loading } = useUser();
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-[#07090f] flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
@@ -44,12 +28,12 @@ export default function App() {
       <Routes>
         <Route 
           path="/login" 
-          element={!session ? <Login /> : <Navigate to="/" />} 
+          element={!user ? <Login /> : <Navigate to="/" />} 
         />
         
         <Route 
           path="/" 
-          element={session ? <MainLayout /> : <Navigate to="/login" />} 
+          element={user ? <MainLayout /> : <Navigate to="/login" />} 
         >
           <Route index element={<Dashboard />} />
           <Route path="projects" element={<ProjectList />} />
