@@ -39,7 +39,7 @@ export default function App() {
           <Route path="projects" element={<ProjectList />} />
           <Route path="project/:id" element={<ProjectDetails />} />
           <Route path="timesheet" element={<Timesheet />} />
-          <Route path="finance" element={<Finance />} />
+          <Route path="finance" element={user?.role === 'admin' ? <Finance /> : <Navigate to="/" />} />
           <Route path="issues" element={<Issues />} />
           <Route path="calendar" element={<CalendarView />} />
         </Route>

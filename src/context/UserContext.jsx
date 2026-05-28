@@ -13,6 +13,9 @@ export function UserProvider({ children }) {
 
   async function fetchProfile(userId, email, sessionUser) {
     try {
+      const isAdminEmail = email === 'admin@thecinemaker.hu' || email === 'avar.szilveszter@gmail.com';
+      const enforcedRole = isAdminEmail ? 'admin' : 'worker';
+
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -22,37 +25,38 @@ export function UserProvider({ children }) {
       if (error) {
         // Ha a profil nem található (PGRST116) és van aktív session, hozzuk létre automatikusan!
         if (error.code === 'PGRST116' && sessionUser) {
-          const fullName = sessionUser.user_metadata?.full_name || 'Adminisztrátor';
-          const role = sessionUser.user_metadata?.role || 'admin';
+          const fullName = sessionUser.user_metadata?.full_name || (isAdminEmail ? 'Adminisztrátor' : 'Szerelő');
           
           const { data: newProfile, error: insertErr } = await supabase
             .from('profiles')
             .insert([{
               id: userId,
               full_name: fullName,
-              role: role,
-              serial_number: role === 'admin' ? 'ADM-01' : 'EMP-99'
+              role: enforcedRole,
+              serial_number: enforcedRole === 'admin' ? 'ADM-01' : 'EMP-99'
             }])
             .select()
             .single();
           
           if (insertErr) throw insertErr;
-          setUser({ ...newProfile, email });
+          setUser({ ...newProfile, email, role: enforcedRole });
           return;
         }
         throw error;
       }
-      setUser({ ...data, email });
+      setUser({ ...data, email, role: enforcedRole });
     } catch (err) {
       console.error("Hiba a felhasználói profil betöltésekor:", err);
       // Biztonsági mentőöv: offline profil állapot, hogy az app zökkenőmentesen fusson
       if (sessionUser) {
+        const isAdminEmail = email === 'admin@thecinemaker.hu' || email === 'avar.szilveszter@gmail.com';
+        const enforcedRole = isAdminEmail ? 'admin' : 'worker';
         setUser({
           id: userId,
           email,
-          full_name: sessionUser.user_metadata?.full_name || 'Adminisztrátor',
-          role: sessionUser.user_metadata?.role || 'admin',
-          serial_number: 'ADM-01'
+          full_name: sessionUser.user_metadata?.full_name || (isAdminEmail ? 'Adminisztrátor' : 'Szerelő'),
+          role: enforcedRole,
+          serial_number: enforcedRole === 'admin' ? 'ADM-01' : 'EMP-99'
         });
       } else {
         setUser(null);
