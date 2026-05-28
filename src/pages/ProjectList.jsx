@@ -45,20 +45,6 @@ export default function ProjectList() {
     return nameMatch || addrMatch || serialMatch;
   });
 
-  const tabStyle = (tabName) => ({
-    flex: 1,
-    padding: '8px 0',
-    textAlign: 'center',
-    fontSize: '12px',
-    fontWeight: 'bold',
-    borderRadius: '10px',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
-    background: activeTab === tabName ? 'var(--s2)' : 'transparent',
-    border: activeTab === tabName ? '1px solid var(--b1)' : '1px solid transparent',
-    color: activeTab === tabName ? 'var(--t1)' : 'var(--t2)'
-  });
-
   return (
     <div className="page active scroll-area">
       <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
@@ -70,13 +56,24 @@ export default function ProjectList() {
       </div>
 
       {/* TABS (Aktív / Archivált szűrő) */}
-      <div className="mx-5 mb-3 p-1 rounded-xl flex items-center" style={{ background: 'var(--s1)', border: '1px solid var(--b1)' }}>
+      <div className="mx-5 mb-4 flex items-center fu" style={{ gap: '10px' }}>
         <div 
           onClick={() => {
             setActiveTab('active');
             setSearchQuery('');
           }} 
-          style={tabStyle('active')}
+          className="cursor-pointer transition-all duration-200"
+          style={{
+            flex: 1,
+            padding: '10px 0',
+            textAlign: 'center',
+            fontSize: '12px',
+            fontWeight: 'bold',
+            borderRadius: '12px',
+            background: activeTab === 'active' ? 'rgba(79, 142, 247, 0.15)' : 'var(--s1)',
+            border: activeTab === 'active' ? '1px solid rgba(79, 142, 247, 0.35)' : '1px solid var(--b1)',
+            color: activeTab === 'active' ? 'var(--blue)' : 'var(--t2)',
+          }}
         >
           ⚡ Aktív munkák
         </div>
@@ -85,7 +82,18 @@ export default function ProjectList() {
             setActiveTab('archived');
             setSearchQuery('');
           }} 
-          style={tabStyle('archived')}
+          className="cursor-pointer transition-all duration-200"
+          style={{
+            flex: 1,
+            padding: '10px 0',
+            textAlign: 'center',
+            fontSize: '12px',
+            fontWeight: 'bold',
+            borderRadius: '12px',
+            background: activeTab === 'archived' ? 'rgba(255, 214, 10, 0.15)' : 'var(--s1)',
+            border: activeTab === 'archived' ? '1px solid rgba(255, 214, 10, 0.35)' : '1px solid var(--b1)',
+            color: activeTab === 'archived' ? '#ffd60a' : 'var(--t2)',
+          }}
         >
           🗂 Archivált / Kész
         </div>
@@ -121,7 +129,7 @@ export default function ProjectList() {
         )}
       </div>
 
-      <div className="hscroll fu d3" style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '15px', paddingBottom: '100px' }}>
+      <div className="fu d3 flex flex-col px-5" style={{ gap: '12px', paddingBottom: '100px' }}>
         {filteredProjects.length === 0 ? (
           <div className="text-center w-full mt-2 py-8" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
             {searchQuery ? 'Nincs a keresésnek megfelelő projekt.' : `Nincsenek ${activeTab === 'active' ? 'aktív' : 'archivált'} projektek.`}
@@ -139,7 +147,8 @@ export default function ProjectList() {
                 key={proj.id} 
                 className="pc animate-[fadeIn_0.2s_ease-out]" 
                 style={{ 
-                  minWidth: '100%',
+                  width: '100%',
+                  flexShrink: 0,
                   border: proj.archived ? '1px solid rgba(255,255,255,0.05)' : '1px solid var(--b1)',
                   background: proj.archived ? 'rgba(7, 9, 15, 0.4)' : 'var(--s1)'
                 }} 
