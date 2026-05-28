@@ -223,7 +223,7 @@ export default function Finance() {
   }
 
   return (
-    <div className="page active scroll-area" id="p-finance">
+    <div className="page active" id="p-finance">
       <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
 
       <div className="page-header fu">
