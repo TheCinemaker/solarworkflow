@@ -761,7 +761,7 @@ export default function ProjectDetails() {
               borderRadius: '6px',
               padding: '8px 12px',
               color: 'var(--t1)',
-              fontSize: '12px',
+              fontSize: '16px',
               width: '100%',
               outline: 'none'
             }}

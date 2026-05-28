@@ -34,7 +34,10 @@ body{
   --input-r:6px;
 }
 
-input,select,textarea{transition:border-color .15s ease}
+input,select,textarea{
+  transition:border-color .15s ease;
+  font-size: 16px !important; /* Prevents auto-zoom in iOS Safari */
+}
 input:focus,select:focus,textarea:focus{border-color:var(--blue)!important;outline:none}
 input::placeholder,textarea::placeholder{color:var(--t3)}
 select option{background:#07090f}
