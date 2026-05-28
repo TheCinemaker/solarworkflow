@@ -263,7 +263,7 @@ export default function Timesheet() {
           <button 
             type="submit" 
             disabled={saving} 
-            className="w-full font-bold transition-all disabled:opacity-50 flex items-center justify-center pt-3 pb-3" 
+            className="w-full font-bold transition-all disabled:opacity-50 flex items-center justify-center pt-3.5 pb-3.5" 
             style={{ 
               background: 'linear-gradient(135deg, #4f8ef7, #2a5ccc)', 
               border: 'none', 
