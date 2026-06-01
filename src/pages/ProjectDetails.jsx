@@ -1268,7 +1268,7 @@ export default function ProjectDetails() {
                       }}
                     >
                       <span>{photo.resolved ? '🟢' : (photo.is_issue ? '⚠️' : '🟢')}</span>
-                      <span style={{ fontSize: '8px' }}>{photo.resolved ? 'Kijavítva' : (photo.is_issue ? 'Hiba' : 'Haladás')}</span>
+                      <span style={{ fontSize: '8px' }}>{photo.resolved ? 'Kijavítva' : (photo.is_issue ? 'Hiba' : 'Kész')}</span>
                     </div>
                   </div>
                   
@@ -1404,7 +1404,7 @@ export default function ProjectDetails() {
               <span>
                 {previewImage.is_verification 
                   ? 'Javítás Igazolása' 
-                  : (previewImage.resolved ? 'Kijavítva' : (previewImage.is_issue ? 'Hiba' : 'Haladás'))}
+                  : (previewImage.resolved ? 'Kijavítva' : (previewImage.is_issue ? 'Hiba' : 'Kész'))}
               </span>
             </div>
           </div>
