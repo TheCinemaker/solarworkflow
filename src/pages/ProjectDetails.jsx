@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { supabase } from '../lib/supabase';
 import EditProjectModal from '../components/EditProjectModal';
 import { useUser } from '../context/UserContext';
@@ -1363,7 +1364,7 @@ export default function ProjectDetails() {
       </div>
 
       {/* IN-APP APPLE STÍLUSÚ IMMERZÍV FÉNYKÉP NÉZEGETŐ OVERLAY */}
-      {previewImage && (
+      {previewImage && createPortal(
         <div
           className="fixed inset-0 z-[2000]"
           style={{
@@ -1373,7 +1374,8 @@ export default function ProjectDetails() {
             animation: 'fadeIn 0.25s ease-out',
             overflowY: 'auto',
             overflowX: 'hidden',
-            WebkitOverflowScrolling: 'touch'
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain'
           }}
         >
           {/* Felső Navigációs és státusz sáv (rögzített, mindig látható) */}
@@ -1492,7 +1494,8 @@ export default function ProjectDetails() {
             )}
           </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       <EditProjectModal
