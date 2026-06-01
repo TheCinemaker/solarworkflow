@@ -30,7 +30,7 @@ body{
   --red: #ff3b30;
   --yellow: #ffd60a;
   --tg: #2AABEE;
-  
+
   /* Hardcoded dark mode replacement variables */
   --shadow-strong: 0 20px 50px rgba(0, 0, 0, 0.6);
   --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.35);
@@ -39,7 +39,20 @@ body{
   --input-bg: rgba(255, 255, 255, 0.03);
   --glow-top: radial-gradient(circle, rgba(79, 142, 247, 0.15) 0%, transparent 70%);
   --glow-bot: radial-gradient(circle, rgba(46, 209, 88, 0.10) 0%, transparent 70%);
-  
+
+  /* Brand gradients (used on buttons / status bars) */
+  --gradient-blue: linear-gradient(135deg, #4f8ef7, #2a5ccc);
+  --gradient-green: linear-gradient(135deg, #2ed158, #1a8a38);
+  --gradient-yellow: linear-gradient(135deg, #ffd60a, #ccab00);
+  --gradient-red: linear-gradient(135deg, #ff3b30, #cc2e26);
+  --gradient-telegram: linear-gradient(135deg, #0088cc, #005580);
+
+  /* Brand shadows (used on CTA buttons) */
+  --shadow-blue: 0 6px 22px rgba(79, 142, 247, 0.35);
+  --shadow-green: 0 6px 22px rgba(46, 209, 88, 0.35);
+  --shadow-yellow: 0 6px 22px rgba(255, 214, 10, 0.30);
+  --shadow-telegram: 0 8px 25px rgba(0, 136, 204, 0.25);
+
   /* Design tokens */
   --btn-r:6px;
   --card-r:6px;
@@ -61,7 +74,7 @@ body{
   --red: #c51b24;
   --yellow: #a87900;
   --tg: #0f82c4;
-  
+
   /* Hardcoded light mode adapted shadow & backdrop variables */
   --shadow-strong: 0 20px 45px rgba(0, 0, 0, 0.07);
   --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.04);
@@ -70,7 +83,20 @@ body{
   --input-bg: rgba(0, 0, 0, 0.015);
   --glow-top: radial-gradient(circle, rgba(28, 98, 214, 0.06) 0%, transparent 70%);
   --glow-bot: radial-gradient(circle, rgba(30, 135, 58, 0.04) 0%, transparent 70%);
-  
+
+  /* Brand gradients — slightly darker for legibility on light bg */
+  --gradient-blue: linear-gradient(135deg, #2a72e3, #1c62d6);
+  --gradient-green: linear-gradient(135deg, #25a247, #1e873a);
+  --gradient-yellow: linear-gradient(135deg, #d1a000, #a87900);
+  --gradient-red: linear-gradient(135deg, #de2934, #c51b24);
+  --gradient-telegram: linear-gradient(135deg, #1098dc, #0f82c4);
+
+  /* Brand shadows — softer for light mode */
+  --shadow-blue: 0 6px 18px rgba(28, 98, 214, 0.20);
+  --shadow-green: 0 6px 18px rgba(30, 135, 58, 0.18);
+  --shadow-yellow: 0 6px 18px rgba(168, 121, 0, 0.18);
+  --shadow-telegram: 0 6px 18px rgba(15, 130, 196, 0.18);
+
   /* Design tokens */
   --btn-r:6px;
   --card-r:6px;

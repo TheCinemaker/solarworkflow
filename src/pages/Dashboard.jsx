@@ -194,8 +194,8 @@ export default function Dashboard() {
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="url(#infoGrad)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0 0 3px rgba(79, 142, 247, 0.4))' }}>
               <defs>
                 <linearGradient id="infoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#4f8ef7" />
-                  <stop offset="100%" stopColor="#2ed158" />
+                  <stop offset="0%" stopColor="var(--blue)" />
+                  <stop offset="100%" stopColor="var(--green)" />
                 </linearGradient>
               </defs>
               <circle cx="12" cy="12" r="10"></circle>
@@ -233,7 +233,7 @@ export default function Dashboard() {
       <div className="stats-grid fu d2">
         <div className="sc" onClick={() => navigate('/projects')}>
           <div className="sc-lbl">Aktív projektek</div>
-          <div className="sc-val" style={{color:'#4f8ef7'}}>{stats.projects}</div>
+          <div className="sc-val" style={{color:'var(--blue)'}}>{stats.projects}</div>
           <div className="sc-sub"><span className="sc-dot"></span>Futó munkák</div>
         </div>
 
@@ -242,17 +242,17 @@ export default function Dashboard() {
           <>
             <div className="sc" onClick={() => navigate('/timesheet')}>
               <div className="sc-lbl">Mai munkalapok</div>
-              <div className="sc-val" style={{color:'#2ed158'}}>{stats.worklogs}</div>
+              <div className="sc-val" style={{color:'var(--green)'}}>{stats.worklogs}</div>
               <div className="sc-sub">{stats.workers} dolgozó terepen</div>
             </div>
             <div className="sc cursor-pointer" onClick={() => navigate('/finance')}>
               <div className="sc-lbl">Havi bevétel</div>
-              <div className="sc-val" style={{color:'#ffd60a'}}>{(stats.income || 0).toLocaleString('hu-HU')} Ft</div>
+              <div className="sc-val" style={{color:'var(--yellow)'}}>{(stats.income || 0).toLocaleString('hu-HU')} Ft</div>
               <div className="sc-sub" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Részletes könyvelés →</div>
             </div>
             <div className="sc" onClick={() => navigate('/issues')}>
               <div className="sc-lbl">Aktív hibák</div>
-              <div className="sc-val" style={{color:'#ff3b30'}}>{stats.issues}</div>
+              <div className="sc-val" style={{color:'var(--red)'}}>{stats.issues}</div>
               <div className="sc-sub">Javításra váró hibák</div>
             </div>
           </>
@@ -261,17 +261,17 @@ export default function Dashboard() {
           <>
             <div className="sc" onClick={() => navigate('/timesheet')}>
               <div className="sc-lbl">Ledolgozott idő (Hó)</div>
-              <div className="sc-val" style={{color:'#2ed158'}}>{workerStats.hours} óra</div>
+              <div className="sc-val" style={{color:'var(--green)'}}>{workerStats.hours} óra</div>
               <div className="sc-sub">Aktuális havi összesítés</div>
             </div>
             <div className="sc">
               <div className="sc-lbl">Várható fizetésed</div>
-              <div className="sc-val" style={{color:'#ffd60a'}}>{workerStats.earnings.toLocaleString('hu-HU')} Ft</div>
+              <div className="sc-val" style={{color:'var(--yellow)'}}>{workerStats.earnings.toLocaleString('hu-HU')} Ft</div>
               <div className="sc-sub">Szerződéses órabéred alapján</div>
             </div>
             <div className="sc cursor-pointer" onClick={() => navigate('/issues')}>
               <div className="sc-lbl">Aktív hibák</div>
-              <div className="sc-val" style={{color:'#ff3b30'}}>{stats.issues}</div>
+              <div className="sc-val" style={{color:'var(--red)'}}>{stats.issues}</div>
               <div className="sc-sub">Javításra váró hibák</div>
             </div>
           </>
@@ -289,14 +289,14 @@ export default function Dashboard() {
               border: '1.5px dashed rgba(79, 142, 247, 0.3)',
               borderRadius: '16px',
               height: '56px',
-              color: '#4f8ef7',
+              color: 'var(--blue)',
               fontWeight: '800',
               fontSize: '13px',
               gap: '6px',
               boxShadow: 'var(--shadow-soft)'
             }}
           >
-            <Icon name="plus" size={14} color="#4f8ef7" strokeWidth={2.5} /> <span>Új projekt</span>
+            <Icon name="plus" size={14} color="var(--blue)" strokeWidth={2.5} /> <span>Új projekt</span>
           </div>
           <div
             onClick={() => setIsWorkerModalOpen(true)}
@@ -306,14 +306,14 @@ export default function Dashboard() {
               border: '1.5px dashed rgba(46, 209, 88, 0.3)',
               borderRadius: '16px',
               height: '56px',
-              color: '#2ed158',
+              color: 'var(--green)',
               fontWeight: '800',
               fontSize: '13px',
               gap: '6px',
               boxShadow: 'var(--shadow-soft)'
             }}
           >
-            <Icon name="plus" size={14} color="#2ed158" strokeWidth={2.5} /> <span>Új dolgozó</span>
+            <Icon name="plus" size={14} color="var(--green)" strokeWidth={2.5} /> <span>Új dolgozó</span>
           </div>
         </div>
       )}
@@ -339,7 +339,7 @@ export default function Dashboard() {
               <div key={proj.id} className="pc" onClick={() => navigate(`/project/${proj.id}`)}>
                 <div className="pc-tag" style={{
                   background: proj.is_solar ? 'rgba(255, 214, 10, 0.12)' : 'rgba(46, 209, 88, 0.14)',
-                  color: proj.is_solar ? '#ffd60a' : '#2ed158',
+                  color: proj.is_solar ? 'var(--yellow)' : 'var(--green)',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '5px'
@@ -352,7 +352,7 @@ export default function Dashboard() {
                   <Icon name="pin" size={11} color="var(--t3)" strokeWidth={2} />
                   <span>{proj.address}</span>
                 </div>
-                <div className="pbar"><div className="pfill" style={{width:`${progress}%`,background: proj.is_solar ? '#ffd60a' : '#2ed158'}}></div></div>
+                <div className="pbar"><div className="pfill" style={{width:`${progress}%`,background: proj.is_solar ? 'var(--yellow)' : 'var(--green)'}}></div></div>
                 <div className="pc-bot">
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                     {progress === 100 ? (<><span>Befejezve</span><Icon name="check" size={11} color="var(--green)" strokeWidth={3} /></>) : `${progress}% kész`}
@@ -377,7 +377,7 @@ export default function Dashboard() {
             <div key={act.id} className="act">
               <div className="act-ico" style={{
                 background: isAdmin ? 'rgba(79,142,247,.12)' : 'rgba(46,209,88,.12)',
-                color: isAdmin ? '#4f8ef7' : '#2ed158'
+                color: isAdmin ? 'var(--blue)' : 'var(--green)'
               }}>
                 <Icon name="clock" size={16} strokeWidth={2.2} />
               </div>

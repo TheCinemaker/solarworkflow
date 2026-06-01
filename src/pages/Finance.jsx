@@ -217,7 +217,7 @@ export default function Finance() {
           <button onClick={() => navigate('/')} style={{
             width: '100%', padding: '12px', borderRadius: '12px', fontWeight: '700',
             fontSize: '14px', color: '#fff', border: 'none', cursor: 'pointer',
-            background: 'linear-gradient(135deg,#4f8ef7,#2a5ccc)',
+            background: 'var(--gradient-blue)',
             boxShadow: '0 6px 20px rgba(79,142,247,0.3)', fontFamily: 'inherit',
           }}>
             Vissza a Főoldalra
@@ -520,7 +520,7 @@ export default function Finance() {
                               className="active:scale-95 transition-all"
                               style={{
                                 padding: '6px 14px', borderRadius: '8px', fontWeight: '700', fontSize: '10px',
-                                cursor: 'pointer', background: 'linear-gradient(135deg,#2ed158,#1a8a38)',
+                                cursor: 'pointer', background: 'var(--gradient-green)',
                                 color: '#fff', border: 'none', fontFamily: 'inherit',
                               }}
                             >Mentés</button>

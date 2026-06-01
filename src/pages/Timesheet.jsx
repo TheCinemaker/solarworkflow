@@ -287,7 +287,7 @@ export default function Timesheet() {
               disabled={saving} 
               className="btn active:scale-95 transition-all flex items-center justify-center cursor-pointer" 
               style={{ 
-                background: 'linear-gradient(135deg, #4f8ef7, #2a5ccc)', 
+                background: 'var(--gradient-blue)', 
                 border: 'none', 
                 borderRadius: '12px', 
                 color: '#fff', 

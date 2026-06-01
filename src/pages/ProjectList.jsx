@@ -107,7 +107,7 @@ export default function ProjectList() {
             borderRadius: 'var(--btn-r)',
             background: activeTab === 'archived' ? 'rgba(255, 214, 10, 0.15)' : 'var(--s1)',
             border: activeTab === 'archived' ? '1px solid rgba(255, 214, 10, 0.35)' : '1px solid var(--b1)',
-            color: activeTab === 'archived' ? '#ffd60a' : 'var(--t2)',
+            color: activeTab === 'archived' ? 'var(--yellow)' : 'var(--t2)',
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -170,18 +170,18 @@ export default function ProjectList() {
                 style={{
                   width: '100%',
                   marginBottom: '15px',
-                  border: proj.archived ? '1px solid rgba(255,255,255,0.05)' : '1px solid var(--b1)',
+                  border: proj.archived ? '1px solid var(--b1)' : '1px solid var(--b1)',
                   background: proj.archived ? 'var(--s2)' : 'var(--s1)'
                 }}
                 onClick={() => navigate(`/project/${proj.id}`)}
               >
                 <div className="pc-tag" style={{
                   background: proj.archived
-                    ? 'rgba(255,255,255,0.05)'
+                    ? 'var(--s2)'
                     : (proj.is_solar ? 'rgba(255, 214, 10, 0.12)' : 'rgba(46, 209, 88, 0.14)'),
                   color: proj.archived
                     ? 'var(--t2)'
-                    : (proj.is_solar ? '#ffd60a' : '#2ed158'),
+                    : (proj.is_solar ? 'var(--yellow)' : 'var(--green)'),
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '5px'
@@ -201,7 +201,7 @@ export default function ProjectList() {
                       width: `${progress}%`,
                       background: proj.archived 
                         ? 'var(--t3)' 
-                        : (proj.is_solar ? '#ffd60a' : '#2ed158')
+                        : (proj.is_solar ? 'var(--yellow)' : 'var(--green)')
                     }}
                   ></div>
                 </div>

@@ -44,8 +44,8 @@ export default function Info() {
           <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="url(#saLogoGrad)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <defs>
               <linearGradient id="saLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#4f8ef7" />
-                <stop offset="100%" stopColor="#2ed158" />
+                <stop offset="0%" stopColor="var(--blue)" />
+                <stop offset="100%" stopColor="var(--green)" />
               </linearGradient>
             </defs>
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
@@ -73,7 +73,7 @@ export default function Info() {
         {/* 1. kártya */}
         <div className="gcard flex items-start space-x-3.5" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', padding: '16px' }}>
           <div style={{ marginTop: '2px', flexShrink: 0 }}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f8ef7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0 0 4px rgba(79, 142, 247, 0.45))' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0 0 4px rgba(79, 142, 247, 0.45))' }}>
               <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
               <line x1="8" y1="21" x2="16" y2="21"></line>
               <line x1="12" y1="17" x2="12" y2="21"></line>
@@ -90,7 +90,7 @@ export default function Info() {
         {/* 2. kártya */}
         <div className="gcard flex items-start space-x-3.5" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', padding: '16px' }}>
           <div style={{ marginTop: '2px', flexShrink: 0 }}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2ed158" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0 0 4px rgba(46, 209, 88, 0.45))' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0 0 4px rgba(46, 209, 88, 0.45))' }}>
               <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
               <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
               <path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path>
@@ -137,7 +137,7 @@ export default function Info() {
             href={`mailto:${developerEmail}?subject=Ajánlatkérés - SA software`}
             className="w-full flex items-center justify-center space-x-2 font-bold transition-all hover:scale-[1.02] active:scale-98"
             style={{
-              background: 'linear-gradient(135deg, #4f8ef7, #2c72e0)',
+              background: 'var(--gradient-blue)',
               border: 'none',
               borderRadius: 'var(--btn-r)',
               padding: '12px 16px',

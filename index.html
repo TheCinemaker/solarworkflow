@@ -7,8 +7,9 @@
     <title>VoltDesk</title>
     <script>
       (function() {
-        const storedTheme = localStorage.getItem('theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', storedTheme);
+        const stored = localStorage.getItem('theme');
+        const preferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', stored || preferred);
       })();
     </script>
   </head>

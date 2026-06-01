@@ -172,9 +172,9 @@ const PATHS = {
 
 // Solid filled-dot icons (for the status dots)
 const FILLED = {
-  'dot-green': <circle cx="12" cy="12" r="6" fill="#2ed158" stroke="none" />,
-  'dot-red': <circle cx="12" cy="12" r="6" fill="#ff3b30" stroke="none" />,
-  'dot-yellow': <circle cx="12" cy="12" r="6" fill="#ffd60a" stroke="none" />,
+  'dot-green': <circle cx="12" cy="12" r="6" fill="var(--green)" stroke="none" />,
+  'dot-red': <circle cx="12" cy="12" r="6" fill="var(--red)" stroke="none" />,
+  'dot-yellow': <circle cx="12" cy="12" r="6" fill="var(--yellow)" stroke="none" />,
 };
 
 export function Icon({ name, size = 16, color = 'currentColor', strokeWidth = 2, style, className, ...props }) {

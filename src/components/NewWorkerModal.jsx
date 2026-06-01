@@ -170,7 +170,7 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
 
   return createPortal(
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-3" style={{ background: 'var(--backdrop)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
-      <div className="w-full max-w-xl relative flex flex-col" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: 'var(--card-r)', boxShadow: '0 10px 40px rgba(0,0,0,0.35), inset 0 1px rgba(255,255,255,0.03)', overflow: 'hidden' }}>
+      <div className="w-full max-w-xl relative flex flex-col" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: 'var(--card-r)', boxShadow: 'var(--shadow-strong)', overflow: 'hidden' }}>
         
         {/* Bezárás gomb */}
         <button
@@ -415,7 +415,7 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
               type="submit" 
               disabled={loading} 
               className="flex-1 font-bold transition-all disabled:opacity-50 flex items-center justify-center hover:scale-[1.01]" 
-              style={{ background: 'linear-gradient(135deg, #2ed158, #1a8a38)', border: 'none', borderRadius: '16px', height: '56px', color: '#fff', fontSize: '14px', boxShadow: '0 8px 25px rgba(46, 209, 88, 0.35)' }}
+              style={{ background: 'var(--gradient-green)', border: 'none', borderRadius: '16px', height: '56px', color: '#fff', fontSize: '14px', boxShadow: '0 8px 25px rgba(46, 209, 88, 0.35)' }}
             >
               {loading ? 'Létrehozás...' : 'Dolgozó Létrehozása'}
             </button>

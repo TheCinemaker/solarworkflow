@@ -419,7 +419,7 @@ export default function ProjectDetails() {
 
       {/* Archivált Banner */}
       {project?.archived && (
-        <div className="mx-[15px] mb-4 p-3 rounded-md flex items-center justify-between text-xs font-semibold" style={{ background: 'rgba(255, 214, 10, 0.12)', border: '1px solid rgba(255, 214, 10, 0.25)', color: '#ffd60a' }}>
+        <div className="mx-[15px] mb-4 p-3 rounded-md flex items-center justify-between text-xs font-semibold" style={{ background: 'rgba(255, 214, 10, 0.12)', border: '1px solid rgba(255, 214, 10, 0.25)', color: 'var(--yellow)' }}>
           <div className="flex items-center space-x-2">
             <Icon name="archive" size={14} strokeWidth={2.2} />
             <span>Ez egy lezárt, archivált projekt.</span>
@@ -428,7 +428,7 @@ export default function ProjectDetails() {
           <button 
             onClick={handleRestoreProject}
             className="px-2.5 py-1 rounded-md font-bold transition-all hover:scale-[1.03]"
-            style={{ background: '#ffd60a', color: '#000', border: 'none' }}
+            style={{ background: 'var(--yellow)', color: '#000', border: 'none' }}
           >
             Visszaállítás aktívvá
           </button>
@@ -635,7 +635,7 @@ export default function ProjectDetails() {
             rel="noreferrer"
             className="w-full font-bold flex items-center justify-center space-x-2 pt-2.5 pb-2.5 text-center text-sm"
             style={{
-              background: 'linear-gradient(135deg, #0088cc, #006699)',
+              background: 'var(--gradient-telegram)',
               borderRadius: '12px',
               color: '#fff',
               border: '1px solid rgba(0, 136, 204, 0.4)',
@@ -655,12 +655,12 @@ export default function ProjectDetails() {
             onClick={handleArchiveProject} 
             className="flex items-center transition-all hover:scale-[1.02] active:scale-98"
             style={{
-              background: progressPercent === 100 ? 'linear-gradient(135deg, #2ed158, #1cc047)' : 'rgba(46, 209, 88, 0.08)',
+              background: progressPercent === 100 ? 'var(--gradient-green)' : 'rgba(46, 209, 88, 0.08)',
               borderRadius: '14px',
               height: '52px',
               padding: '0 20px',
               gap: '12px',
-              color: progressPercent === 100 ? '#fff' : '#2ed158',
+              color: progressPercent === 100 ? '#fff' : 'var(--green)',
               border: progressPercent === 100 ? 'none' : '1px solid rgba(46, 209, 88, 0.25)',
               boxShadow: progressPercent === 100 ? '0 8px 25px rgba(46, 209, 88, 0.25)' : 'none',
               cursor: 'pointer',
@@ -798,7 +798,7 @@ export default function ProjectDetails() {
                   className="flex flex-col max-w-[85%] text-xs transition-all"
                   style={{
                     alignSelf: isOwn ? 'flex-end' : 'flex-start',
-                    background: isOwn ? 'linear-gradient(135deg, #0088cc, #005580)' : 'var(--s1)',
+                    background: isOwn ? 'var(--gradient-telegram)' : 'var(--s1)',
                     border: isOwn ? '1px solid rgba(0, 136, 204, 0.2)' : '1px solid var(--b1)',
                     borderRadius: isOwn ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
                     padding: '10px 14px',
@@ -854,7 +854,7 @@ export default function ProjectDetails() {
             disabled={sendingMsg || !newMessage.trim()}
             className="flex items-center justify-center transition-all disabled:opacity-50 hover:scale-[1.03] active:scale-97"
             style={{ 
-              background: 'linear-gradient(135deg, #2ed158, #1a8a38)', 
+              background: 'var(--gradient-green)', 
               color: '#fff',
               border: 'none',
               width: '46px',
@@ -914,7 +914,7 @@ export default function ProjectDetails() {
                       height: '22px',
                       borderRadius: '50%',
                       border: isDone ? 'none' : '1.5px solid var(--b2)',
-                      background: isDone ? 'linear-gradient(135deg, #2ed158, #1a8a38)' : 'var(--s1)',
+                      background: isDone ? 'var(--gradient-green)' : 'var(--s1)',
                       boxShadow: isDone ? '0 3px 8px rgba(46, 209, 88, 0.2)' : 'none'
                     }}
                   >
@@ -983,7 +983,7 @@ export default function ProjectDetails() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            background: 'linear-gradient(135deg, #0088cc, #005580)', 
+            background: 'var(--gradient-telegram)', 
             border: 'none', 
             borderRadius: '23px',
             height: '46px',
@@ -1174,8 +1174,8 @@ export default function ProjectDetails() {
                   className="flex-1 font-bold transition-all active:scale-95 flex items-center justify-center premium-breathe"
                   style={{
                     background: isIssue 
-                      ? 'linear-gradient(135deg, #ff3b30, #ff453a)' 
-                      : 'linear-gradient(135deg, #2ed158, #1ca542)',
+                      ? 'var(--gradient-red)' 
+                      : 'var(--gradient-green)',
                     color: '#fff',
                     border: 'none',
                     borderRadius: '16px',
@@ -1293,10 +1293,10 @@ export default function ProjectDetails() {
                       <div className="text-xs font-medium italic mt-1.5 p-1.5 rounded-lg border leading-snug" style={{ 
                         background: photo.resolved 
                           ? 'rgba(46, 209, 88, 0.05)' 
-                          : (photo.is_issue ? 'rgba(255, 59, 48, 0.08)' : 'rgba(255, 255, 255, 0.03)'), 
+                          : (photo.is_issue ? 'rgba(255, 59, 48, 0.08)' : 'var(--s1)'), 
                         borderColor: photo.resolved 
                           ? 'rgba(46, 209, 88, 0.15)' 
-                          : (photo.is_issue ? 'rgba(255, 59, 48, 0.15)' : 'rgba(255, 255, 255, 0.06)'),
+                          : (photo.is_issue ? 'rgba(255, 59, 48, 0.15)' : 'var(--b1)'),
                         color: photo.resolved 
                           ? 'var(--green)' 
                           : (photo.is_issue ? 'var(--red)' : 'var(--t1)')

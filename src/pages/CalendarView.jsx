@@ -101,7 +101,7 @@ export default function CalendarView() {
       transition: 'all 0.15s ease',
       position: 'relative',
       background: isSelected 
-        ? 'linear-gradient(135deg, #4f8ef7, #2a5ccc)' 
+        ? 'var(--gradient-blue)' 
         : isToday 
           ? 'rgba(79, 142, 247, 0.15)' 
           : 'transparent',
@@ -114,7 +114,7 @@ export default function CalendarView() {
       color: isSelected 
         ? '#fff' 
         : isToday 
-          ? '#4f8ef7' 
+          ? 'var(--blue)' 
           : 'var(--t1)'
     };
   };
@@ -191,7 +191,7 @@ export default function CalendarView() {
             const dayProjects = getProjectsForDay(day);
             const hasProjects = dayProjects.length > 0;
             const hasSolar = dayProjects.some(p => p.is_solar);
-            const dotColor = hasSolar ? '#ffd60a' : '#2ed158';
+            const dotColor = hasSolar ? 'var(--yellow)' : 'var(--green)';
 
             return (
               <div 
@@ -260,7 +260,7 @@ export default function CalendarView() {
                 <div className="flex items-center justify-between mb-3" style={{ display: 'flex', alignItems: 'center', justifyContent: 'between', width: '100%' }}>
                   <div style={{
                     background: proj.is_solar ? 'rgba(255, 214, 10, 0.12)' : 'rgba(46, 209, 88, 0.14)',
-                    color: proj.is_solar ? '#ffd60a' : '#2ed158',
+                    color: proj.is_solar ? 'var(--yellow)' : 'var(--green)',
                     fontSize: '10px',
                     fontWeight: '800',
                     padding: '4px 10px',
@@ -298,7 +298,7 @@ export default function CalendarView() {
                       height: '100%',
                       borderRadius: '10px',
                       width: `${progress}%`,
-                      background: proj.is_solar ? '#ffd60a' : '#2ed158',
+                      background: proj.is_solar ? 'var(--yellow)' : 'var(--green)',
                       boxShadow: proj.is_solar ? '0 0 8px rgba(255, 214, 10, 0.4)' : '0 0 8px rgba(46, 209, 88, 0.4)'
                     }}
                   ></div>
@@ -307,11 +307,11 @@ export default function CalendarView() {
                 {/* Alsó állapot és százalék sor */}
                 <div className="flex items-center justify-between" style={{ display: 'flex', alignItems: 'center', justifyContent: 'between', fontSize: '11px', fontWeight: '700', width: '100%' }}>
                   <span style={{ color: 'var(--t2)' }}>
-                    Haladás: <span style={{ color: proj.is_solar ? '#ffd60a' : '#2ed158' }}>{progress}% kész</span>
+                    Haladás: <span style={{ color: proj.is_solar ? 'var(--yellow)' : 'var(--green)' }}>{progress}% kész</span>
                   </span>
                   <span style={{ 
                     background: progress === 100 ? 'rgba(46, 209, 88, 0.12)' : 'rgba(79, 142, 247, 0.12)', 
-                    color: progress === 100 ? '#2ed158' : 'var(--blue)', 
+                    color: progress === 100 ? 'var(--green)' : 'var(--blue)', 
                     border: progress === 100 ? '1px solid rgba(46, 209, 88, 0.2)' : '1px solid rgba(79, 142, 247, 0.2)', 
                     padding: '2px 8px', 
                     borderRadius: '12px', 

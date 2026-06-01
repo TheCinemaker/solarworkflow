@@ -130,7 +130,7 @@ export default function EditProjectModal({ isOpen, onClose, project, onSuccess }
 
   return createPortal(
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-3" style={{ background: 'var(--backdrop)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
-      <div className="w-full max-w-xl relative flex flex-col" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: 'var(--card-r)', boxShadow: '0 10px 40px rgba(0,0,0,0.35), inset 0 1px rgba(255,255,255,0.03)', overflow: 'hidden' }}>
+      <div className="w-full max-w-xl relative flex flex-col" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: 'var(--card-r)', boxShadow: 'var(--shadow-strong)', overflow: 'hidden' }}>
         
         {/* Bezárás gomb - Gridre helyezve (28px top/right, 40x40px) */}
         <button
@@ -420,7 +420,7 @@ export default function EditProjectModal({ isOpen, onClose, project, onSuccess }
               type="submit" 
               disabled={loading} 
               className="flex-1 font-bold transition-all disabled:opacity-50 flex items-center justify-center hover:scale-[1.01]" 
-              style={{ background: 'linear-gradient(135deg, #4f8ef7, #2c72e0)', border: 'none', borderRadius: '16px', height: '56px', color: '#fff', fontSize: '14px', boxShadow: '0 8px 25px rgba(79, 142, 247, 0.35)' }}
+              style={{ background: 'var(--gradient-blue)', border: 'none', borderRadius: '16px', height: '56px', color: '#fff', fontSize: '14px', boxShadow: '0 8px 25px rgba(79, 142, 247, 0.35)' }}
             >
               {loading ? 'Mentés...' : 'Változások Mentése'}
             </button>

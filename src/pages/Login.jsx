@@ -153,7 +153,7 @@ export default function Login() {
             type="submit"
             disabled={loading}
             style={{
-              background: loading ? 'rgba(79,142,247,0.45)' : 'linear-gradient(135deg,#4f8ef7,#2a5ccc)',
+              background: loading ? 'rgba(79,142,247,0.45)' : 'var(--gradient-blue)',
               border: 'none',
               borderRadius: 'var(--btn-r)',
               padding: '14px',

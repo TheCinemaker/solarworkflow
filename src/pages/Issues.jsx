@@ -231,7 +231,7 @@ export default function Issues() {
                         style={{
                           padding: '6px 12px', borderRadius: '8px', fontWeight: '700', fontSize: '10px',
                           cursor: 'pointer', border: 'none', fontFamily: 'inherit',
-                          background: 'linear-gradient(135deg,#ffd60a,#ccab00)',
+                          background: 'var(--gradient-yellow)',
                           color: '#000', boxShadow: '0 4px 12px rgba(255,214,10,0.2)',
                         }}
                       >
@@ -306,7 +306,7 @@ export default function Issues() {
                             style={{
                               width: '100%', padding: '10px', borderRadius: '10px', fontWeight: '700',
                               fontSize: '13px', cursor: savingFix ? 'default' : 'pointer', border: 'none',
-                              fontFamily: 'inherit', background: 'linear-gradient(135deg,#2ed158,#1ca542)',
+                              fontFamily: 'inherit', background: 'var(--gradient-green)',
                               color: '#fff', boxShadow: '0 6px 15px rgba(46,209,88,0.25)',
                             }}
                           >

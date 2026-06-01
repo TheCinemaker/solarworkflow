@@ -19,7 +19,7 @@ export default function App() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)' }}>
-        <div className="w-8 h-8 border-4 border-[#4f8ef7] border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-[var(--blue)] border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
