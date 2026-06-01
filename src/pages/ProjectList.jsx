@@ -162,7 +162,7 @@ export default function ProjectList() {
                   width: '100%',
                   marginBottom: '15px',
                   border: proj.archived ? '1px solid rgba(255,255,255,0.05)' : '1px solid var(--b1)',
-                  background: proj.archived ? 'rgba(7, 9, 15, 0.4)' : 'var(--s1)'
+                  background: proj.archived ? 'var(--s2)' : 'var(--s1)'
                 }}
                 onClick={() => navigate(`/project/${proj.id}`)}
               >

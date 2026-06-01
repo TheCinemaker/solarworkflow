@@ -13,9 +13,9 @@ export default function Info() {
           <div className="pg-greet">RENDSZERINFORMÁCIÓ</div>
           <div className="pg-title">Névjegy & Info</div>
         </div>
-        <div 
-          className="hdr-btn" 
-          onClick={() => navigate('/')} 
+        <div
+          className="hdr-btn"
+          onClick={() => navigate('/')}
           title="Vissza a Főoldalra"
           style={{ padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px' }}
         >
@@ -32,7 +32,7 @@ export default function Info() {
           width: '74px',
           height: '74px',
           borderRadius: '22px',
-          background: 'rgba(7, 9, 15, 0.6)',
+          background: 'var(--s2)',
           border: '1.5px solid rgba(79, 142, 247, 0.4)',
           display: 'flex',
           alignItems: 'center',
@@ -51,14 +51,14 @@ export default function Info() {
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
           </svg>
         </div>
-        
+
         <div style={{ fontSize: '22px', fontWeight: '800', color: 'var(--t1)', letterSpacing: '-0.8px', marginBottom: '4px' }}>
           SA software
         </div>
         <div style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.15em', color: 'var(--blue)', marginBottom: '14px' }}>
           & Network Solutions
         </div>
-        
+
         <p style={{ fontSize: '13px', color: 'var(--t2)', lineHeight: '1.6', maxWidth: '300px', margin: '0 auto' }}>
           Egyedi szoftverfejlesztés, felhő-infrastruktúrák tervezése és prémium IT hálózati megoldások az Ön vállalkozására szabva.
         </p>
@@ -131,9 +131,9 @@ export default function Info() {
         <div style={{ fontSize: '13px', color: 'var(--t2)', lineHeight: '1.5' }}>
           Szeretne hasonló prémium szoftvert, vagy optimalizálná cége informatikai infrastruktúráját? Vegye fel velünk a kapcsolatot!
         </div>
-        
+
         <div className="flex flex-col space-y-3 pt-1">
-          <a 
+          <a
             href={`mailto:${developerEmail}?subject=Ajánlatkérés - SA software`}
             className="w-full flex items-center justify-center space-x-2 font-bold transition-all hover:scale-[1.02] active:scale-98"
             style={{
@@ -154,7 +154,7 @@ export default function Info() {
             <span>Írjon nekünk e-mailt</span>
           </a>
 
-          <a 
+          <a
             href={`mailto:${developerEmail}`}
             style={{
               fontSize: '11px',

@@ -416,13 +416,13 @@ export default function Finance() {
               return (
                 <div key={worker.id} style={{
                   background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px',
-                  overflow: 'hidden', boxShadow: isExpanded ? '0 12px 30px rgba(0,0,0,0.35)' : 'none',
+                  overflow: 'hidden', boxShadow: isExpanded ? 'var(--shadow-soft)' : 'none',
                   transition: 'all 0.25s ease'
                 }}>
                   <div
                     onClick={() => { if (!isEditing) setExpandedWorkerId(isExpanded ? null : worker.id); }}
                     className="p-5 flex flex-col space-y-4 cursor-pointer active:scale-[0.99] transition-all"
-                    style={{ background: isExpanded ? 'rgba(255,255,255,0.02)' : 'transparent', padding: '20px' }}
+                    style={{ background: isExpanded ? 'var(--s1)' : 'transparent', padding: '20px' }}
                   >
                     <div className="flex justify-between items-center">
                       <div className="flex items-center space-x-2.5">
@@ -471,7 +471,7 @@ export default function Finance() {
                   </div>
 
                   {isExpanded && (
-                    <div className="p-5 space-y-4 fu" style={{ background: 'rgba(0,0,0,0.35)', borderTop: '1px solid var(--b1)', padding: '20px' }}>
+                    <div className="p-5 space-y-4 fu" style={{ background: 'var(--s2)', borderTop: '1px solid var(--b1)', padding: '20px' }}>
                       <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
                         <span style={{ fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--green)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                           <span>🔒</span> <span>Bizalmas adatok</span>
@@ -559,7 +559,7 @@ export default function Finance() {
                           <div className="col-span-2 pt-4 mt-2" style={{ borderTop: '1px solid var(--b1)' }}>
                             <div style={{ ...labelXs, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                               <span>📋 Havi munkalap elszámolások</span>
-                              <span style={{ fontSize: '9px', background: 'rgba(255,255,255,0.05)', padding: '1px 6px', borderRadius: '10px', color: 'var(--t2)' }}>{worker.logs?.length || 0} nap</span>
+                              <span style={{ fontSize: '9px', background: 'var(--s1)', padding: '1px 6px', borderRadius: '10px', color: 'var(--t2)' }}>{worker.logs?.length || 0} nap</span>
                             </div>
                             
                             {(!worker.logs || worker.logs.length === 0) ? (
@@ -588,7 +588,7 @@ export default function Finance() {
                                     const isMonthExpanded = !!expandedMonths[monthKey];
                                     
                                     return (
-                                      <div key={month.name} style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--b1)', borderRadius: '12px', overflow: 'hidden' }}>
+                                      <div key={month.name} style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '12px', overflow: 'hidden' }}>
                                         {/* Hónap Accordion Fejléc */}
                                         <div 
                                           onClick={() => toggleMonthExpand(worker.id, month.name)}
@@ -598,7 +598,7 @@ export default function Finance() {
                                             display: 'flex', 
                                             justifyContent: 'space-between', 
                                             alignItems: 'center',
-                                            background: isMonthExpanded ? 'rgba(255,255,255,0.03)' : 'transparent'
+                                            background: isMonthExpanded ? 'var(--s2)' : 'transparent'
                                           }}
                                         >
                                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -619,7 +619,7 @@ export default function Finance() {
                                         
                                         {/* Hónapon belüli napi bejegyzések */}
                                         {isMonthExpanded && (
-                                          <div style={{ padding: '8px 10px', background: 'rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid var(--b1)' }}>
+                                          <div style={{ padding: '8px 10px', background: 'var(--s2)', display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid var(--b1)' }}>
                                             {month.items.map(log => (
                                               <div key={log.id} style={{ background: 'var(--s2)', padding: '8px 10px', borderRadius: '8px', border: '1px solid var(--b1)', display: 'flex', flexDirection: 'column', gap: '3px' }}>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -637,7 +637,7 @@ export default function Finance() {
                                                   </span>
                                                 </div>
                                                 {log.description && (
-                                                  <div style={{ fontSize: '9.5px', color: 'var(--t3)', fontStyle: 'italic', marginTop: '1px', background: 'rgba(0,0,0,0.12)', padding: '3px 6px', borderRadius: '4px', lineHeight: '1.3' }}>
+                                                  <div style={{ fontSize: '9.5px', color: 'var(--t3)', fontStyle: 'italic', marginTop: '1px', background: 'var(--s2)', padding: '3px 6px', borderRadius: '4px', lineHeight: '1.3' }}>
                                                     {log.description}
                                                   </div>
                                                 )}

@@ -159,16 +159,16 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
   const sectionStyle = {
     padding: '20px',
     borderRadius: '16px',
-    border: '1px solid rgba(255, 255, 255, 0.03)',
-    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.005) 100%)',
-    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.01)',
+    border: '1px solid var(--b1)',
+    background: 'var(--s1)',
+    boxShadow: 'none',
     display: 'flex',
     flexDirection: 'column',
     gap: '16px'
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-3" style={{ background: 'rgba(7, 9, 15, 0.85)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-3" style={{ background: 'var(--backdrop)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
       <div className="w-full max-w-xl relative flex flex-col" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: 'var(--card-r)', boxShadow: '0 10px 40px rgba(0,0,0,0.35), inset 0 1px rgba(255,255,255,0.03)', overflow: 'hidden' }}>
         
         {/* Bezárás gomb */}
@@ -284,8 +284,8 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
                     onChange={(e) => setRole(e.target.value)} 
                     style={selectStyle}
                   >
-                    <option value="worker" style={{ background: '#07090f' }}>Terepi Szerelő</option>
-                    <option value="admin" style={{ background: '#07090f' }}>Irodai Admin</option>
+                    <option value="worker" style={{ background: 'var(--bg)' }}>Terepi Szerelő</option>
+                    <option value="admin" style={{ background: 'var(--bg)' }}>Irodai Admin</option>
                   </select>
                 </div>
               </div>

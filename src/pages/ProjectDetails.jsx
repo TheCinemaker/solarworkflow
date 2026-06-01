@@ -492,7 +492,7 @@ export default function ProjectDetails() {
             marginTop: '15px', 
             marginBottom: '15px',
             padding: '16px',
-            background: 'linear-gradient(135deg, rgba(7, 9, 15, 0.9), rgba(15, 23, 42, 0.8))',
+            background: 'linear-gradient(135deg, var(--backdrop), var(--s1))',
             border: showLiveTelemetry ? '1px solid rgba(46, 209, 88, 0.3)' : '1px solid var(--b1)',
             boxShadow: showLiveTelemetry ? '0 10px 30px rgba(46, 209, 88, 0.08)' : 'none'
           }}>
@@ -521,7 +521,7 @@ export default function ProjectDetails() {
                     onClick={() => setShowLiveTelemetry(true)}
                     className="px-3.5 py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-wider transition-all hover:scale-[1.03]"
                     style={{
-                      background: 'rgba(255, 255, 255, 0.05)',
+                      background: 'var(--s1)',
                       color: 'var(--t1)',
                       border: '1px solid var(--b1)'
                     }}
@@ -790,7 +790,7 @@ export default function ProjectDetails() {
                   className="flex flex-col max-w-[85%] text-xs transition-all"
                   style={{
                     alignSelf: isOwn ? 'flex-end' : 'flex-start',
-                    background: isOwn ? 'linear-gradient(135deg, #0088cc, #005580)' : 'rgba(255, 255, 255, 0.05)',
+                    background: isOwn ? 'linear-gradient(135deg, #0088cc, #005580)' : 'var(--s1)',
                     border: isOwn ? '1px solid rgba(0, 136, 204, 0.2)' : '1px solid var(--b1)',
                     borderRadius: isOwn ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
                     padding: '10px 14px',
@@ -905,8 +905,8 @@ export default function ProjectDetails() {
                       width: '22px',
                       height: '22px',
                       borderRadius: '50%',
-                      border: isDone ? 'none' : '1.5px solid rgba(255, 255, 255, 0.25)',
-                      background: isDone ? 'linear-gradient(135deg, #2ed158, #1a8a38)' : 'rgba(255, 255, 255, 0.03)',
+                      border: isDone ? 'none' : '1.5px solid var(--b2)',
+                      background: isDone ? 'linear-gradient(135deg, #2ed158, #1a8a38)' : 'var(--s1)',
                       boxShadow: isDone ? '0 3px 8px rgba(46, 209, 88, 0.2)' : 'none'
                     }}
                   >
@@ -1027,7 +1027,7 @@ export default function ProjectDetails() {
         <div 
           className="fixed inset-0 z-[1000] flex items-center justify-center p-4 overflow-y-auto" 
           style={{ 
-            background: 'rgba(7, 9, 15, 0.90)', 
+            background: 'var(--backdrop)', 
             backdropFilter: 'blur(25px)', 
             WebkitBackdropFilter: 'blur(25px)' 
           }}
@@ -1035,10 +1035,10 @@ export default function ProjectDetails() {
           <div 
             className="w-full max-w-sm animate-[scaleUp_0.25s_ease-out]" 
             style={{ 
-              background: 'rgba(255, 255, 255, 0.03)', 
-              border: '1px solid rgba(255, 255, 255, 0.08)', 
+              background: 'var(--s1)', 
+              border: '1px solid var(--b1)', 
               borderRadius: '24px', 
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6)',
+              boxShadow: 'var(--shadow-strong)',
               backdropFilter: 'blur(30px)',
               WebkitBackdropFilter: 'blur(30px)',
               maxHeight: 'calc(100vh - 32px)',
@@ -1054,8 +1054,8 @@ export default function ProjectDetails() {
                 onClick={cancelPhotoUpload} 
                 className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-95 hover:bg-white/10"
                 style={{ 
-                  background: 'rgba(255, 255, 255, 0.05)', 
-                  border: '1px solid rgba(255, 255, 255, 0.1)', 
+                  background: 'var(--s1)', 
+                  border: '1px solid var(--b1)', 
                   color: 'var(--t2)', 
                   cursor: 'pointer' 
                 }}
@@ -1076,8 +1076,8 @@ export default function ProjectDetails() {
                     backgroundImage: `url(${filePreview})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                    border: '1px solid rgba(255, 255, 255, 0.25)',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+                    border: '1px solid var(--b2)',
+                    boxShadow: 'var(--shadow-soft)',
                     aspectRatio: '16 / 9'
                   }}
                 />
@@ -1091,8 +1091,8 @@ export default function ProjectDetails() {
                     onClick={() => setIsIssue(false)}
                     className="p-3.5 rounded-2xl cursor-pointer flex flex-col items-center justify-center space-y-1.5 transition-all active:scale-95"
                     style={{
-                      background: !isIssue ? 'rgba(46, 209, 88, 0.04)' : 'rgba(255, 255, 255, 0.02)',
-                      border: !isIssue ? '2px solid var(--green)' : '1px solid rgba(255, 255, 255, 0.06)',
+                      background: !isIssue ? 'rgba(46, 209, 88, 0.04)' : 'var(--s1)',
+                      border: !isIssue ? '2px solid var(--green)' : '1px solid var(--b1)',
                       boxShadow: !isIssue ? '0 8px 20px rgba(46, 209, 88, 0.12)' : 'none'
                     }}
                   >
@@ -1105,8 +1105,8 @@ export default function ProjectDetails() {
                     onClick={() => setIsIssue(true)}
                     className="p-3.5 rounded-2xl cursor-pointer flex flex-col items-center justify-center space-y-1.5 transition-all active:scale-95"
                     style={{
-                      background: isIssue ? 'rgba(255, 59, 48, 0.04)' : 'rgba(255, 255, 255, 0.02)',
-                      border: isIssue ? '2px solid var(--red)' : '1px solid rgba(255, 255, 255, 0.06)',
+                      background: isIssue ? 'rgba(255, 59, 48, 0.04)' : 'var(--s1)',
+                      border: isIssue ? '2px solid var(--red)' : '1px solid var(--b1)',
                       boxShadow: isIssue ? '0 8px 20px rgba(255, 59, 48, 0.12)' : 'none'
                     }}
                   >
@@ -1128,8 +1128,8 @@ export default function ProjectDetails() {
                   rows="3"
                   placeholder={isIssue ? "pl. Törött a napelem sarka..." : "pl. Sínek felszerelve a tetőre..."}
                   style={{
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    border: isIssue && !photoComment.trim() ? '1px solid rgba(255, 59, 48, 0.5)' : '1px solid rgba(255, 255, 255, 0.08)',
+                    background: 'var(--s1)',
+                    border: isIssue && !photoComment.trim() ? '1px solid rgba(255, 59, 48, 0.5)' : '1px solid var(--b1)',
                     borderRadius: '14px',
                     padding: '12px 14px',
                     color: 'var(--t1)',
@@ -1243,7 +1243,7 @@ export default function ProjectDetails() {
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                       aspectRatio: '4 / 3',
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.12)'
+                      borderBottom: '1px solid var(--b2)'
                     }}
                   >
                     {/* Hiba vs Munkafolyamat Jelvény ráúsztatva a képre */}
@@ -1263,7 +1263,7 @@ export default function ProjectDetails() {
                         alignItems: 'center',
                         gap: '4px',
                         whiteSpace: 'nowrap',
-                        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.25)',
+                        boxShadow: 'var(--shadow-soft)',
                         lineHeight: '1'
                       }}
                     >
@@ -1316,7 +1316,7 @@ export default function ProjectDetails() {
                               backgroundSize: 'cover',
                               backgroundPosition: 'center',
                               aspectRatio: '16 / 9',
-                              border: '1px solid rgba(255, 255, 255, 0.15)'
+                              border: '1px solid var(--b2)'
                             }}
                           >
                             <div 
@@ -1331,7 +1331,7 @@ export default function ProjectDetails() {
                                 alignItems: 'center',
                                 gap: '3px',
                                 whiteSpace: 'nowrap',
-                                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
+                                boxShadow: 'var(--shadow-soft)',
                                 lineHeight: '1'
                               }}
                             >
@@ -1357,7 +1357,7 @@ export default function ProjectDetails() {
         <div 
           className="fixed inset-0 z-[2000] flex flex-col items-center justify-center p-4" 
           style={{ 
-            background: 'rgba(7, 8, 12, 0.97)', 
+            background: 'var(--backdrop)', 
             backdropFilter: 'blur(25px)', 
             WebkitBackdropFilter: 'blur(25px)',
             animation: 'fadeIn 0.25s ease-out'
@@ -1369,8 +1369,8 @@ export default function ProjectDetails() {
               onClick={() => setPreviewImage(null)}
               className="px-4 py-2 rounded-full font-extrabold text-xs flex items-center space-x-1.5 transition-all hover:bg-white/10 active:scale-95 cursor-pointer"
               style={{ 
-                background: 'rgba(255, 255, 255, 0.08)', 
-                border: '1px solid rgba(255, 255, 255, 0.15)', 
+                background: 'var(--s2)', 
+                border: '1px solid var(--b2)', 
                 color: '#fff'
               }}
             >
@@ -1396,7 +1396,7 @@ export default function ProjectDetails() {
                 alignItems: 'center',
                 gap: '5px',
                 whiteSpace: 'nowrap',
-                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.25)',
+                boxShadow: 'var(--shadow-soft)',
                 lineHeight: '1'
               }}
             >
@@ -1416,8 +1416,8 @@ export default function ProjectDetails() {
               alt={previewImage.description || 'Fénykép'} 
               className="max-w-full max-h-[72vh] object-contain rounded-2xl"
               style={{ 
-                boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.95)',
-                border: '1px solid rgba(255, 255, 255, 0.12)'
+                boxShadow: 'var(--shadow-strong)',
+                border: '1px solid var(--b2)'
               }}
             />
           </div>
@@ -1426,17 +1426,17 @@ export default function ProjectDetails() {
           <div 
             className="w-full max-w-md mt-6 p-4 rounded-xl flex flex-col space-y-2 text-left transition-all"
             style={{ 
-              background: 'rgba(255, 255, 255, 0.02)', 
-              border: '1px solid rgba(255, 255, 255, 0.06)',
+              background: 'var(--s1)', 
+              border: '1px solid var(--b1)',
               borderLeft: previewImage.is_verification || previewImage.resolved
                 ? '4px solid var(--green)'
                 : (previewImage.is_issue ? '4px solid var(--red)' : '4px solid var(--blue)'),
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
-              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
+              boxShadow: 'var(--shadow-soft)'
             }}
           >
-            <div className="flex justify-between items-center text-[10px] text-[var(--t3)] font-black uppercase tracking-wider" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)', paddingBottom: '6px' }}>
+            <div className="flex justify-between items-center text-[10px] text-[var(--t3)] font-black uppercase tracking-wider" style={{ borderBottom: '1px solid var(--b1)', paddingBottom: '6px' }}>
               <span>👷 Feltöltötte: {previewImage.profiles?.full_name || 'Dolgozó'}</span>
               <span>{previewImage.created_at && new Date(previewImage.created_at).toLocaleDateString('hu-HU', {
                 month: 'short',

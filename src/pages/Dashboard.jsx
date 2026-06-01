@@ -134,6 +134,17 @@ export default function Dashboard() {
     ? rawName.trim().split(' ')[0].charAt(0).toUpperCase() + rawName.trim().split(' ')[0].slice(1)
     : 'Dolgozó';
 
+  const [theme, setTheme] = useState(() => {
+    return document.documentElement.getAttribute('data-theme') || 'dark';
+  });
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    document.documentElement.setAttribute('data-theme', nextTheme);
+    localStorage.setItem('theme', nextTheme);
+  };
+
   return (
     <div className="page active" id="p-home">
       <div className="page-header fu">
@@ -142,6 +153,14 @@ export default function Dashboard() {
           <div className="pg-title">{isAdmin ? 'Adminisztráció' : 'VoltDesk dashboard'}</div>
         </div>
         <div className="flex items-center" style={{ gap: '6px' }}>
+          <div 
+            className="hdr-btn" 
+            onClick={toggleTheme} 
+            title={theme === 'dark' ? 'Világos mód' : 'Sötét mód'}
+            style={{ padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', cursor: 'pointer', transition: 'all 0.2s' }}
+          >
+            <span style={{ fontSize: '15px', lineHeight: 1 }}>{theme === 'dark' ? '☀️' : '🌙'}</span>
+          </div>
           <div 
             className="hdr-btn" 
             onClick={() => navigate('/calendar')} 
@@ -273,7 +292,7 @@ export default function Dashboard() {
               fontWeight: '800',
               fontSize: '13px',
               gap: '6px',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
+              boxShadow: 'var(--shadow-soft)'
             }}
           >
             <span>➕</span> <span>Új projekt</span>
@@ -290,7 +309,7 @@ export default function Dashboard() {
               fontWeight: '800',
               fontSize: '13px',
               gap: '6px',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
+              boxShadow: 'var(--shadow-soft)'
             }}
           >
             <span>➕</span> <span>Új dolgozó</span>

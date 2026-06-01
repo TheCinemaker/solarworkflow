@@ -238,7 +238,7 @@ export default function Issues() {
 
                     {/* Javítás panel */}
                     {expandedIssueId === issue.id && (
-                      <div className="mt-2 p-3 space-y-3" style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--b1)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      <div className="mt-2 p-3 space-y-3" style={{ background: 'var(--s1)', borderRadius: '10px', border: '1px solid var(--b1)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--yellow)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                           🔧 Hiba elhárításának rögzítése
                         </div>

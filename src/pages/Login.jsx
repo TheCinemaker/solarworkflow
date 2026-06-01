@@ -68,14 +68,14 @@ export default function Login() {
         padding: '36px 28px 32px',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
-        boxShadow: '0 32px 64px rgba(0,0,0,0.5)',
+        boxShadow: 'var(--shadow-strong)',
         position: 'relative',
         zIndex: 1,
       }}>
         {/* Top highlight line */}
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0, height: '1px',
-          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent)',
+          background: 'linear-gradient(90deg, transparent, var(--b2), transparent)',
           borderRadius: 'var(--card-r) var(--card-r) 0 0',
         }} />
 

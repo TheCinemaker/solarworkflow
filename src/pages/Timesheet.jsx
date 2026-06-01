@@ -221,9 +221,9 @@ export default function Timesheet() {
               required 
               style={inputStyle}
             >
-              <option value="" style={{ background: '#07090f' }}>Válassz projektet...</option>
+              <option value="" style={{ background: 'var(--bg)' }}>Válassz projektet...</option>
               {projects.map(proj => (
-                <option key={proj.id} value={proj.id} style={{ background: '#07090f' }}>
+                <option key={proj.id} value={proj.id} style={{ background: 'var(--bg)' }}>
                   {proj.serial_number ? `[${proj.serial_number}] ` : ''}{proj.name}
                 </option>
               ))}

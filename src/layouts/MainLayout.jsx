@@ -88,7 +88,7 @@ export default function MainLayout() {
               100% { transform: translateY(0); opacity: 1; }
             }
           `}</style>
-          <div 
+          <div
             onClick={() => {
               navigate(`/project/${toast.projectId}`);
               setToast(null);
@@ -123,7 +123,7 @@ export default function MainLayout() {
               </div>
             </div>
             <div style={{ fontSize: '14px', color: 'var(--blue)', marginLeft: '10px', fontWeight: 'bold' }}>➔</div>
-            <div 
+            <div
               onClick={(e) => {
                 e.stopPropagation();
                 setToast(null);
@@ -146,13 +146,13 @@ export default function MainLayout() {
 
       <div className="scroll-area" id="SA">
         <Outlet />
-        
+
         {/* Modern, Premium Branding Footer */}
         <div style={{
           padding: '24px 15px 36px',
           textAlign: 'center',
-          borderTop: '1px solid rgba(255, 255, 255, 0.03)',
-          background: 'rgba(7, 9, 15, 0.4)',
+          borderTop: '1px solid var(--b1)',
+          background: 'var(--s1)',
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
           marginTop: '24px',
@@ -165,24 +165,24 @@ export default function MainLayout() {
           <div style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--t3)' }}>
             Software by <a href="mailto:avar.szilveszter@gmail.com" style={{ color: 'var(--blue)', textDecoration: 'none', fontWeight: '800', transition: 'color 0.2s' }}>SA software</a> & Network Solutions
           </div>
-          <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.25)', fontWeight: '500' }}>
+          <div style={{ fontSize: '10px', color: 'var(--t3)', opacity: 0.5, fontWeight: '500' }}>
             Copyright © 2026 · Minden jog fenntartva · VoltDesk v1.4
           </div>
-          <div 
+          <div
             onClick={() => navigate('/info')}
-            style={{ 
-              color: 'rgba(255, 255, 255, 0.4)', 
-              fontSize: '9px', 
-              fontWeight: '700', 
-              textTransform: 'uppercase', 
-              letterSpacing: '0.05em', 
-              border: '1px solid rgba(255, 255, 255, 0.08)', 
-              borderRadius: '20px', 
-              padding: '3px 10px', 
-              marginTop: '4px', 
+            style={{
+              color: 'var(--t3)',
+              fontSize: '9px',
+              fontWeight: '700',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              border: '1px solid var(--b1)',
+              borderRadius: '20px',
+              padding: '3px 10px',
+              marginTop: '4px',
               cursor: 'pointer',
-              background: 'rgba(255, 255, 255, 0.02)', 
-              transition: 'all 0.2s' 
+              background: 'var(--s1)',
+              transition: 'all 0.2s'
             }}
             className="hover:bg-white/10 hover:text-white"
           >
