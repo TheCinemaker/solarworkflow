@@ -252,19 +252,19 @@ export default function Finance() {
       {/* Stat cards */}
       {activeTab === 'projects' ? (
         <div className="stats-grid fu d1 mt-4">
-          <div className="sc">
-            <div className="sc-lbl">Szerződéses állomány</div>
-            <div className="sc-val" style={{ color: 'var(--t1)', fontSize: '18px' }}>{totalContractVolume.toLocaleString('hu-HU')} Ft</div>
+          <div className="sc" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--b1)' }}>
+            <div className="sc-lbl" style={{ color: 'var(--t2)' }}>Szerződéses állomás</div>
+            <div className="sc-val" style={{ color: 'var(--t1)', fontSize: '24px', fontWeight: '800' }}>{totalContractVolume.toLocaleString('hu-HU')} Ft</div>
             <div className="sc-sub">Összes rögzített projektérték</div>
           </div>
-          <div className="sc" style={{ background: 'rgba(46,209,88,0.05)', border: '1px solid rgba(46,209,88,0.15)' }}>
-            <div className="sc-lbl">Beérkezett összeg</div>
-            <div className="sc-val" style={{ color: 'var(--green)', fontSize: '18px' }}>{paidVolume.toLocaleString('hu-HU')} Ft</div>
+          <div className="sc" style={{ background: 'rgba(46,209,88,0.04)', border: '1px solid rgba(46,209,88,0.2)' }}>
+            <div className="sc-lbl" style={{ color: 'var(--t2)' }}>Beérkezett összeg</div>
+            <div className="sc-val" style={{ color: 'var(--green)', fontSize: '24px', fontWeight: '800' }}>{paidVolume.toLocaleString('hu-HU')} Ft</div>
             <div className="sc-sub">Kifizetett projektek összege</div>
           </div>
-          <div className="sc" style={{ background: 'rgba(255,59,48,0.05)', border: '1px solid rgba(255,59,48,0.15)' }}>
-            <div className="sc-lbl">Kinnlévőség</div>
-            <div className="sc-val" style={{ color: 'var(--red)', fontSize: '18px' }}>{unpaidVolume.toLocaleString('hu-HU')} Ft</div>
+          <div className="sc" style={{ background: 'rgba(255,59,48,0.04)', border: '1px solid rgba(255,59,48,0.2)' }}>
+            <div className="sc-lbl" style={{ color: 'var(--t2)' }}>Kinnlövőség</div>
+            <div className="sc-val" style={{ color: 'var(--red)', fontSize: '24px', fontWeight: '800' }}>{unpaidVolume.toLocaleString('hu-HU')} Ft</div>
             <div className="sc-sub">Fizetésre váró tételek</div>
           </div>
         </div>
@@ -288,7 +288,7 @@ export default function Finance() {
         <div className="mt-4 px-5 pb-24 fu d2 space-y-3">
           <div className="flex justify-between items-center mb-1">
             <span style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--t3)' }}>
-              Projektek fizetési státusza
+              PROJEKTEK FIZETÉSI ÁLLAPOTA
             </span>
             <span style={{ fontSize: '10px', background: 'var(--s1)', border: '1px solid var(--b1)', padding: '2px 8px', borderRadius: '20px', color: 'var(--t2)', fontWeight: '700' }}>
               {projects.length} db
@@ -303,7 +303,7 @@ export default function Finance() {
             projects.map(proj => (
               <div key={proj.id} className="p-4 flex flex-col space-y-3" style={{
                 background: 'var(--s1)', borderRadius: '16px',
-                border: proj.paid ? '1px solid rgba(46,209,88,0.2)' : '1px solid var(--b1)',
+                border: proj.paid ? '1px solid rgba(46,209,88,0.18)' : '1px solid rgba(255,59,48,0.15)',
               }}>
                 <div className="flex justify-between items-start">
                   <div>
@@ -322,10 +322,10 @@ export default function Finance() {
                       fontFamily: 'inherit', transition: 'all 0.2s ease', border: 'none',
                       background: proj.paid ? 'rgba(46,209,88,0.12)' : 'rgba(255,59,48,0.08)',
                       color: proj.paid ? 'var(--green)' : 'var(--red)',
-                      outline: proj.paid ? '1px solid rgba(46,209,88,0.25)' : '1px solid rgba(255,59,48,0.15)',
+                      outline: proj.paid ? '1px solid rgba(46,209,88,0.25)' : '1px solid rgba(255,59,48,0.18)',
                     }}
                   >
-                    {proj.paid ? '✓ Fizetve' : '✕ Fizetésre vár'}
+                    {proj.paid ? '✓ FIZETVE' : '× FIZETÉSRE VÁR'}
                   </button>
                 </div>
                 <div className="flex justify-between items-center pt-2" style={{ borderTop: '1px solid var(--b1)' }}>

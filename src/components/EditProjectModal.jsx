@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { supabase } from '../lib/supabase';
 
 export default function EditProjectModal({ isOpen, onClose, project, onSuccess }) {
@@ -7,6 +8,8 @@ export default function EditProjectModal({ isOpen, onClose, project, onSuccess }
   const [address, setAddress] = useState('');
   const [clientName, setClientName] = useState('');
   const [clientPhone, setClientPhone] = useState('');
+  const [clientPhone2, setClientPhone2] = useState('');
+  const [clientPhone3, setClientPhone3] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [importantInfo, setImportantInfo] = useState('');
@@ -30,6 +33,8 @@ export default function EditProjectModal({ isOpen, onClose, project, onSuccess }
       setAddress(project.address || '');
       setClientName(project.client_name || '');
       setClientPhone(project.client_phone || '');
+      setClientPhone2(project.client_phone_2 || '');
+      setClientPhone3(project.client_phone_3 || '');
       setStartTime(project.start_time || '');
       setEndTime(project.end_time || '');
       setImportantInfo(project.important_info || '');
@@ -58,6 +63,8 @@ export default function EditProjectModal({ isOpen, onClose, project, onSuccess }
         address, 
         client_name: clientName, 
         client_phone: clientPhone,
+        client_phone_2: clientPhone2,
+        client_phone_3: clientPhone3,
         deadline: endTime || null,
         start_time: startTime,
         end_time: endTime,
@@ -86,97 +93,233 @@ export default function EditProjectModal({ isOpen, onClose, project, onSuccess }
   const inputStyle = {
     background: 'var(--s1)',
     border: '1px solid var(--b1)',
-    borderRadius: 'var(--input-r)',
-    padding: '7px 12px',
+    borderRadius: '14px',
+    padding: '14px 16px 10px',
     color: 'var(--t1)',
-    fontSize: '13px',
+    fontSize: '14px',
     width: '100%',
     outline: 'none',
-    transition: 'border-color 0.15s ease'
+    transition: 'all 0.18s ease',
+    minHeight: '52px'
   };
 
-  const labelStyle = {
-    color: 'var(--t2)',
-    fontSize: '13px',
-    fontWeight: '600',
+  const floatingLabelStyle = {
+    position: 'absolute',
+    top: '8px',
+    left: '16px',
+    fontSize: '10px',
+    color: 'var(--t3)',
     textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    marginBottom: '6px',
-    display: 'block'
+    letterSpacing: '0.08em',
+    fontWeight: 700,
+    pointerEvents: 'none'
   };
 
-  return (
-    <div className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-4" style={{ background: 'rgba(7, 9, 15, 0.85)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
-      <div className="w-full max-w-md relative my-auto" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: 'var(--card-r)', padding: '20px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
-        <button 
+  // Prémium üvegkártya szekció stílus degradált háttérrel és finom kerettel
+  const sectionStyle = {
+    padding: '20px',
+    borderRadius: '16px',
+    border: '1px solid rgba(255, 255, 255, 0.03)',
+    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.005) 100%)',
+    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.01)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px' // Belső térköz
+  };
+
+  return createPortal(
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-3" style={{ background: 'rgba(7, 9, 15, 0.85)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+      <div className="w-full max-w-xl relative flex flex-col" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: 'var(--card-r)', boxShadow: '0 10px 40px rgba(0,0,0,0.35), inset 0 1px rgba(255,255,255,0.03)', overflow: 'hidden' }}>
+        
+        {/* Bezárás gomb - Gridre helyezve (28px top/right, 40x40px) */}
+        <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-full"
-          style={{ background: 'var(--s2)', color: 'var(--t2)' }}
+          className="absolute right-7 w-10 h-10 flex items-center justify-center rounded-full z-10 transition-all hover:bg-white/5"
+          style={{ 
+            top: 'calc(28px + env(safe-area-inset-top))',
+            background: 'var(--s2)', 
+            color: 'var(--t2)', 
+            border: '1px solid var(--b1)' 
+          }}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="w-8 h-8 rounded-[6px] flex items-center justify-center" style={{ background: 'rgba(79, 142, 247, 0.15)', border: '1px solid rgba(79, 142, 247, 0.3)' }}>
-            <span style={{ fontSize: '16px' }}>✏️</span>
-          </div>
-          <div>
-            <h2 className="text-base font-bold" style={{ color: 'var(--t1)', letterSpacing: '-0.5px' }}>Projekt Szerkesztése</h2>
-          </div>
-        </div>
-        
-        {error && (
-          <div className="p-2 mb-3 rounded-[6px] text-xs" style={{ background: 'rgba(255, 59, 48, 0.1)', border: '1px solid rgba(255, 59, 48, 0.2)', color: 'var(--red)' }}>
-            {error}
-          </div>
-        )}
 
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1.5 scroll-area">
-            {/* Alapadatok */}
-            <div className="grid grid-cols-3 gap-2">
-              <div className="col-span-1">
-                <label style={labelStyle}>Sorszám</label>
-                <input type="text" value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} placeholder="PL-21" required style={inputStyle} />
-              </div>
-              <div className="col-span-2">
-                <label style={labelStyle}>Projekt/Megrendelő Neve</label>
-                <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Napelem Telepítés..." required style={inputStyle} />
-              </div>
+        {/* Fejléc */}
+        <div style={{ padding: 'calc(28px + env(safe-area-inset-top)) 28px 20px', flexShrink: 0 }}>
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-[6px] flex items-center justify-center" style={{ background: 'rgba(79, 142, 247, 0.15)', border: '1px solid rgba(79, 142, 247, 0.3)' }}>
+              <span style={{ fontSize: '16px' }}>✏️</span>
             </div>
-
             <div>
-              <label style={labelStyle}>Szerelési Cím</label>
-              <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="8900 Zalaegerszeg, Fő út 12." required style={inputStyle} />
+              <h2 className="text-base font-bold" style={{ color: 'var(--t1)', letterSpacing: '-0.5px' }}>Projekt Szerkesztése</h2>
+            </div>
+          </div>
+          {error && (
+            <div className="mt-3 p-2 rounded-[6px] text-xs" style={{ background: 'rgba(255, 59, 48, 0.1)', border: '1px solid rgba(255, 59, 48, 0.2)', color: 'var(--red)' }}>
+              {error}
+            </div>
+          )}
+        </div>
+
+        {/* Űrlap */}
+        <form onSubmit={handleSubmit} className="flex flex-col">
+          {/* Tágasabb padding-top és section gap (space-y-7) */}
+          <div className="space-y-7 pr-1.5 custom-scroll" style={{ padding: '8px 28px 28px', maxHeight: '64dvh', overflowY: 'auto' }}>
+            
+            {/* 1. SZEKCIÓ: ALAPADATOK */}
+            <div style={sectionStyle}>
+              <div className="text-[10px] font-bold text-[var(--t3)] uppercase tracking-widest pb-3 border-b border-white/[0.03] mb-2">
+                Alapadatok & Cím
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4 w-full">
+                <div style={{ position: 'relative' }} className="w-full sm:w-1/3">
+                  <span style={floatingLabelStyle}>Sorszám</span>
+                  <input 
+                    type="text" 
+                    value={serialNumber} 
+                    onChange={(e) => setSerialNumber(e.target.value)} 
+                    placeholder="PL-21" 
+                    required 
+                    style={{ ...inputStyle, paddingTop: '22px' }} 
+                  />
+                </div>
+                <div style={{ position: 'relative' }} className="w-full sm:w-2/3">
+                  <span style={floatingLabelStyle}>Projekt / Megrendelő Neve</span>
+                  <input 
+                    type="text" 
+                    value={name} 
+                    onChange={(e) => setName(e.target.value)} 
+                    placeholder="Napelem Telepítés..." 
+                    required 
+                    style={{ ...inputStyle, paddingTop: '22px' }} 
+                  />
+                </div>
+              </div>
+
+              <div style={{ position: 'relative' }} className="w-full">
+                <span style={floatingLabelStyle}>Szerelési Cím</span>
+                <input 
+                  type="text" 
+                  value={address} 
+                  onChange={(e) => setAddress(e.target.value)} 
+                  placeholder="8900 Zalaegerszeg, Fő út 12." 
+                  required 
+                  style={{ ...inputStyle, paddingTop: '22px' }} 
+                />
+              </div>
             </div>
 
-            {/* Megrendelő és ára */}
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label style={labelStyle}>Megrendelő Teljes Neve</label>
-                <input type="text" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="Szabó István" required style={inputStyle} />
+            {/* 2. SZEKCIÓ: ÜGYFÉLKAPCSOLAT & PÉNZÜGYEK */}
+            <div style={sectionStyle}>
+              <div className="text-[10px] font-bold text-[var(--t3)] uppercase tracking-widest pb-3 border-b border-white/[0.03] mb-2">
+                Megrendelő & Pénzügyek
               </div>
-              <div>
-                <label style={labelStyle}>Megrendelői Ár (Ft)</label>
-                <input type="number" value={clientPrice} onChange={(e) => setClientPrice(e.target.value)} placeholder="2400000" required style={inputStyle} />
+
+              <div className="flex flex-col sm:flex-row gap-4 w-full">
+                <div style={{ position: 'relative' }} className="w-full sm:w-1/2">
+                  <span style={floatingLabelStyle}>Kapcsolattartó Neve</span>
+                  <input 
+                    type="text" 
+                    value={clientName} 
+                    onChange={(e) => setClientName(e.target.value)} 
+                    placeholder="Szabó István" 
+                    required 
+                    style={{ ...inputStyle, paddingTop: '22px' }} 
+                  />
+                </div>
+                <div style={{ position: 'relative' }} className="w-full sm:w-1/2">
+                  <span style={floatingLabelStyle}>Kialkudott ár (Ft)</span>
+                  <input 
+                    type="number" 
+                    value={clientPrice} 
+                    onChange={(e) => setClientPrice(e.target.value)} 
+                    placeholder="2400000" 
+                    required 
+                    style={{ ...inputStyle, paddingTop: '22px' }} 
+                  />
+                </div>
+              </div>
+
+              {/* Telefonszámok */}
+              <div className="flex flex-col md:flex-row gap-4 w-full">
+                <div style={{ position: 'relative' }} className="w-full md:w-1/3">
+                  <span style={floatingLabelStyle}>Telefon 1</span>
+                  <input 
+                    type="text" 
+                    value={clientPhone} 
+                    onChange={(e) => setClientPhone(e.target.value)} 
+                    placeholder="+36 30 123 4567" 
+                    style={{ ...inputStyle, paddingTop: '22px' }} 
+                  />
+                </div>
+                <div style={{ position: 'relative' }} className="w-full md:w-1/3">
+                  <span style={floatingLabelStyle}>Telefon 2</span>
+                  <input 
+                    type="text" 
+                    value={clientPhone2} 
+                    onChange={(e) => setClientPhone2(e.target.value)} 
+                    placeholder="+36 20 987 6543" 
+                    style={{ ...inputStyle, paddingTop: '22px' }} 
+                  />
+                </div>
+                <div style={{ position: 'relative' }} className="w-full md:w-1/3">
+                  <span style={floatingLabelStyle}>Telefon 3</span>
+                  <input 
+                    type="text" 
+                    value={clientPhone3} 
+                    onChange={(e) => setClientPhone3(e.target.value)} 
+                    placeholder="+36 70 111 2222" 
+                    style={{ ...inputStyle, paddingTop: '22px' }} 
+                  />
+                </div>
+              </div>
+
+              <div style={{ position: 'relative' }} className="w-full">
+                <span style={floatingLabelStyle}>Telegram Csoport Link</span>
+                <input 
+                  type="url" 
+                  value={telegramLink} 
+                  onChange={(e) => setTelegramLink(e.target.value)} 
+                  placeholder="https://t.me/joinchat/..." 
+                  style={{ ...inputStyle, paddingTop: '22px' }} 
+                />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label style={labelStyle}>Kezdő Dátum</label>
-                <input type="date" value={startTime} onChange={(e) => setStartTime(e.target.value)} style={inputStyle} />
+            {/* 3. SZEKCIÓ: ÜTEMEZÉS */}
+            <div style={sectionStyle}>
+              <div className="text-[10px] font-bold text-[var(--t3)] uppercase tracking-widest pb-3 border-b border-white/[0.03] mb-2">
+                Ütemezés & Időzítés
               </div>
-              <div>
-                <label style={labelStyle}>Határidő / Vége</label>
-                <input type="date" value={endTime} onChange={(e) => setEndTime(e.target.value)} style={inputStyle} />
+
+              <div className="flex flex-col sm:flex-row gap-4 w-full">
+                <div style={{ position: 'relative' }} className="w-full sm:w-1/2">
+                  <span style={floatingLabelStyle}>Kezdő Dátum</span>
+                  <input 
+                    type="date" 
+                    value={startTime} 
+                    onChange={(e) => setStartTime(e.target.value)} 
+                    style={{ ...inputStyle, paddingTop: '22px' }} 
+                  />
+                </div>
+                <div style={{ position: 'relative' }} className="w-full sm:w-1/2">
+                  <span style={floatingLabelStyle}>Határidő / Vége</span>
+                  <input 
+                    type="date" 
+                    value={endTime} 
+                    onChange={(e) => setEndTime(e.target.value)} 
+                    style={{ ...inputStyle, paddingTop: '22px' }} 
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Inverter és Napelem Telemetria Adatok */}
-            <div className="p-3 rounded-[6px] bg-white/[0.02] border border-white/[0.04] space-y-3">
+            {/* 4. SZEKCIÓ: NAPELEM TELEMETRIA */}
+            <div style={sectionStyle}>
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
                   <span className="text-xs font-bold text-[var(--t2)]">☀️ Napelemes projekt?</span>
@@ -194,58 +337,96 @@ export default function EditProjectModal({ isOpen, onClose, project, onSuccess }
               </div>
               
               {isSolar && (
-                <div className="space-y-3 pt-3 border-t border-white/5 animate-[fadeIn_0.2s_ease-out]">
-                  <div>
-                    <label style={labelStyle}>Inverter Márka (pl. Fronius, Huawei)</label>
-                    <input type="text" value={inverterBrand} onChange={(e) => setInverterBrand(e.target.value)} placeholder="pl. Fronius" style={inputStyle} />
+                <div className="flex flex-col gap-4 pt-4 border-t border-white/[0.03] animate-[fadeIn_0.2s_ease-out] w-full">
+                  <div style={{ position: 'relative' }} className="w-full">
+                    <span style={floatingLabelStyle}>Inverter Márka (pl. Fronius, Huawei)</span>
+                    <input 
+                      type="text" 
+                      value={inverterBrand} 
+                      onChange={(e) => setInverterBrand(e.target.value)} 
+                      placeholder="pl. Fronius" 
+                      style={{ ...inputStyle, paddingTop: '22px' }} 
+                    />
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label style={labelStyle}>Készülék ID (Datalogger)</label>
-                      <input type="text" value={inverterId} onChange={(e) => setInverterId(e.target.value)} placeholder="1234567" style={inputStyle} />
+                  <div className="flex flex-col sm:flex-row gap-4 w-full">
+                    <div style={{ position: 'relative' }} className="w-full sm:w-1/2">
+                      <span style={floatingLabelStyle}>Készülék ID (Datalogger)</span>
+                      <input 
+                        type="text" 
+                        value={inverterId} 
+                        onChange={(e) => setInverterId(e.target.value)} 
+                        placeholder="1234567" 
+                        style={{ ...inputStyle, paddingTop: '22px' }} 
+                      />
                     </div>
-                    <div>
-                      <label style={labelStyle}>Inverter API Kulcs (Key)</label>
-                      <input type="password" value={inverterApiKey} onChange={(e) => setInverterApiKey(e.target.value)} placeholder="••••••••" style={inputStyle} />
+                    <div style={{ position: 'relative' }} className="w-full sm:w-1/2">
+                      <span style={floatingLabelStyle}>Inverter API Kulcs</span>
+                      <input 
+                        type="password" 
+                        value={inverterApiKey} 
+                        onChange={(e) => setInverterApiKey(e.target.value)} 
+                        placeholder="••••••••" 
+                        style={{ ...inputStyle, paddingTop: '22px' }} 
+                      />
                     </div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Kapcsolati és egyéb mezők */}
-            <div>
-              <label style={labelStyle}>Megrendelő Telefonja</label>
-              <input type="text" value={clientPhone} onChange={(e) => setClientPhone(e.target.value)} placeholder="+36 30 123 4567" style={inputStyle} />
-            </div>
+            {/* 5. SZEKCIÓ: TEREP Jegyzetek */}
+            <div style={sectionStyle}>
+              <div className="text-[10px] font-bold text-[var(--t3)] uppercase tracking-widest pb-3 border-b border-white/[0.03] mb-2">
+                Terepi Jegyzetek & Feladatok
+              </div>
 
-            <div>
-              <label style={labelStyle}>Telegram Csoport Link</label>
-              <input type="url" value={telegramLink} onChange={(e) => setTelegramLink(e.target.value)} placeholder="https://t.me/joinchat/..." style={inputStyle} />
-            </div>
+              <div style={{ position: 'relative' }} className="w-full">
+                <span style={floatingLabelStyle}>Fontos Információk (Szerelőknek)</span>
+                <textarea 
+                  value={importantInfo} 
+                  onChange={(e) => setImportantInfo(e.target.value)} 
+                  placeholder="pl. Kulcs a kapu melletti postaládában..." 
+                  rows={2} 
+                  style={{ ...inputStyle, paddingTop: '24px', resize: 'none', minHeight: '68px' }} 
+                />
+              </div>
 
-            <div>
-              <label style={labelStyle}>Fontos Információk (Terepi szerelőknek)</label>
-              <textarea value={importantInfo} onChange={(e) => setImportantInfo(e.target.value)} placeholder="pl. Kulcs a kapu melletti postaládában..." rows={2} style={{ ...inputStyle, resize: 'none' }} />
-            </div>
-
-            <div>
-              <label style={labelStyle}>Feladatok listája (Soronként egy!)</label>
-              <textarea value={tasks} onChange={(e) => setTasks(e.target.value)} placeholder="Napelemek felszerelése&#10;Inverter bekötése&#10;AC/DC elosztó kiépítése&#10;EPH földelés és mérés" rows={4} style={{ ...inputStyle, resize: 'none', fontFamily: 'monospace', lineHeight: '1.4' }} />
+              <div style={{ position: 'relative' }} className="w-full">
+                <span style={floatingLabelStyle}>Feladatok listája (Soronként egy!)</span>
+                <textarea 
+                  value={tasks} 
+                  onChange={(e) => setTasks(e.target.value)} 
+                  placeholder="Napelemek felszerelése&#10;Inverter bekötése&#10;AC/DC elosztó kiépítése" 
+                  rows={4} 
+                  style={{ ...inputStyle, paddingTop: '24px', resize: 'none', fontFamily: 'monospace', lineHeight: '1.4', minHeight: '100px' }} 
+                />
+              </div>
             </div>
           </div>
-          
-          <div className="pt-2 border-t border-white/5 flex space-x-2">
-            <button type="button" onClick={onClose} className="flex-1 font-bold transition-all" style={{ background: 'var(--s2)', border: '1px solid var(--b1)', borderRadius: 'var(--btn-r)', padding: '10px', color: 'var(--t1)', fontSize: '14px' }}>
+
+          {/* Gombok - Igazítva a gridre (padding: 20px 28px 28px, space-x-4, magasság 56px, lekerekítés 16px) */}
+          <div className="flex space-x-4" style={{ padding: '20px 28px 28px', borderTop: '1px solid var(--b1)', flexShrink: 0 }}>
+            <button 
+              type="button" 
+              onClick={onClose} 
+              className="flex-1 font-bold transition-all hover:bg-white/5 flex items-center justify-center" 
+              style={{ background: 'var(--s2)', border: '1px solid var(--b1)', borderRadius: '16px', height: '56px', color: 'var(--t1)', fontSize: '14px' }}
+            >
               Mégse
             </button>
-            <button type="submit" disabled={loading} className="flex-1 font-bold transition-all disabled:opacity-50 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #4f8ef7, #2c72e0)', border: 'none', borderRadius: 'var(--btn-r)', padding: '10px', color: '#fff', fontSize: '14px', boxShadow: '0 8px 25px rgba(79, 142, 247, 0.35)' }}>
+            <button 
+              type="submit" 
+              disabled={loading} 
+              className="flex-1 font-bold transition-all disabled:opacity-50 flex items-center justify-center hover:scale-[1.01]" 
+              style={{ background: 'linear-gradient(135deg, #4f8ef7, #2c72e0)', border: 'none', borderRadius: '16px', height: '56px', color: '#fff', fontSize: '14px', boxShadow: '0 8px 25px rgba(79, 142, 247, 0.35)' }}
+            >
               {loading ? 'Mentés...' : 'Változások Mentése'}
             </button>
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

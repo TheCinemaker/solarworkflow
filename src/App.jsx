@@ -11,6 +11,7 @@ import Timesheet from './pages/Timesheet';
 import Finance from './pages/Finance';
 import Issues from './pages/Issues';
 import CalendarView from './pages/CalendarView';
+import Info from './pages/Info';
 
 export default function App() {
   const { user, loading } = useUser();
@@ -42,6 +43,7 @@ export default function App() {
           <Route path="finance" element={user?.role === 'admin' ? <Finance /> : <Navigate to="/" />} />
           <Route path="issues" element={<Issues />} />
           <Route path="calendar" element={<CalendarView />} />
+          <Route path="info" element={<Info />} />
         </Route>
       </Routes>
     </BrowserRouter>

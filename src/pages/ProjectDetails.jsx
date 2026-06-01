@@ -370,8 +370,8 @@ export default function ProjectDetails() {
   const progressPercent = tasks.length > 0 ? Math.round((completedTasks.length / tasks.length) * 100) : 0;
 
   return (
-    <div className="page active" id="p-detail">
-      <div className="flex justify-between items-center px-[15px] mb-2.5 fu" style={{ paddingTop: '18px' }}>
+    <div className="page active pb-28" id="p-detail">
+      <div className="flex justify-between items-center px-[15px] mb-2.5 fu" style={{ paddingTop: 'calc(18px + env(safe-area-inset-top))' }}>
         <div className="back-btn" style={{ margin: 0, paddingTop: 0 }} onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
         {isAdmin && (
           <button 
@@ -652,14 +652,27 @@ export default function ProjectDetails() {
             <div className="font-semibold text-[var(--t1)]">{project?.client_name || 'Nincs megadva'}</div>
           </div>
           <div>
-            <div className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-0.5">Telefonszám</div>
-            {project?.client_phone ? (
-              <a href={`tel:${project.client_phone}`} className="font-semibold text-blue-400 hover:underline">
-                📱 {project.client_phone}
-              </a>
-            ) : (
-              <div className="text-[var(--t3)] italic">Nincs megadva</div>
-            )}
+            <div className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-0.5">Telefonszámok</div>
+            <div className="flex flex-col space-y-1 mt-0.5">
+              {project?.client_phone && (
+                <a href={`tel:${project.client_phone}`} className="font-semibold text-blue-400 hover:underline flex items-center space-x-1">
+                  <span>📱</span> <span>{project.client_phone}</span>
+                </a>
+              )}
+              {project?.client_phone_2 && (
+                <a href={`tel:${project.client_phone_2}`} className="font-semibold text-blue-400 hover:underline flex items-center space-x-1">
+                  <span>📱</span> <span>{project.client_phone_2}</span>
+                </a>
+              )}
+              {project?.client_phone_3 && (
+                <a href={`tel:${project.client_phone_3}`} className="font-semibold text-blue-400 hover:underline flex items-center space-x-1">
+                  <span>📱</span> <span>{project.client_phone_3}</span>
+                </a>
+              )}
+              {!project?.client_phone && !project?.client_phone_2 && !project?.client_phone_3 && (
+                <div className="text-[var(--t3)] italic">Nincs megadva</div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -694,7 +707,7 @@ export default function ProjectDetails() {
         {/* Üzenetek görgethető doboza */}
         <div 
           ref={chatContainerRef}
-          className="scroll-area flex flex-col space-y-2 mb-3 pr-1"
+          className="custom-scroll flex flex-col space-y-2 mb-3 pr-1"
           style={{ 
             maxHeight: '260px', 
             overflowY: 'auto', 
