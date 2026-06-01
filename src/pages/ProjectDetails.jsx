@@ -1304,10 +1304,11 @@ export default function ProjectDetails() {
                         {photo.resolved_file_path && (
                           <div 
                             onClick={() => setPreviewImage({
+                              ...photo,
                               file_path: photo.resolved_file_path,
-                              description: `Javítás igazolása: ${photo.resolved_comment || 'Sikeresen javítva.'}`,
-                              profiles: photo.profiles,
-                              created_at: photo.resolved_at || photo.created_at
+                              description: photo.resolved_comment || 'Sikeresen javítva.',
+                              created_at: photo.resolved_at || photo.created_at,
+                              is_verification: true
                             })}
                             className="block aspect-video rounded-lg overflow-hidden relative cursor-pointer"
                             style={{
@@ -1356,57 +1357,86 @@ export default function ProjectDetails() {
         <div 
           className="fixed inset-0 z-[2000] flex flex-col items-center justify-center p-4" 
           style={{ 
-            background: 'rgba(7, 9, 15, 0.96)', 
+            background: 'rgba(7, 8, 12, 0.97)', 
             backdropFilter: 'blur(25px)', 
             WebkitBackdropFilter: 'blur(25px)',
             animation: 'fadeIn 0.25s ease-out'
           }}
         >
-          {/* Felső Vissza navigációs sáv */}
+          {/* Felső Navigációs és státusz sáv */}
           <div className="absolute top-5 left-5 right-5 flex justify-between items-center z-[2010]">
             <button 
               onClick={() => setPreviewImage(null)}
-              className="px-4 py-2 rounded-full font-bold text-xs flex items-center space-x-1 transition-all active:scale-95"
+              className="px-4 py-2 rounded-full font-extrabold text-xs flex items-center space-x-1.5 transition-all hover:bg-white/10 active:scale-95 cursor-pointer"
               style={{ 
                 background: 'rgba(255, 255, 255, 0.08)', 
                 border: '1px solid rgba(255, 255, 255, 0.15)', 
-                color: '#fff',
-                cursor: 'pointer'
+                color: '#fff'
               }}
             >
-              <span>‹ Bezárás</span>
+              <span>✕ Bezárás</span>
             </button>
-            <span className="text-[10px] font-black uppercase tracking-wider text-[var(--t3)]">VoltDesk Képnézegető</span>
+            
+            {/* Dinamikus kép státusz toaszt */}
+            <div 
+              className="rounded-full text-[9px] font-black uppercase tracking-wider text-white" 
+              style={{
+                background: previewImage.is_verification
+                  ? 'rgba(46, 209, 88, 0.95)' 
+                  : (previewImage.resolved 
+                      ? 'rgba(46, 209, 88, 0.95)' 
+                      : (previewImage.is_issue ? 'rgba(255, 59, 48, 0.95)' : 'rgba(79, 142, 247, 0.9)')),
+                border: previewImage.is_verification || previewImage.resolved
+                  ? '1px solid rgba(46, 209, 88, 0.3)'
+                  : (previewImage.is_issue ? '1px solid rgba(255, 59, 48, 0.3)' : '1px solid rgba(79, 142, 247, 0.3)'),
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                padding: '5px 12px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                whiteSpace: 'nowrap',
+                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.25)',
+                lineHeight: '1'
+              }}
+            >
+              <span>{previewImage.is_verification ? '✅' : (previewImage.resolved ? '🟢' : (previewImage.is_issue ? '⚠️' : '⏱'))}</span>
+              <span>
+                {previewImage.is_verification 
+                  ? 'Javítás Igazolása' 
+                  : (previewImage.resolved ? 'Kijavítva' : (previewImage.is_issue ? 'Hiba' : 'Haladás'))}
+              </span>
+            </div>
           </div>
 
-          <div 
-            className="w-full max-w-lg flex items-center justify-center relative overflow-hidden" 
-            style={{ 
-              maxHeight: '70vh', 
-              boxShadow: '0 20px 50px rgba(0,0,0,0.8)',
-              border: '1px solid rgba(255,255,255,0.15)',
-              borderRadius: '12px'
-            }}
-          >
+          {/* Immerzív kép - keret nélkül, önmagában lebegő árnyékkal */}
+          <div className="w-full max-w-2xl flex items-center justify-center relative overflow-hidden" style={{ maxHeight: '72vh' }}>
             <img 
               src={previewImage.file_path} 
               alt={previewImage.description || 'Fénykép'} 
-              className="max-w-full max-h-[70vh] object-contain"
-              style={{ borderRadius: '12px' }}
+              className="max-w-full max-h-[72vh] object-contain rounded-2xl"
+              style={{ 
+                boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.95)',
+                border: '1px solid rgba(255, 255, 255, 0.12)'
+              }}
             />
           </div>
 
           {/* Alsó Adatlap Kártya (Információk a képről) */}
           <div 
-            className="w-full max-w-sm mt-6 p-4 rounded-md flex flex-col space-y-2 text-left"
+            className="w-full max-w-md mt-6 p-4 rounded-xl flex flex-col space-y-2 text-left transition-all"
             style={{ 
-              background: 'rgba(255,255,255,0.02)', 
-              border: '1px solid rgba(255,255,255,0.06)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)'
+              background: 'rgba(255, 255, 255, 0.02)', 
+              border: '1px solid rgba(255, 255, 255, 0.06)',
+              borderLeft: previewImage.is_verification || previewImage.resolved
+                ? '4px solid var(--green)'
+                : (previewImage.is_issue ? '4px solid var(--red)' : '4px solid var(--blue)'),
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
             }}
           >
-            <div className="flex justify-between items-center text-[10px] text-[var(--t3)] font-bold uppercase tracking-wider">
+            <div className="flex justify-between items-center text-[10px] text-[var(--t3)] font-black uppercase tracking-wider" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)', paddingBottom: '6px' }}>
               <span>👷 Feltöltötte: {previewImage.profiles?.full_name || 'Dolgozó'}</span>
               <span>{previewImage.created_at && new Date(previewImage.created_at).toLocaleDateString('hu-HU', {
                 month: 'short',
@@ -1417,11 +1447,17 @@ export default function ProjectDetails() {
             </div>
             
             {previewImage.description ? (
-              <div className="text-xs font-semibold text-[var(--t1)] leading-snug pt-1">
+              <div className="text-xs font-semibold text-[var(--t1)] leading-snug pt-1" style={{ letterSpacing: '0.01em' }}>
                 💬 {previewImage.description}
               </div>
             ) : (
               <div className="text-xs text-[var(--t3)] italic pt-1">Nincs megjegyzés ehhez a képhez.</div>
+            )}
+
+            {previewImage.is_verification && (
+              <div className="text-[9px] text-emerald-400 font-extrabold uppercase tracking-wider pt-1 flex items-center gap-1">
+                <span>🛡️</span> Ez a fotó az eredeti hibajelentés sikeres javítását igazolja.
+              </div>
             )}
           </div>
         </div>
