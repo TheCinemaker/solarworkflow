@@ -645,12 +645,13 @@ export default function ProjectDetails() {
         <div className="fu d1" style={{ padding: '0 15px', marginTop: '15px', marginBottom: '15px', display: 'flex', justifyContent: 'flex-start' }}>
           <button 
             onClick={handleArchiveProject} 
-            className="flex items-center space-x-2 transition-all hover:scale-[1.02] active:scale-98"
+            className="flex items-center transition-all hover:scale-[1.02] active:scale-98"
             style={{
               background: progressPercent === 100 ? 'linear-gradient(135deg, #2ed158, #1cc047)' : 'rgba(46, 209, 88, 0.08)',
               borderRadius: '14px',
               height: '52px',
               padding: '0 20px',
+              gap: '12px',
               color: progressPercent === 100 ? '#fff' : '#2ed158',
               border: progressPercent === 100 ? 'none' : '1px solid rgba(46, 209, 88, 0.25)',
               boxShadow: progressPercent === 100 ? '0 8px 25px rgba(46, 209, 88, 0.25)' : 'none',
