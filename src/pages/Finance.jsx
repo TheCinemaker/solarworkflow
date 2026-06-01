@@ -67,7 +67,8 @@ export default function Finance() {
 
       const { data: logs, error: logsErr } = await supabase
         .from('worklogs')
-        .select('user_id, hours');
+        .select('id, user_id, date, hours, start_time, end_time, description, projects (name)')
+        .order('date', { ascending: false });
       if (logsErr) throw logsErr;
 
       if (profiles) {
@@ -75,7 +76,13 @@ export default function Finance() {
           const workerLogs = logs ? logs.filter(log => log.user_id === profile.id) : [];
           const totalHours = workerLogs.reduce((sum, log) => sum + Number(log.hours), 0);
           const wage = Number(profile.hourly_wage) || 3500;
-          return { ...profile, totalHours: parseFloat(totalHours.toFixed(2)), totalLogs: workerLogs.length, estimatedPay: totalHours * wage };
+          return { 
+            ...profile, 
+            totalHours: parseFloat(totalHours.toFixed(2)), 
+            totalLogs: workerLogs.length, 
+            estimatedPay: totalHours * wage,
+            logs: workerLogs
+          };
         });
         aggregated.sort((a, b) => b.totalHours - a.totalHours);
         setWorkersData(aggregated);
@@ -526,6 +533,46 @@ export default function Finance() {
                           <div>
                             <div style={labelXs}>Személyi Igazolvány</div>
                             <div style={{ fontWeight: '700', color: 'var(--t2)', fontSize: '12px' }}>{worker.id_card_number || '—'}</div>
+                          </div>
+
+                          {/* Részletes munkalapok listája a dolgozónál */}
+                          <div className="col-span-2 pt-4 mt-2" style={{ borderTop: '1px solid var(--b1)' }}>
+                            <div style={{ ...labelXs, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                              <span>📋 Részletes Munkalapok</span>
+                              <span style={{ fontSize: '9px', background: 'rgba(255,255,255,0.05)', padding: '1px 6px', borderRadius: '10px', color: 'var(--t2)' }}>{worker.logs?.length || 0} nap</span>
+                            </div>
+                            
+                            {(!worker.logs || worker.logs.length === 0) ? (
+                              <div style={{ fontSize: '11px', color: 'var(--t3)', fontStyle: 'italic', padding: '12px', background: 'var(--s2)', borderRadius: '12px', border: '1px solid var(--b1)', textAlign: 'center' }}>
+                                Még nem küldött be munkalapot ez a dolgozó.
+                              </div>
+                            ) : (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '180px', overflowY: 'auto', paddingRight: '4px' }} className="custom-scroll">
+                                {worker.logs.map(log => (
+                                  <div key={log.id} style={{ background: 'var(--s2)', padding: '10px 12px', borderRadius: '12px', border: '1px solid var(--b1)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                      <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--t1)' }}>
+                                        ⚡ {log.projects?.name || 'Névtelen projekt'}
+                                      </span>
+                                      <span style={{ fontSize: '10px', fontWeight: '800', color: 'var(--blue)' }}>
+                                        {log.date}
+                                      </span>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10px', color: 'var(--t2)', fontWeight: '600' }}>
+                                      <span>⏱ {log.hours} óra ({log.start_time} – {log.end_time})</span>
+                                      <span style={{ color: 'var(--green)', fontWeight: '700' }}>
+                                        +{(log.hours * (worker.hourly_wage || 3500)).toLocaleString('hu-HU')} Ft
+                                      </span>
+                                    </div>
+                                    {log.description && (
+                                      <div style={{ fontSize: '10px', color: 'var(--t3)', fontStyle: 'italic', marginTop: '2px', background: 'rgba(0,0,0,0.15)', padding: '4px 8px', borderRadius: '6px', lineHeight: '1.4' }}>
+                                        {log.description}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                       ) : (
