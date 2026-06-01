@@ -249,6 +249,11 @@ export default function Dashboard() {
               <div className="sc-val" style={{color:'#ffd60a'}}>{workerStats.earnings.toLocaleString('hu-HU')} Ft</div>
               <div className="sc-sub">Szerződéses órabéred alapján</div>
             </div>
+            <div className="sc cursor-pointer" onClick={() => navigate('/issues')}>
+              <div className="sc-lbl">Aktív hibák</div>
+              <div className="sc-val" style={{color:'#ff3b30'}}>{stats.issues}</div>
+              <div className="sc-sub">Javításra váró hibák</div>
+            </div>
           </>
         )}
       </div>
