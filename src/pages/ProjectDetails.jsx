@@ -647,13 +647,13 @@ export default function ProjectDetails() {
             onClick={handleArchiveProject} 
             className="flex items-center space-x-2 transition-all hover:scale-[1.02] active:scale-98"
             style={{
-              background: progressPercent === 100 ? 'linear-gradient(135deg, #ffd60a, #ccab00)' : 'rgba(255, 69, 58, 0.08)',
+              background: progressPercent === 100 ? 'linear-gradient(135deg, #2ed158, #1cc047)' : 'rgba(46, 209, 88, 0.08)',
               borderRadius: '14px',
               height: '52px',
               padding: '0 20px',
-              color: progressPercent === 100 ? '#000' : '#ff453a',
-              border: progressPercent === 100 ? 'none' : '1px solid rgba(255, 69, 58, 0.25)',
-              boxShadow: progressPercent === 100 ? '0 8px 25px rgba(255, 214, 10, 0.15)' : 'none',
+              color: progressPercent === 100 ? '#fff' : '#2ed158',
+              border: progressPercent === 100 ? 'none' : '1px solid rgba(46, 209, 88, 0.25)',
+              boxShadow: progressPercent === 100 ? '0 8px 25px rgba(46, 209, 88, 0.25)' : 'none',
               cursor: 'pointer',
               fontSize: '13px',
               fontWeight: '800',
@@ -661,10 +661,10 @@ export default function ProjectDetails() {
             }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
             </svg>
-            <span>{progressPercent === 100 ? 'Projekt Lezárása (100% Kész)' : 'Projekt Lezárása'}</span>
+            <span>{progressPercent === 100 ? 'Projekt Lezárása (100% Kész!)' : 'Projekt Lezárása'}</span>
           </button>
         </div>
       )}
