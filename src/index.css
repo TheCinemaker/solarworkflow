@@ -131,6 +131,7 @@ select option{background:var(--bg);color:var(--t1)}
 .scroll-area{
   flex:1;overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
+  padding-top:env(safe-area-inset-top);
   padding-bottom:90px;
   position:relative;z-index:1;
 }
@@ -139,7 +140,7 @@ select option{background:var(--bg);color:var(--t1)}
 .page{display:block;} 
 
 .page-header{
-  padding:calc(20px + env(safe-area-inset-top)) 15px 0;
+  padding:20px 15px 0;
   display:flex;justify-content:space-between;align-items:flex-start;
 }
 .pg-greet{font-size:12px;color:var(--t3);font-weight:500;margin-bottom:3px}

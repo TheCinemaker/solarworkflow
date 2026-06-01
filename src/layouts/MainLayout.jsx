@@ -97,7 +97,7 @@ export default function MainLayout() {
             className="fu"
             style={{
               position: 'fixed',
-              top: '20px',
+              top: 'calc(20px + env(safe-area-inset-top))',
               left: '15px',
               right: '15px',
               background: 'rgba(20, 24, 35, 0.9)',
