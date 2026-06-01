@@ -1364,17 +1364,20 @@ export default function ProjectDetails() {
 
       {/* IN-APP APPLE STÍLUSÚ IMMERZÍV FÉNYKÉP NÉZEGETŐ OVERLAY */}
       {previewImage && (
-        <div 
-          className="fixed inset-0 z-[2000] flex flex-col items-center justify-center p-4" 
-          style={{ 
-            background: 'var(--backdrop)', 
-            backdropFilter: 'blur(25px)', 
+        <div
+          className="fixed inset-0 z-[2000]"
+          style={{
+            background: 'var(--backdrop)',
+            backdropFilter: 'blur(25px)',
             WebkitBackdropFilter: 'blur(25px)',
-            animation: 'fadeIn 0.25s ease-out'
+            animation: 'fadeIn 0.25s ease-out',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            WebkitOverflowScrolling: 'touch'
           }}
         >
-          {/* Felső Navigációs és státusz sáv */}
-          <div className="absolute top-5 left-5 right-5 flex justify-between items-center z-[2010]">
+          {/* Felső Navigációs és státusz sáv (rögzített, mindig látható) */}
+          <div className="fixed left-5 right-5 flex justify-between items-center z-[2010]" style={{ top: 'calc(20px + env(safe-area-inset-top))' }}>
             <button 
               onClick={() => setPreviewImage(null)}
               className="px-4 py-2 rounded-full font-extrabold text-xs flex items-center space-x-1.5 transition-all hover:bg-white/10 active:scale-95 cursor-pointer"
@@ -1425,13 +1428,23 @@ export default function ProjectDetails() {
             </div>
           </div>
 
+          {/* Görgethető tartalom — kép + adatlap egymás alatt, padding hagy helyet a fix nav-nak felül és a notch/home indicator-nak */}
+          <div
+            className="flex flex-col items-center"
+            style={{
+              minHeight: '100dvh',
+              padding: 'calc(72px + env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom))',
+              gap: '20px'
+            }}
+          >
           {/* Immerzív kép - keret nélkül, önmagában lebegő árnyékkal */}
-          <div className="w-full max-w-2xl flex items-center justify-center relative overflow-hidden" style={{ maxHeight: '72vh' }}>
-            <img 
-              src={previewImage.file_path} 
-              alt={previewImage.description || 'Fénykép'} 
-              className="max-w-full max-h-[72vh] object-contain rounded-2xl"
-              style={{ 
+          <div className="w-full max-w-2xl flex items-center justify-center relative" style={{ flexShrink: 0 }}>
+            <img
+              src={previewImage.file_path}
+              alt={previewImage.description || 'Fénykép'}
+              className="max-w-full object-contain rounded-2xl"
+              style={{
+                maxHeight: '70dvh',
                 boxShadow: 'var(--shadow-strong)',
                 border: '1px solid var(--b2)'
               }}
@@ -1439,17 +1452,18 @@ export default function ProjectDetails() {
           </div>
 
           {/* Alsó Adatlap Kártya (Információk a képről) */}
-          <div 
-            className="w-full max-w-md mt-6 p-4 rounded-xl flex flex-col space-y-2 text-left transition-all"
-            style={{ 
-              background: 'var(--s1)', 
+          <div
+            className="w-full max-w-md p-4 rounded-xl flex flex-col space-y-2 text-left transition-all"
+            style={{
+              background: 'var(--s1)',
               border: '1px solid var(--b1)',
               borderLeft: previewImage.is_verification || previewImage.resolved
                 ? '4px solid var(--green)'
                 : (previewImage.is_issue ? '4px solid var(--red)' : '4px solid var(--blue)'),
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
-              boxShadow: 'var(--shadow-soft)'
+              boxShadow: 'var(--shadow-soft)',
+              flexShrink: 0
             }}
           >
             <div className="flex justify-between items-center text-[10px] text-[var(--t3)] font-black uppercase tracking-wider" style={{ borderBottom: '1px solid var(--b1)', paddingBottom: '6px' }}>
@@ -1476,6 +1490,7 @@ export default function ProjectDetails() {
                 <Icon name="shield" size={10} color="var(--green)" strokeWidth={2.2} /> Ez a fotó az eredeti hibajelentés sikeres javítását igazolja.
               </div>
             )}
+          </div>
           </div>
         </div>
       )}
