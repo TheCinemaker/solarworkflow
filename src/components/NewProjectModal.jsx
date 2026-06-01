@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { supabase } from '../lib/supabase';
+import { Icon } from './Icon';
 
 export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
   const [serialNumber, setSerialNumber] = useState('');
@@ -177,7 +178,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
         <div style={{ padding: 'calc(28px + env(safe-area-inset-top)) 28px 20px', flexShrink: 0 }}>
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 rounded-[6px] flex items-center justify-center" style={{ background: 'rgba(79, 142, 247, 0.15)', border: '1px solid rgba(79, 142, 247, 0.3)' }}>
-              <span style={{ fontSize: '16px' }}>⚡</span>
+              <Icon name="bolt" size={16} color="var(--blue)" strokeWidth={2.5} />
             </div>
             <div>
               <h2 className="text-base font-bold" style={{ color: 'var(--t1)', letterSpacing: '-0.5px' }}>Új Projekt Létrehozása</h2>
@@ -348,7 +349,7 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
             <div style={sectionStyle}>
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
-                  <span className="text-xs font-bold text-[var(--t2)]">☀️ Napelemes projekt?</span>
+                  <span className="text-xs font-bold text-[var(--t2)]" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}><Icon name="sun" size={13} color="var(--yellow)" strokeWidth={2.2} /> Napelemes projekt?</span>
                   <span className="text-[9px] text-[var(--t3)] font-bold uppercase tracking-wider mt-0.5">Inverter és távfelügyelet bekapcsolása</span>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">

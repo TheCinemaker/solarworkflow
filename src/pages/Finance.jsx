@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useUser } from '../context/UserContext';
+import { Icon } from '../components/Icon';
 
 const inputStyle = {
   background: 'var(--s1)',
@@ -205,8 +206,8 @@ export default function Finance() {
             width: '56px', height: '56px', borderRadius: '14px',
             background: 'rgba(255,59,48,0.10)', border: '1px solid rgba(255,59,48,0.2)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '24px', margin: '0 auto 16px',
-          }}>🔒</div>
+            margin: '0 auto 16px',
+          }}><Icon name="lock" size={24} color="var(--red)" strokeWidth={2} /></div>
           <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--t1)', marginBottom: '8px', letterSpacing: '-0.3px' }}>
             Hozzáférés megtagadva
           </div>
@@ -279,7 +280,7 @@ export default function Finance() {
           <div className="pg-greet">Mini Könyvelőiroda</div>
           <div className="pg-title">Pénzügy & Bérek</div>
         </div>
-        <div className="hdr-btn">💼</div>
+        <div className="hdr-btn"><Icon name="briefcase" size={16} color="var(--t2)" strokeWidth={2.2} /></div>
       </div>
 
       {error && (
@@ -292,8 +293,8 @@ export default function Finance() {
       {/* Tab selector */}
       <div style={{ paddingLeft: '15px', paddingRight: '15px', marginTop: '16px' }}>
         <div className="flex p-1 rounded-xl" style={{ background: 'var(--s1)', border: '1px solid var(--b1)' }}>
-          <button onClick={() => setActiveTab('projects')} style={tabStyle('projects')}>🏢 Megrendelői Kifizetések</button>
-          <button onClick={() => setActiveTab('workers')} style={tabStyle('workers')}>👷 Dolgozói Bérszámfejtés</button>
+          <button onClick={() => setActiveTab('projects')} style={{ ...tabStyle('projects'), display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}><Icon name="building" size={12} strokeWidth={2.2} /> Megrendelői Kifizetések</button>
+          <button onClick={() => setActiveTab('workers')} style={{ ...tabStyle('workers'), display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}><Icon name="worker" size={12} strokeWidth={2} /> Dolgozói Bérszámfejtés</button>
         </div>
       </div>
 
@@ -361,8 +362,8 @@ export default function Finance() {
                     <div style={{ fontWeight: '700', color: 'var(--t1)', fontSize: '15px', letterSpacing: '-0.3px' }}>
                       {proj.name || 'Névtelen Projekt'}
                     </div>
-                    <div style={{ fontSize: '11px', color: 'var(--t3)', fontWeight: '600', marginTop: '4px' }}>
-                      {proj.serial_number ? `${proj.serial_number} · ` : ''}📍 {proj.address || 'Cím nélkül'}
+                    <div style={{ fontSize: '11px', color: 'var(--t3)', fontWeight: '600', marginTop: '4px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      {proj.serial_number ? `${proj.serial_number} · ` : ''}<Icon name="pin" size={11} color="var(--t3)" strokeWidth={2} /> {proj.address || 'Cím nélkül'}
                     </div>
                   </div>
                   <button
@@ -377,7 +378,11 @@ export default function Finance() {
                       outline: proj.paid ? '1px solid rgba(46,209,88,0.25)' : '1px solid rgba(255,59,48,0.18)',
                     }}
                   >
-                    {proj.paid ? '✓ FIZETVE' : '× FIZETÉSRE VÁR'}
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      {proj.paid
+                        ? (<><Icon name="check" size={11} color="var(--green)" strokeWidth={3} /> FIZETVE</>)
+                        : (<><Icon name="close" size={11} color="var(--red)" strokeWidth={3} /> FIZETÉSRE VÁR</>)}
+                    </span>
                   </button>
                 </div>
                 <div className="flex justify-between items-center pt-3" style={{ borderTop: '1px solid var(--b1)', paddingTop: '12px' }}>
@@ -428,9 +433,9 @@ export default function Finance() {
                       <div className="flex items-center space-x-2.5">
                         <div style={{
                           width: '38px', height: '38px', borderRadius: '10px', flexShrink: 0,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
                           background: 'var(--s2)', border: '1px solid var(--b1)',
-                        }}>👷</div>
+                        }}><Icon name="worker" size={18} color="var(--t2)" strokeWidth={2} /></div>
                         <div>
                           <div style={{ fontWeight: '800', color: 'var(--t1)', fontSize: '15px', letterSpacing: '-0.3px' }}>{worker.full_name || 'Névtelen'}</div>
                           <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '2px' }}>
@@ -474,7 +479,7 @@ export default function Finance() {
                     <div className="p-5 space-y-4 fu" style={{ background: 'var(--s2)', borderTop: '1px solid var(--b1)', padding: '20px' }}>
                       <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
                         <span style={{ fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--green)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <span>🔒</span> <span>Bizalmas adatok</span>
+                          <Icon name="lock" size={11} color="var(--green)" strokeWidth={2.2} /> <span>Bizalmas adatok</span>
                         </span>
                         {!isEditing ? (
                           <div className="flex space-x-2">
@@ -487,7 +492,7 @@ export default function Finance() {
                                 background: 'var(--s1)', color: 'var(--t1)', border: '1px solid var(--b1)',
                                 fontFamily: 'inherit',
                               }}
-                            >✏️ Szerkesztés</button>
+                            ><span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon name="edit" size={11} strokeWidth={2.2} /> Szerkesztés</span></button>
                             <button 
                               onClick={() => handleDeleteWorker(worker.id, worker.full_name)} 
                               className="active:scale-95 transition-all"
@@ -497,7 +502,7 @@ export default function Finance() {
                                 background: 'rgba(255, 59, 48, 0.08)', color: 'var(--red)', border: '1px solid rgba(255, 59, 48, 0.15)',
                                 fontFamily: 'inherit',
                               }}
-                            >🗑️ Törlés</button>
+                            ><span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon name="trash" size={11} color="var(--red)" strokeWidth={2.2} /> Törlés</span></button>
                           </div>
                         ) : (
                           <div className="flex space-x-2">
@@ -558,7 +563,7 @@ export default function Finance() {
 
                           <div className="col-span-2 pt-4 mt-2" style={{ borderTop: '1px solid var(--b1)' }}>
                             <div style={{ ...labelXs, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                              <span>📋 Havi munkalap elszámolások</span>
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}><Icon name="clipboard" size={11} strokeWidth={2.2} /> Havi munkalap elszámolások</span>
                               <span style={{ fontSize: '9px', background: 'var(--s1)', padding: '1px 6px', borderRadius: '10px', color: 'var(--t2)' }}>{worker.logs?.length || 0} nap</span>
                             </div>
                             
@@ -602,7 +607,7 @@ export default function Finance() {
                                           }}
                                         >
                                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                            <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--t1)' }}>📅 {month.name}</span>
+                                            <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--t1)', display: 'inline-flex', alignItems: 'center', gap: '5px' }}><Icon name="calendar" size={11} strokeWidth={2.2} /> {month.name}</span>
                                             <span style={{ fontSize: '9px', background: 'rgba(79,142,247,0.1)', border: '1px solid rgba(79,142,247,0.15)', color: 'var(--blue)', padding: '1px 5px', borderRadius: '10px', fontWeight: '700' }}>
                                               {month.items.length} nap
                                             </span>
@@ -624,14 +629,14 @@ export default function Finance() {
                                               <div key={log.id} style={{ background: 'var(--s2)', padding: '8px 10px', borderRadius: '8px', border: '1px solid var(--b1)', display: 'flex', flexDirection: 'column', gap: '3px' }}>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                   <span style={{ fontSize: '10.5px', fontWeight: '700', color: 'var(--t1)' }}>
-                                                    ⚡ {log.projects?.name || 'Névtelen projekt'}
+                                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon name="bolt" size={10} color="var(--blue)" strokeWidth={2.5} /> {log.projects?.name || 'Névtelen projekt'}</span>
                                                   </span>
                                                   <span style={{ fontSize: '9.5px', fontWeight: '700', color: 'var(--blue)' }}>
                                                     {log.date}
                                                   </span>
                                                 </div>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '9.5px', color: 'var(--t2)', fontWeight: '600' }}>
-                                                  <span>⏱ {log.hours} óra ({log.start_time} – {log.end_time})</span>
+                                                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon name="clock" size={10} color="var(--t2)" strokeWidth={2.2} /> {log.hours} óra ({log.start_time} – {log.end_time})</span>
                                                   <span style={{ color: 'var(--green)', fontWeight: '700' }}>
                                                     +{(log.hours * (worker.hourly_wage || 3500)).toLocaleString('hu-HU')} Ft
                                                   </span>

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { Icon } from '../components/Icon';
 
 export default function Issues() {
   const navigate = useNavigate();
@@ -72,7 +73,7 @@ export default function Issues() {
       setFixFile(null);
       setExpandedIssueId(null);
       await loadIssues();
-      alert("Javítás sikeresen rögzítve! Köszönjük a munkádat! 👍");
+      alert("Javítás sikeresen rögzítve! Köszönjük a munkádat!");
     } catch (err) {
       setError("Hiba történt: " + err.message);
     } finally {
@@ -131,7 +132,7 @@ export default function Issues() {
           <div className="pg-greet">Központi hibajegy követés</div>
           <div className="pg-title">Hibák / Visszajárás</div>
         </div>
-        <div className="hdr-btn" style={{ background: 'rgba(255,59,48,0.10)', color: 'var(--red)', border: '1px solid rgba(255,59,48,0.22)' }}>⚠️</div>
+        <div className="hdr-btn" style={{ background: 'rgba(255,59,48,0.10)', color: 'var(--red)', border: '1px solid rgba(255,59,48,0.22)' }}><Icon name="warning" size={16} color="var(--red)" strokeWidth={2.2} /></div>
       </div>
 
       {error && (
@@ -143,11 +144,11 @@ export default function Issues() {
 
       {/* Tab selector */}
       <div className="p-1 rounded-xl flex items-center" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginLeft: '15px', marginRight: '15px', marginTop: '12px', marginBottom: '15px' }}>
-        <div className="active:scale-[0.98] transition-all" onClick={() => { setActiveTab('open'); setExpandedIssueId(null); }} style={tabStyle('open')}>
-          🔴 Nyitott hibák ({openIssues.length})
+        <div className="active:scale-[0.98] transition-all" onClick={() => { setActiveTab('open'); setExpandedIssueId(null); }} style={{ ...tabStyle('open'), display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+          <Icon name="dot-red" size={10} /> Nyitott hibák ({openIssues.length})
         </div>
-        <div className="active:scale-[0.98] transition-all" onClick={() => { setActiveTab('resolved'); setExpandedIssueId(null); }} style={tabStyle('resolved')}>
-          🟢 Javított ({resolvedIssues.length})
+        <div className="active:scale-[0.98] transition-all" onClick={() => { setActiveTab('resolved'); setExpandedIssueId(null); }} style={{ ...tabStyle('resolved'), display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+          <Icon name="dot-green" size={10} /> Javított ({resolvedIssues.length})
         </div>
       </div>
 
@@ -184,7 +185,7 @@ export default function Issues() {
                       color: issue.resolved ? 'var(--green)' : 'var(--red)',
                       border: issue.resolved ? '1px solid rgba(46,209,88,0.22)' : '1px solid rgba(255,59,48,0.22)',
                     }}>
-                      ⚡ {issue.projects?.serial_number || 'Projekt'}
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon name="bolt" size={10} strokeWidth={2.5} /> {issue.projects?.serial_number || 'Projekt'}</span>
                     </span>
                     <div style={{ fontWeight: '700', color: 'var(--t1)', fontSize: '14px', marginTop: '5px' }}>
                       {issue.projects?.name || 'Névtelen Projekt'}
@@ -211,16 +212,18 @@ export default function Issues() {
                         <div style={{
                           fontSize: '12px', color: 'var(--red)', fontWeight: '500', lineHeight: '1.45',
                           fontStyle: 'italic', background: 'rgba(255,59,48,0.06)', padding: '8px 10px',
-                          borderRadius: '8px', border: '1px solid rgba(255,59,48,0.10)', textAlign: 'left'
+                          borderRadius: '8px', border: '1px solid rgba(255,59,48,0.10)', textAlign: 'left',
+                          display: 'flex', alignItems: 'flex-start', gap: '6px'
                         }}>
-                          ⚠️ {issue.description || 'Hiba leírás nélkül feltöltve.'}
+                          <Icon name="warning" size={13} color="var(--red)" strokeWidth={2.2} style={{ marginTop: '2px' }} />
+                          <span>{issue.description || 'Hiba leírás nélkül feltöltve.'}</span>
                         </div>
                       </div>
                     </div>
 
                     <div className="flex justify-between items-center pt-2" style={{ borderTop: '1px solid var(--b1)', display: 'flex', justifyContent: 'between', alignItems: 'center', width: '100%' }}>
                       <span style={{ fontSize: '10px', color: 'var(--t3)' }}>
-                        Bejelentette: <b style={{ color: 'var(--t2)' }}>👷 {issue.profiles?.full_name || 'Szerelő'}</b>
+                        Bejelentette: <b style={{ color: 'var(--t2)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon name="worker" size={11} color="var(--t2)" strokeWidth={2} /> {issue.profiles?.full_name || 'Szerelő'}</b>
                       </span>
                       <button
                         onClick={() => setExpandedIssueId(expandedIssueId === issue.id ? null : issue.id)}
@@ -232,7 +235,7 @@ export default function Issues() {
                           color: '#000', boxShadow: '0 4px 12px rgba(255,214,10,0.2)',
                         }}
                       >
-                        {expandedIssueId === issue.id ? 'Mégsem' : '🔧 Javítás rögzítése'}
+                        {expandedIssueId === issue.id ? 'Mégsem' : (<span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}><Icon name="tool" size={11} color="#000" strokeWidth={2.5} /> Javítás rögzítése</span>)}
                       </button>
                     </div>
 
@@ -240,7 +243,7 @@ export default function Issues() {
                     {expandedIssueId === issue.id && (
                       <div className="mt-2 p-3 space-y-3" style={{ background: 'var(--s1)', borderRadius: '10px', border: '1px solid var(--b1)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--yellow)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          🔧 Hiba elhárításának rögzítése
+                          <Icon name="tool" size={13} color="var(--yellow)" strokeWidth={2.2} /> Hiba elhárításának rögzítése
                         </div>
                         <form onSubmit={(e) => handleResolveIssue(e, issue)} className="space-y-3" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                           <div>
@@ -320,7 +323,7 @@ export default function Issues() {
                   <>
                     <div className="grid grid-cols-2 gap-3 pt-2" style={{ borderTop: '1px solid var(--b1)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                       <div className="flex flex-col space-y-1.5" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <div style={{ fontSize: '9px', color: 'var(--red)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'left' }}>🔴 Eredeti hiba</div>
+                        <div style={{ fontSize: '9px', color: 'var(--red)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'left', display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon name="dot-red" size={9} /> Eredeti hiba</div>
                         <a href={issue.file_path} target="_blank" rel="noreferrer" style={{
                           display: 'block', aspectRatio: '4/3', borderRadius: '8px',
                           backgroundImage: `url(${issue.file_path})`, backgroundSize: 'cover', backgroundPosition: 'center',
@@ -331,7 +334,7 @@ export default function Issues() {
                         </div>
                       </div>
                       <div className="flex flex-col space-y-1.5" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <div style={{ fontSize: '9px', color: 'var(--green)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'left' }}>🟢 Elvégzett javítás</div>
+                        <div style={{ fontSize: '9px', color: 'var(--green)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'left', display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon name="dot-green" size={9} /> Elvégzett javítás</div>
                         <a href={issue.resolved_file_path} target="_blank" rel="noreferrer" style={{
                           display: 'block', aspectRatio: '4/3', borderRadius: '8px',
                           backgroundImage: `url(${issue.resolved_file_path})`, backgroundSize: 'cover', backgroundPosition: 'center',
@@ -348,7 +351,7 @@ export default function Issues() {
                         Jelentette: <b style={{ color: 'var(--t2)' }}>{issue.profiles?.full_name || 'Ismeretlen'}</b>
                       </span>
                       <span style={{ fontSize: '9px', color: 'var(--green)', fontWeight: '600' }}>
-                        ✅ Javította: <b>{issue.resolved_by_profile?.full_name || 'Szerelő'}</b>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}><Icon name="check-circle" size={11} color="var(--green)" strokeWidth={2.5} /> Javította: <b>{issue.resolved_by_profile?.full_name || 'Szerelő'}</b></span>
                       </span>
                     </div>
                   </>

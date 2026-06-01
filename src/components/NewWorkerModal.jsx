@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { createClient } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { Icon } from './Icon';
 
 // Külön, ideiglenes Supabase kliens regisztrációhoz (session perzisztencia nélkül)
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -191,7 +192,7 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
         <div style={{ padding: 'calc(28px + env(safe-area-inset-top)) 28px 20px', flexShrink: 0 }}>
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 rounded-[6px] flex items-center justify-center" style={{ background: 'rgba(46, 209, 88, 0.15)', border: '1px solid rgba(46, 209, 88, 0.3)' }}>
-              <span style={{ fontSize: '16px' }}>👷</span>
+              <Icon name="worker" size={16} color="var(--green)" strokeWidth={2.2} />
             </div>
             <div>
               <h2 className="text-base font-bold" style={{ color: 'var(--t1)', letterSpacing: '-0.5px' }}>Új Dolgozó Létrehozása</h2>

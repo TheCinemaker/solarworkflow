@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { Icon } from '../components/Icon';
 
 export default function Timesheet() {
   const navigate = useNavigate();
@@ -197,7 +198,7 @@ export default function Timesheet() {
           <div className="pg-greet">{new Date().toLocaleDateString('hu-HU')}</div>
           <div className="pg-title">Napi lap</div>
         </div>
-        <div className="hdr-btn">📋</div>
+        <div className="hdr-btn"><Icon name="clipboard" size={16} color="var(--t2)" strokeWidth={2.2} /></div>
       </div>
 
       {error && (
@@ -265,8 +266,8 @@ export default function Timesheet() {
           </div>
 
           {computedHours > 0 && (
-            <div className="p-2.5 text-xs font-semibold text-center" style={{ background: 'rgba(46, 209, 88, 0.1)', border: '1px solid rgba(46, 209, 88, 0.2)', color: 'var(--green)', borderRadius: '12px' }}>
-              ⏱ Számolt munkaidő: {computedHours} óra
+            <div className="p-2.5 text-xs font-semibold text-center" style={{ background: 'rgba(46, 209, 88, 0.1)', border: '1px solid rgba(46, 209, 88, 0.2)', color: 'var(--green)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+              <Icon name="clock" size={13} color="var(--green)" strokeWidth={2.2} /> Számolt munkaidő: {computedHours} óra
             </div>
           )}
 
@@ -341,7 +342,7 @@ export default function Timesheet() {
                 <div>
                   <div style={{ fontSize: '9px', color: 'var(--t3)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>Szerelő</div>
                   <div style={{ fontWeight: '700', color: 'var(--t1)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <span>👷</span>
+                    <Icon name="worker" size={14} color="var(--t1)" strokeWidth={2} />
                     <span>{log.profiles?.full_name || (log.user_id === currentUser?.id ? (currentUser?.user_metadata?.full_name || currentUser?.full_name || 'Én') : 'Ismeretlen')} {log.profiles?.serial_number ? `[${log.profiles.serial_number}]` : (log.user_id === currentUser?.id && currentUser?.role === 'admin' ? '[ADM-01]' : '')}</span>
                   </div>
                 </div>
@@ -354,14 +355,14 @@ export default function Timesheet() {
                 <div>
                   <div style={{ fontSize: '9px', color: 'var(--t3)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>Projekt</div>
                   <div style={{ fontWeight: '700', color: 'var(--t1)', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <span>⚡</span>
+                    <Icon name="bolt" size={13} color="var(--blue)" strokeWidth={2.5} />
                     <span>{log.projects?.name || 'Névtelen Projekt'}</span>
                   </div>
                 </div>
                 <div>
                   <div style={{ fontSize: '9px', color: 'var(--t3)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>Időtartam</div>
                   <div style={{ fontWeight: '700', color: 'var(--t1)', fontSize: '13px', display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'start' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>⏱ {log.hours} óra</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Icon name="clock" size={13} color="var(--t1)" strokeWidth={2.2} /> {log.hours} óra</span>
                     <span style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '500' }}>({log.start_time} – {log.end_time})</span>
                   </div>
                 </div>

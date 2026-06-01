@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { useUser } from '../context/UserContext';
 import { supabase } from '../lib/supabase';
+import { Icon } from '../components/Icon';
 
 export default function MainLayout() {
   const navigate = useNavigate();
@@ -67,11 +68,11 @@ export default function MainLayout() {
   }, [user, location.pathname]);
 
   const navItems = [
-    { to: '/', icon: '⬡', label: 'Főoldal' },
-    { to: '/projects', icon: '📁', label: 'Projektek' },
-    { to: '/calendar', icon: '📅', label: 'Naptár' },
-    { to: '/timesheet', icon: '📋', label: 'Munkalapok' },
-    ...(user?.role === 'admin' ? [{ to: '/finance', icon: '💼', label: 'Pénzügyek' }] : []),
+    { to: '/', iconName: 'home', label: 'Főoldal' },
+    { to: '/projects', iconName: 'folder', label: 'Projektek' },
+    { to: '/calendar', iconName: 'calendar', label: 'Naptár' },
+    { to: '/timesheet', iconName: 'clipboard', label: 'Munkalapok' },
+    ...(user?.role === 'admin' ? [{ to: '/finance', iconName: 'briefcase', label: 'Pénzügyek' }] : []),
   ];
 
   return (
@@ -113,7 +114,7 @@ export default function MainLayout() {
               animation: 'slideDownToast 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards'
             }}
           >
-            <div style={{ fontSize: '22px', marginRight: '12px' }}>💬</div>
+            <div style={{ marginRight: '12px', display: 'flex', alignItems: 'center' }}><Icon name="chat" size={22} color="var(--blue)" strokeWidth={2} /></div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '9px', color: 'var(--blue)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '2px' }}>
                 ÚJ CHAT ÜZENET: {toast.projectName}
@@ -122,23 +123,23 @@ export default function MainLayout() {
                 {toast.senderName}: <span style={{ fontWeight: '400', color: 'var(--t2)' }}>"{toast.content}"</span>
               </div>
             </div>
-            <div style={{ fontSize: '14px', color: 'var(--blue)', marginLeft: '10px', fontWeight: 'bold' }}>➔</div>
+            <div style={{ color: 'var(--blue)', marginLeft: '10px', display: 'flex', alignItems: 'center' }}><Icon name="arrow-right" size={14} color="var(--blue)" strokeWidth={2.5} /></div>
             <div
               onClick={(e) => {
                 e.stopPropagation();
                 setToast(null);
               }}
               style={{
-                fontSize: '16px',
                 color: 'rgba(255, 59, 48, 0.85)',
                 marginLeft: '15px',
                 padding: '4px 8px',
                 lineHeight: 1,
                 cursor: 'pointer',
-                fontWeight: 'bold'
+                display: 'flex',
+                alignItems: 'center'
               }}
             >
-              ✕
+              <Icon name="close" size={14} strokeWidth={2.5} />
             </div>
           </div>
         </>
@@ -186,7 +187,7 @@ export default function MainLayout() {
             }}
             className="hover:bg-white/10 hover:text-white"
           >
-            Rendszerinfó ➔
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>Rendszerinfó <Icon name="arrow-right" size={10} strokeWidth={2.5} /></span>
           </div>
         </div>
       </div>
@@ -199,7 +200,7 @@ export default function MainLayout() {
             className={({ isActive }) => clsx("nb", isActive && "on")}
             end={item.to === '/'}
           >
-            <div className="nb-i">{item.icon}</div>
+            <div className="nb-i"><Icon name={item.iconName} size={22} strokeWidth={2} /></div>
             <div className="nb-l">{item.label}</div>
           </NavLink>
         ))}

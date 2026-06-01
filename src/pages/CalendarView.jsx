@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { Icon } from '../components/Icon';
 
 const HUNGARIAN_MONTHS = [
   'Január', 'Február', 'Március', 'Április', 'Május', 'Június',
@@ -165,7 +166,7 @@ export default function CalendarView() {
         </div>
       </div>
 
-      {/* 📅 NAPTÁR GRID */}
+      {/* NAPTÁR GRID */}
       <div className="mb-5 p-4 fu d1" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', marginLeft: '15px', marginRight: '15px' }}>
         {/* Hét napjai fejléc */}
         <div className="grid grid-cols-7 gap-1 text-center mb-2">
@@ -216,7 +217,7 @@ export default function CalendarView() {
         </div>
       </div>
 
-      {/* 📋 NAPI BEOSZTÁS RÉSZLETES LISTÁJA */}
+      {/* NAPI BEOSZTÁS RÉSZLETES LISTÁJA */}
       <div className="shdr fu d2 flex justify-between items-center mb-3" style={{ marginLeft: '15px', marginRight: '15px' }}>
         <div className="shdr-t">
           {HUNGARIAN_MONTHS[currentMonth]} {selectedDay}. ({selectedDayOfWeekName}) Beosztás
@@ -230,8 +231,8 @@ export default function CalendarView() {
 
       <div className="act-list fu d3" style={{ paddingLeft: '15px', paddingRight: '15px', display: 'flex', flexDirection: 'column', gap: '12px', paddingBottom: '90px' }}>
         {selectedDayProjects.length === 0 ? (
-          <div className="p-6 text-center w-full" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
-            🍀 Nincs ütemezett munka mára.
+          <div className="p-6 text-center w-full" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+            <Icon name="sparkles" size={13} color="var(--t3)" strokeWidth={2} /> Nincs ütemezett munka mára.
           </div>
         ) : (
           selectedDayProjects.map(proj => {
@@ -265,13 +266,17 @@ export default function CalendarView() {
                     padding: '4px 10px',
                     borderRadius: '20px',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
+                    letterSpacing: '0.05em',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px'
                   }}>
-                    {proj.is_solar ? '☀️ Napelem' : '⚡ Projekt'} {proj.serial_number ? `· ${proj.serial_number}` : ''}
+                    <Icon name={proj.is_solar ? 'sun' : 'bolt'} size={11} strokeWidth={2.5} />
+                    <span>{proj.is_solar ? 'Napelem' : 'Projekt'}{proj.serial_number ? ` · ${proj.serial_number}` : ''}</span>
                   </div>
-                  
-                  <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    📅 {proj.start_time} – {proj.end_time}
+
+                  <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                    <Icon name="calendar" size={11} color="var(--t3)" strokeWidth={2.2} /> {proj.start_time} – {proj.end_time}
                   </div>
                 </div>
 
@@ -281,8 +286,8 @@ export default function CalendarView() {
                 </div>
 
                 {/* Cím */}
-                <div style={{ fontSize: '11px', color: 'var(--t2)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '4px', textAlign: 'left' }}>
-                  <span>📍</span>
+                <div style={{ fontSize: '11px', color: 'var(--t2)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '5px', textAlign: 'left' }}>
+                  <Icon name="pin" size={12} color="var(--t3)" strokeWidth={2} />
                   <span>{proj.address}</span>
                 </div>
 
@@ -315,7 +320,9 @@ export default function CalendarView() {
                     textTransform: 'uppercase',
                     letterSpacing: '0.04em'
                   }}>
-                    {progress === 100 ? 'Befejezve ✓' : 'Folyamatban'}
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      {progress === 100 ? (<><span>Befejezve</span><Icon name="check" size={10} color="var(--green)" strokeWidth={3} /></>) : 'Folyamatban'}
+                    </span>
                   </span>
                 </div>
               </div>

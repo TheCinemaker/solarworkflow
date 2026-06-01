@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import EditProjectModal from '../components/EditProjectModal';
 import { useUser } from '../context/UserContext';
+import { Icon } from '../components/Icon';
 
 export default function ProjectDetails() {
   const navigate = useNavigate();
@@ -321,7 +322,7 @@ export default function ProjectDetails() {
       setPhotoComment('');
       setIsIssue(false);
       await loadData();
-      alert("Fénykép sikeresen feltöltve! 👍");
+      alert("Fénykép sikeresen feltöltve!");
     } catch (err) {
       console.error("Feltöltési hiba:", err);
       setError("Feltöltés sikertelen: " + err.message);
@@ -419,7 +420,7 @@ export default function ProjectDetails() {
       {project?.archived && (
         <div className="mx-[15px] mb-4 p-3 rounded-md flex items-center justify-between text-xs font-semibold" style={{ background: 'rgba(255, 214, 10, 0.12)', border: '1px solid rgba(255, 214, 10, 0.25)', color: '#ffd60a' }}>
           <div className="flex items-center space-x-2">
-            <span>🗂</span>
+            <Icon name="archive" size={14} strokeWidth={2.2} />
             <span>Ez egy lezárt, archivált projekt.</span>
           </div>
           {isAdmin && (
@@ -436,9 +437,15 @@ export default function ProjectDetails() {
       
       {/* Fő Kártya (Hero Panel) */}
       <div className="dhero fu d1" style={{ marginBottom: '15px' }}>
-        <div className="dh-tag">⚡ Projekt Adatlap {project?.serial_number ? `· ${project.serial_number}` : ''}</div>
+        <div className="dh-tag" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+          <Icon name="bolt" size={11} strokeWidth={2.5} />
+          <span>Projekt Adatlap{project?.serial_number ? ` · ${project.serial_number}` : ''}</span>
+        </div>
         <div className="dh-name">{project?.name || 'Névtelen Projekt'}</div>
-        <div className="dh-addr">📍 {project?.address || 'Nincs cím megadva'}</div>
+        <div className="dh-addr" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <Icon name="pin" size={12} color="var(--t3)" strokeWidth={2} />
+          <span>{project?.address || 'Nincs cím megadva'}</span>
+        </div>
         
         {/* Készültségi sáv */}
         <div className="mt-4">
@@ -478,7 +485,7 @@ export default function ProjectDetails() {
               }}
             >
               <div className="flex items-center space-x-3">
-                <span className="text-xl">☀️</span>
+                <Icon name="sun" size={20} color="var(--yellow)" strokeWidth={2.2} />
                 <div className="text-left">
                   <div className="text-xs font-black text-[var(--t2)] tracking-tight">Napelemes távfelügyelet beállítása</div>
                   <div className="text-[9px] text-[var(--t3)] font-bold uppercase tracking-wider mt-0.5">Inverter API távoli elérés konfigurálása</div>
@@ -499,7 +506,7 @@ export default function ProjectDetails() {
               {/* Felső információs sáv */}
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center space-x-2">
-                  <span className="text-base">⚡</span>
+                  <Icon name="bolt" size={14} color="var(--blue)" strokeWidth={2.5} />
                   <span className="text-xs font-extrabold uppercase tracking-wider text-[var(--t1)]">
                     {showLiveTelemetry ? 'Élő Termelés Követés' : 'Inverter Telemetria'}
                   </span>
@@ -634,7 +641,7 @@ export default function ProjectDetails() {
               boxShadow: '0 8px 25px rgba(0, 136, 204, 0.25)'
             }}
           >
-            <span>💬</span>
+            <Icon name="chat" size={16} color="#fff" strokeWidth={2.2} />
             <span>Közös Telegram Csoport</span>
           </a>
         </div>
@@ -695,17 +702,17 @@ export default function ProjectDetails() {
           <div className="flex flex-col space-y-2.5">
             {project?.client_phone && (
               <a href={`tel:${project.client_phone}`} className="font-semibold text-blue-400 hover:underline flex items-center space-x-2 text-sm">
-                <span>📱</span> <span>{project.client_phone}</span>
+                <Icon name="phone" size={14} strokeWidth={2.2} /> <span>{project.client_phone}</span>
               </a>
             )}
             {project?.client_phone_2 && (
               <a href={`tel:${project.client_phone_2}`} className="font-semibold text-blue-400 hover:underline flex items-center space-x-2 text-sm">
-                <span>📱</span> <span>{project.client_phone_2}</span>
+                <Icon name="phone" size={14} strokeWidth={2.2} /> <span>{project.client_phone_2}</span>
               </a>
             )}
             {project?.client_phone_3 && (
               <a href={`tel:${project.client_phone_3}`} className="font-semibold text-blue-400 hover:underline flex items-center space-x-2 text-sm">
-                <span>📱</span> <span>{project.client_phone_3}</span>
+                <Icon name="phone" size={14} strokeWidth={2.2} /> <span>{project.client_phone_3}</span>
               </a>
             )}
             {!project?.client_phone && !project?.client_phone_2 && !project?.client_phone_3 && (
@@ -742,7 +749,7 @@ export default function ProjectDetails() {
               lineHeight: '1.5'
             }}
           >
-            <span style={{ fontSize: '16px', lineHeight: 1 }}>🔑</span>
+            <Icon name="key" size={16} color="var(--orange)" strokeWidth={2.2} />
             <div style={{ flex: 1, wordBreak: 'break-word' }}>
               <span className="font-bold block mb-1" style={{ textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.05em', color: 'rgba(255, 159, 10, 0.8)' }}>Fontos információ</span>
               {project.important_info}
@@ -752,7 +759,7 @@ export default function ProjectDetails() {
       </div>
       {/* Belső Projekt Chat Szakasz */}
       <div className="shdr fu d2_5">
-        <div className="shdr-t">💬 Belső Projekt Chat</div>
+        <div className="shdr-t" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Icon name="chat" size={13} strokeWidth={2.2} /> Belső Projekt Chat</div>
         <div className="shdr-a">{messages.length} üzenet</div>
       </div>
 
@@ -1048,7 +1055,7 @@ export default function ProjectDetails() {
           >
             {/* Modal Fejléc */}
             <div className="p-5 pb-2 flex justify-between items-center flex-shrink-0">
-              <span className="text-sm font-bold text-[var(--t1)]" style={{ fontSize: '15px', fontWeight: '800', letterSpacing: '-0.3px' }}>📸 Fénykép ellenőrzése</span>
+              <span className="text-sm font-bold text-[var(--t1)]" style={{ fontSize: '15px', fontWeight: '800', letterSpacing: '-0.3px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}><Icon name="camera" size={16} strokeWidth={2.2} /> Fénykép ellenőrzése</span>
               <button 
                 type="button" 
                 onClick={cancelPhotoUpload} 
@@ -1096,7 +1103,7 @@ export default function ProjectDetails() {
                       boxShadow: !isIssue ? '0 8px 20px rgba(46, 209, 88, 0.12)' : 'none'
                     }}
                   >
-                    <span className="text-xl">🟢</span>
+                    <Icon name="dot-green" size={18} />
                     <span className="text-[11px] font-bold text-[var(--t1)]">Munkafolyamat</span>
                   </div>
 
@@ -1110,7 +1117,7 @@ export default function ProjectDetails() {
                       boxShadow: isIssue ? '0 8px 20px rgba(255, 59, 48, 0.12)' : 'none'
                     }}
                   >
-                    <span className="text-xl">⚠️</span>
+                    <Icon name="warning" size={18} color="var(--red)" strokeWidth={2.2} />
                     <span className="text-[11px] font-bold text-[var(--t1)]">Hiba / Akadály</span>
                   </div>
                 </div>
@@ -1118,8 +1125,8 @@ export default function ProjectDetails() {
 
               {/* MEGJEGYZÉS (Textarea, ha hiba, akkor KÖTELEZŐ) */}
               <div>
-                <label className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider block" style={{ marginBottom: '4px' }}>
-                  {isIssue ? '🔴 Probléma leírása (KÖTELEZŐ)' : 'Megjegyzés a képhez (Opcionális)'}
+                <label className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider block" style={{ marginBottom: '4px', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                  {isIssue ? (<><Icon name="dot-red" size={10} /> Probléma leírása (KÖTELEZŐ)</>) : 'Megjegyzés a képhez (Opcionális)'}
                 </label>
                 <textarea 
                   value={photoComment} 
@@ -1267,7 +1274,9 @@ export default function ProjectDetails() {
                         lineHeight: '1'
                       }}
                     >
-                      <span>{photo.resolved ? '🟢' : (photo.is_issue ? '⚠️' : '🟢')}</span>
+                      {photo.is_issue && !photo.resolved
+                        ? <Icon name="warning" size={9} color="var(--red)" strokeWidth={2.5} />
+                        : <Icon name="dot-green" size={9} />}
                       <span style={{ fontSize: '8px' }}>{photo.resolved ? 'Kijavítva' : (photo.is_issue ? 'Hiba' : 'Kész')}</span>
                     </div>
                   </div>
@@ -1275,7 +1284,7 @@ export default function ProjectDetails() {
                   {/* Kártya alsó rész: Feltöltő + Időpont + Megjegyzés */}
                   <div className="p-2.5 flex flex-col space-y-1 text-[11px] leading-tight">
                     <div className="flex justify-between items-center text-[9px] text-[var(--t3)] font-semibold uppercase tracking-wider">
-                      <span>👷 {photo.profiles?.full_name || 'Szerelő'}</span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon name="worker" size={10} color="var(--t3)" strokeWidth={2} /> {photo.profiles?.full_name || 'Szerelő'}</span>
                     </div>
                     <div className="text-[9px] text-[var(--t3)]">{formattedDate}</div>
                     
@@ -1291,7 +1300,7 @@ export default function ProjectDetails() {
                           ? 'var(--green)' 
                           : (photo.is_issue ? 'var(--red)' : 'var(--t1)')
                       }}>
-                        💬 {photo.description}
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}><Icon name="chat" size={11} strokeWidth={2.2} /> {photo.description}</span>
                       </div>
                     ) : (
                       <div className="text-[10px] text-[var(--t3)] italic mt-1">Nincs leírás</div>
@@ -1300,7 +1309,7 @@ export default function ProjectDetails() {
                     {/* JAVÍTÁS KÉPE ÉS LEÍRÁSA (Ha van) */}
                     {photo.resolved && (
                       <div className="mt-2 pt-2 border-t border-white/5 space-y-1.5">
-                        <div className="text-[9px] text-emerald-400 font-extrabold uppercase tracking-wider">✅ Javítás Igazolása:</div>
+                        <div className="text-[9px] text-emerald-400 font-extrabold uppercase tracking-wider" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon name="check-circle" size={10} color="var(--green)" strokeWidth={2.5} /> Javítás Igazolása:</div>
                         {photo.resolved_file_path && (
                           <div 
                             onClick={() => setPreviewImage({
@@ -1335,12 +1344,13 @@ export default function ProjectDetails() {
                                 lineHeight: '1'
                               }}
                             >
-                              🔍 Nagyítás
+                              <Icon name="search" size={9} color="#fff" strokeWidth={2.5} /> Nagyítás
                             </div>
                           </div>
                         )}
-                        <div className="text-[10px] text-[var(--t2)] italic p-1.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 leading-snug">
-                          🛠️ {photo.resolved_comment || 'Sikeresen javítva.'}
+                        <div className="text-[10px] text-[var(--t2)] italic p-1.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 leading-snug" style={{ display: 'flex', alignItems: 'flex-start', gap: '5px' }}>
+                          <Icon name="tool" size={11} color="var(--green)" strokeWidth={2.2} style={{ marginTop: '2px' }} />
+                          <span>{photo.resolved_comment || 'Sikeresen javítva.'}</span>
                         </div>
                       </div>
                     )}
@@ -1352,7 +1362,7 @@ export default function ProjectDetails() {
         )}
       </div>
 
-      {/* 🖼️ IN-APP APPLE STÍLUSÚ IMMERZÍV FÉNYKÉP NÉZEGETŐ OVERLAY */}
+      {/* IN-APP APPLE STÍLUSÚ IMMERZÍV FÉNYKÉP NÉZEGETŐ OVERLAY */}
       {previewImage && (
         <div 
           className="fixed inset-0 z-[2000] flex flex-col items-center justify-center p-4" 
@@ -1374,7 +1384,7 @@ export default function ProjectDetails() {
                 color: '#fff'
               }}
             >
-              <span>✕ Bezárás</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon name="close" size={12} strokeWidth={2.5} /> Bezárás</span>
             </button>
             
             {/* Dinamikus kép státusz toaszt */}
@@ -1400,7 +1410,13 @@ export default function ProjectDetails() {
                 lineHeight: '1'
               }}
             >
-              <span>{previewImage.is_verification ? '✅' : (previewImage.resolved ? '🟢' : (previewImage.is_issue ? '⚠️' : '⏱'))}</span>
+              {previewImage.is_verification
+                ? <Icon name="check-circle" size={11} color="#fff" strokeWidth={2.5} />
+                : (previewImage.resolved
+                    ? <Icon name="dot-green" size={10} />
+                    : (previewImage.is_issue
+                        ? <Icon name="warning" size={11} color="#fff" strokeWidth={2.5} />
+                        : <Icon name="clock" size={11} color="#fff" strokeWidth={2.2} />))}
               <span>
                 {previewImage.is_verification 
                   ? 'Javítás Igazolása' 
@@ -1437,7 +1453,7 @@ export default function ProjectDetails() {
             }}
           >
             <div className="flex justify-between items-center text-[10px] text-[var(--t3)] font-black uppercase tracking-wider" style={{ borderBottom: '1px solid var(--b1)', paddingBottom: '6px' }}>
-              <span>👷 Feltöltötte: {previewImage.profiles?.full_name || 'Dolgozó'}</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}><Icon name="worker" size={11} color="var(--t3)" strokeWidth={2} /> Feltöltötte: {previewImage.profiles?.full_name || 'Dolgozó'}</span>
               <span>{previewImage.created_at && new Date(previewImage.created_at).toLocaleDateString('hu-HU', {
                 month: 'short',
                 day: 'numeric',
@@ -1447,8 +1463,9 @@ export default function ProjectDetails() {
             </div>
             
             {previewImage.description ? (
-              <div className="text-xs font-semibold text-[var(--t1)] leading-snug pt-1" style={{ letterSpacing: '0.01em' }}>
-                💬 {previewImage.description}
+              <div className="text-xs font-semibold text-[var(--t1)] leading-snug pt-1" style={{ letterSpacing: '0.01em', display: 'flex', alignItems: 'flex-start', gap: '5px' }}>
+                <Icon name="chat" size={13} color="var(--t1)" strokeWidth={2.2} style={{ marginTop: '2px' }} />
+                <span>{previewImage.description}</span>
               </div>
             ) : (
               <div className="text-xs text-[var(--t3)] italic pt-1">Nincs megjegyzés ehhez a képhez.</div>
@@ -1456,7 +1473,7 @@ export default function ProjectDetails() {
 
             {previewImage.is_verification && (
               <div className="text-[9px] text-emerald-400 font-extrabold uppercase tracking-wider pt-1 flex items-center gap-1">
-                <span>🛡️</span> Ez a fotó az eredeti hibajelentés sikeres javítását igazolja.
+                <Icon name="shield" size={10} color="var(--green)" strokeWidth={2.2} /> Ez a fotó az eredeti hibajelentés sikeres javítását igazolja.
               </div>
             )}
           </div>

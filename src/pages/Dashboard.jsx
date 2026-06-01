@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { useUser } from '../context/UserContext';
 import NewWorkerModal from '../components/NewWorkerModal';
 import NewProjectModal from '../components/NewProjectModal';
+import { Icon } from '../components/Icon';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -111,10 +112,10 @@ export default function Dashboard() {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour >= 5 && hour < 10) return { text: 'Jó reggelt', emoji: '🌅' };
-    if (hour >= 10 && hour < 18) return { text: 'Szép napot', emoji: '☀️' };
-    if (hour >= 18 && hour < 22) return { text: 'Szép estét', emoji: '🌆' };
-    return { text: 'Szép éjszakát', emoji: '🌙' };
+    if (hour >= 5 && hour < 10) return { text: 'Jó reggelt' };
+    if (hour >= 10 && hour < 18) return { text: 'Szép napot' };
+    if (hour >= 18 && hour < 22) return { text: 'Szép estét' };
+    return { text: 'Szép éjszakát' };
   };
 
   const greeting = getGreeting();
@@ -159,7 +160,7 @@ export default function Dashboard() {
             title={theme === 'dark' ? 'Világos mód' : 'Sötét mód'}
             style={{ padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', cursor: 'pointer', transition: 'all 0.2s' }}
           >
-            <span style={{ fontSize: '15px', lineHeight: 1 }}>{theme === 'dark' ? '☀️' : '🌙'}</span>
+            <Icon name={theme === 'dark' ? 'sun' : 'moon'} size={15} color="var(--t2)" strokeWidth={2.5} />
           </div>
           <div 
             className="hdr-btn" 
@@ -295,9 +296,9 @@ export default function Dashboard() {
               boxShadow: 'var(--shadow-soft)'
             }}
           >
-            <span>➕</span> <span>Új projekt</span>
+            <Icon name="plus" size={14} color="#4f8ef7" strokeWidth={2.5} /> <span>Új projekt</span>
           </div>
-          <div 
+          <div
             onClick={() => setIsWorkerModalOpen(true)}
             className="cursor-pointer transition-all active:scale-[0.98] hover:scale-[1.01] flex items-center justify-center"
             style={{
@@ -312,7 +313,7 @@ export default function Dashboard() {
               boxShadow: 'var(--shadow-soft)'
             }}
           >
-            <span>➕</span> <span>Új dolgozó</span>
+            <Icon name="plus" size={14} color="#2ed158" strokeWidth={2.5} /> <span>Új dolgozó</span>
           </div>
         </div>
       )}
@@ -338,14 +339,26 @@ export default function Dashboard() {
               <div key={proj.id} className="pc" onClick={() => navigate(`/project/${proj.id}`)}>
                 <div className="pc-tag" style={{
                   background: proj.is_solar ? 'rgba(255, 214, 10, 0.12)' : 'rgba(46, 209, 88, 0.14)',
-                  color: proj.is_solar ? '#ffd60a' : '#2ed158'
+                  color: proj.is_solar ? '#ffd60a' : '#2ed158',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px'
                 }}>
-                  {proj.is_solar ? '☀️ Napelem' : '⚡ Projekt'} {proj.serial_number ? `· ${proj.serial_number}` : ''}
+                  <Icon name={proj.is_solar ? 'sun' : 'bolt'} size={11} strokeWidth={2.5} />
+                  <span>{proj.is_solar ? 'Napelem' : 'Projekt'}{proj.serial_number ? ` · ${proj.serial_number}` : ''}</span>
                 </div>
                 <div className="pc-name">{proj.name}</div>
-                <div className="pc-addr">📍 {proj.address}</div>
+                <div className="pc-addr" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <Icon name="pin" size={11} color="var(--t3)" strokeWidth={2} />
+                  <span>{proj.address}</span>
+                </div>
                 <div className="pbar"><div className="pfill" style={{width:`${progress}%`,background: proj.is_solar ? '#ffd60a' : '#2ed158'}}></div></div>
-                <div className="pc-bot"><span>{progress === 100 ? 'Befejezve ✓' : `${progress}% kész`}</span><span className="pill p-ok">Aktív</span></div>
+                <div className="pc-bot">
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    {progress === 100 ? (<><span>Befejezve</span><Icon name="check" size={11} color="var(--green)" strokeWidth={3} /></>) : `${progress}% kész`}
+                  </span>
+                  <span className="pill p-ok">Aktív</span>
+                </div>
               </div>
             );
           })
@@ -366,7 +379,7 @@ export default function Dashboard() {
                 background: isAdmin ? 'rgba(79,142,247,.12)' : 'rgba(46,209,88,.12)',
                 color: isAdmin ? '#4f8ef7' : '#2ed158'
               }}>
-                ⏱
+                <Icon name="clock" size={16} strokeWidth={2.2} />
               </div>
               <div className="act-body">
                 <div className="act-txt">

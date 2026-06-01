@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { Icon } from '../components/Icon';
 
 export default function ProjectList() {
   const navigate = useNavigate();
@@ -83,9 +84,13 @@ export default function ProjectList() {
             background: activeTab === 'active' ? 'rgba(79, 142, 247, 0.15)' : 'var(--s1)',
             border: activeTab === 'active' ? '1px solid rgba(79, 142, 247, 0.35)' : '1px solid var(--b1)',
             color: activeTab === 'active' ? 'var(--blue)' : 'var(--t2)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px'
           }}
         >
-          ⚡ Aktív munkák
+          <Icon name="bolt" size={12} strokeWidth={2.5} /> Aktív munkák
         </div>
         <div 
           onClick={() => {
@@ -103,13 +108,17 @@ export default function ProjectList() {
             background: activeTab === 'archived' ? 'rgba(255, 214, 10, 0.15)' : 'var(--s1)',
             border: activeTab === 'archived' ? '1px solid rgba(255, 214, 10, 0.35)' : '1px solid var(--b1)',
             color: activeTab === 'archived' ? '#ffd60a' : 'var(--t2)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px'
           }}
         >
-          🗂 Archivált / Kész
+          <Icon name="archive" size={12} strokeWidth={2.5} /> Archivált / Kész
         </div>
       </div>
 
-      {/* 🔍 MODERNEBB APPLE STÍLUSÚ VALÓS IDEJŰ KERESŐ */}
+      {/* MODERNEBB APPLE STÍLUSÚ VALÓS IDEJŰ KERESŐ */}
       <div className="relative fu d2" style={{ marginLeft: '15px', marginRight: '15px', marginBottom: '16px' }}>
         <input 
           type="text" 
@@ -129,14 +138,14 @@ export default function ProjectList() {
             height: '46px'
           }}
         />
-        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ fontSize: '14px', color: 'var(--t3)' }}>🔍</span>
+        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--t3)', display: 'flex', alignItems: 'center' }}><Icon name="search" size={14} color="var(--t3)" strokeWidth={2.2} /></span>
         {searchQuery && (
-          <button 
+          <button
             onClick={() => setSearchQuery('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full flex items-center justify-center font-bold transition-all"
-            style={{ background: 'var(--s2)', color: 'var(--t2)', fontSize: '8px' }}
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full flex items-center justify-center transition-all"
+            style={{ background: 'var(--s2)', color: 'var(--t2)' }}
           >
-            ✕
+            <Icon name="close" size={8} strokeWidth={3} />
           </button>
         )}
       </div>
@@ -167,19 +176,24 @@ export default function ProjectList() {
                 onClick={() => navigate(`/project/${proj.id}`)}
               >
                 <div className="pc-tag" style={{
-                  background: proj.archived 
-                    ? 'rgba(255,255,255,0.05)' 
+                  background: proj.archived
+                    ? 'rgba(255,255,255,0.05)'
                     : (proj.is_solar ? 'rgba(255, 214, 10, 0.12)' : 'rgba(46, 209, 88, 0.14)'),
-                  color: proj.archived 
-                    ? 'var(--t2)' 
-                    : (proj.is_solar ? '#ffd60a' : '#2ed158')
+                  color: proj.archived
+                    ? 'var(--t2)'
+                    : (proj.is_solar ? '#ffd60a' : '#2ed158'),
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px'
                 }}>
-                  {proj.archived 
-                    ? '🗂 Archivált' 
-                    : (proj.is_solar ? '☀️ Napelem' : '⚡ Projekt')} {proj.serial_number ? `· ${proj.serial_number}` : ''}
+                  <Icon name={proj.archived ? 'archive' : (proj.is_solar ? 'sun' : 'bolt')} size={11} strokeWidth={2.5} />
+                  <span>{proj.archived ? 'Archivált' : (proj.is_solar ? 'Napelem' : 'Projekt')}{proj.serial_number ? ` · ${proj.serial_number}` : ''}</span>
                 </div>
                 <div className="pc-name" style={{ color: proj.archived ? 'var(--t2)' : 'var(--t1)' }}>{proj.name}</div>
-                <div className="pc-addr">📍 {proj.address}</div>
+                <div className="pc-addr" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <Icon name="pin" size={11} color="var(--t3)" strokeWidth={2} />
+                  <span>{proj.address}</span>
+                </div>
                 <div className="pbar">
                   <div 
                     className="pfill" 
@@ -192,7 +206,9 @@ export default function ProjectList() {
                   ></div>
                 </div>
                 <div className="pc-bot">
-                  <span>{progress === 100 ? 'Befejezve ✓' : `${progress}% kész`}</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    {progress === 100 ? (<><span>Befejezve</span><Icon name="check" size={11} color="var(--green)" strokeWidth={3} /></>) : `${progress}% kész`}
+                  </span>
                   <span className={`pill ${proj.archived ? 'p-warn' : 'p-ok'}`}>
                     {proj.archived ? 'Lezárt' : 'Folyamatban'}
                   </span>
