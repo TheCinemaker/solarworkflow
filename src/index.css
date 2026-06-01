@@ -124,9 +124,22 @@ select option{background:#07090f}
 .as-arr{font-size:15px;color:var(--red)}
 
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 15px 0}
+/* Eredeti nagy csempe stílusok (ha vissza kellene állítani):
 .sc{
   background:var(--s1);border:1px solid var(--b1);
   border-radius:var(--card-r);padding:16px;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  position:relative;overflow:hidden;cursor:pointer;
+  transition:transform .15s;
+}
+.sc-lbl{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+.sc-val{font-size:28px;font-weight:700;letter-spacing:-1.2px}
+.sc-sub{font-size:11px;color:var(--t3);margin-top:6px;display:flex;align-items:center;gap:4px}
+*/
+
+.sc{
+  background:var(--s1);border:1px solid var(--b1);
+  border-radius:var(--card-r);padding:12px 14px;
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   position:relative;overflow:hidden;cursor:pointer;
   transition:transform .15s;
@@ -136,9 +149,9 @@ select option{background:#07090f}
   content:'';position:absolute;top:0;left:0;right:0;height:1px;
   background:linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent);
 }
-.sc-lbl{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
-.sc-val{font-size:28px;font-weight:700;letter-spacing:-1.2px}
-.sc-sub{font-size:11px;color:var(--t3);margin-top:6px;display:flex;align-items:center;gap:4px}
+.sc-lbl{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.sc-val{font-size:22px;font-weight:700;letter-spacing:-0.8px}
+.sc-sub{font-size:11px;color:var(--t3);margin-top:4px;display:flex;align-items:center;gap:4px}
 .sc-dot{width:5px;height:5px;border-radius:50%;background:var(--green)}
 
 .shdr{display:flex;align-items:center;justify-content:space-between;padding:22px 15px 12px}

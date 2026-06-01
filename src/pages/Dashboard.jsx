@@ -253,39 +253,14 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* GYORS MŰVELETEK (Szerepkör alapú gomb elrejtéssel) */}
-      <div className="shdr fu d3">
-        <div className="shdr-t">Gyorsműveletek</div>
-      </div>
-      <div className="qa-row fu d3">
-        <div className="qa" onClick={() => navigate('/timesheet')}>
-          <span className="qa-i">📋</span><div className="qa-l">Munkalapok</div>
-        </div>
-        <div className="qa" onClick={() => navigate('/calendar')}>
-          <span className="qa-i">📅</span><div className="qa-l">Naptár</div>
-        </div>
-        <div className="qa" onClick={() => navigate('/projects')}>
-          <span className="qa-i">📷</span><div className="qa-l">Fotó küld.</div>
-        </div>
-        {isAdmin && (
-          <>
-            <div className="qa" onClick={() => setIsProjectModalOpen(true)}>
-              <span className="qa-i">➕</span><div className="qa-l">Új Projekt</div>
-            </div>
-            <div className="qa" onClick={() => setIsWorkerModalOpen(true)}>
-              <span className="qa-i">👷</span><div className="qa-l">Új Dolgozó</div>
-            </div>
-          </>
-        )}
-      </div>
-
       {/* AKTÍV PROJEKTEK SZAKASZ */}
-      <div className="shdr fu d4">
+      <div className="shdr fu d3">
         <div className="shdr-t">Projektek</div>
         <div className="shdr-a" onClick={() => navigate('/projects')}>Mind →</div>
       </div>
       
-      <div className="hscroll fu d4">
+      {/* Eredeti horizontális görgetős elrendezés (ha vissza kellene állítani): <div className="hscroll fu d3"> */}
+      <div className="space-y-3 px-[15px] fu d3">
         {projects.length === 0 ? (
           <div className="p-4 text-center w-full" style={{ fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>Nincsenek még projektek.</div>
         ) : (
@@ -314,10 +289,10 @@ export default function Dashboard() {
       </div>
 
       {/* FRISS AKTIVITÁS (Dolgozóknak csak a saját órajelentéseik, Adminoknak a teljes csapaté) */}
-      <div className="shdr fu d5">
+      <div className="shdr fu d4">
         <div className="shdr-t">{isAdmin ? 'Friss aktivitás (Csapat)' : 'Utolsó időrögzítéseid'}</div>
       </div>
-      <div className="act-list fu d5" style={{ paddingBottom: '80px' }}>
+      <div className="act-list fu d4" style={{ paddingBottom: '80px' }}>
         {activities.length === 0 ? (
           <div className="p-4 text-center" style={{ fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>Nincs még aktivitás rögzítve.</div>
         ) : (

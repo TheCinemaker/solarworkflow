@@ -47,11 +47,21 @@ export default function ProjectList() {
 
   return (
     <div className="page active">
-      <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
-      
-      <div className="page-header fu">
+      <div className="page-header fu flex items-center justify-between" style={{ marginBottom: '10px' }}>
         <div>
-          <div className="pg-title">Projektek listája</div>
+          <div className="pg-greet">VOLTDESK MUNKAÁLLOMÁS</div>
+          <div className="pg-title">Projektek</div>
+        </div>
+        <div 
+          className="hdr-btn" 
+          onClick={() => navigate('/')} 
+          title="Vissza a Dashboardra"
+          style={{ padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px' }}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
         </div>
       </div>
 
@@ -106,18 +116,20 @@ export default function ProjectList() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Keresés név, utca vagy sorszám alapján..."
-          className="w-full text-xs font-semibold"
+          className="w-full font-semibold"
           style={{
             background: 'var(--s1)',
             border: '1px solid var(--b1)',
-            borderRadius: 'var(--input-r)',
-            padding: '10px 14px 10px 36px',
+            borderRadius: '14px',
+            padding: '12px 14px 12px 38px',
+            fontSize: '13px',
             color: 'var(--t1)',
             outline: 'none',
-            transition: 'all 0.15s ease'
+            transition: 'all 0.15s ease',
+            height: '46px'
           }}
         />
-        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ fontSize: '13px', color: 'var(--t3)' }}>🔍</span>
+        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ fontSize: '14px', color: 'var(--t3)' }}>🔍</span>
         {searchQuery && (
           <button 
             onClick={() => setSearchQuery('')}
@@ -155,14 +167,30 @@ export default function ProjectList() {
                 onClick={() => navigate(`/project/${proj.id}`)}
               >
                 <div className="pc-tag" style={{
-                  background: proj.archived ? 'rgba(255,255,255,0.05)' : 'rgba(46,209,88,.14)',
-                  color: proj.archived ? 'var(--t2)' : '#2ed158'
+                  background: proj.archived 
+                    ? 'rgba(255,255,255,0.05)' 
+                    : (proj.is_solar ? 'rgba(255, 214, 10, 0.12)' : 'rgba(46, 209, 88, 0.14)'),
+                  color: proj.archived 
+                    ? 'var(--t2)' 
+                    : (proj.is_solar ? '#ffd60a' : '#2ed158')
                 }}>
-                  {proj.archived ? '🗂 Archivált' : '⚡ Aktív'} {proj.serial_number ? `· ${proj.serial_number}` : ''}
+                  {proj.archived 
+                    ? '🗂 Archivált' 
+                    : (proj.is_solar ? '☀️ Napelem' : '⚡ Projekt')} {proj.serial_number ? `· ${proj.serial_number}` : ''}
                 </div>
                 <div className="pc-name" style={{ color: proj.archived ? 'var(--t2)' : 'var(--t1)' }}>{proj.name}</div>
                 <div className="pc-addr">📍 {proj.address}</div>
-                <div className="pbar"><div className="pfill" style={{width:`${progress}%`,background: proj.archived ? 'var(--t3)' : '#2ed158'}}></div></div>
+                <div className="pbar">
+                  <div 
+                    className="pfill" 
+                    style={{
+                      width: `${progress}%`,
+                      background: proj.archived 
+                        ? 'var(--t3)' 
+                        : (proj.is_solar ? '#ffd60a' : '#2ed158')
+                    }}
+                  ></div>
+                </div>
                 <div className="pc-bot">
                   <span>{progress === 100 ? 'Befejezve ✓' : `${progress}% kész`}</span>
                   <span className={`pill ${proj.archived ? 'p-warn' : 'p-ok'}`}>
