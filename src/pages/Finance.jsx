@@ -6,10 +6,10 @@ import { useUser } from '../context/UserContext';
 const inputStyle = {
   background: 'var(--s1)',
   border: '1px solid var(--b1)',
-  borderRadius: '8px',
-  padding: '7px 10px',
+  borderRadius: '12px',
+  padding: '10px 14px',
   color: 'var(--t1)',
-  fontSize: '12px',
+  fontSize: '13px',
   width: '100%',
   outline: 'none',
   fontFamily: 'inherit',
@@ -23,7 +23,7 @@ const labelXs = {
   fontWeight: '700',
   textTransform: 'uppercase',
   letterSpacing: '0.07em',
-  marginBottom: '5px',
+  marginBottom: '4px',
 };
 
 export default function Finance() {
@@ -224,9 +224,29 @@ export default function Finance() {
 
   return (
     <div className="page active" id="p-finance">
-      <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
+      {/* Elegáns Vissza gomb */}
+      <div 
+        onClick={() => navigate('/')}
+        className="cursor-pointer transition-all active:scale-95 flex items-center"
+        style={{ 
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px', 
+          fontSize: '13px', 
+          fontWeight: 'bold', 
+          color: 'var(--t2)', 
+          marginLeft: '15px', 
+          marginTop: '15px',
+          marginBottom: '5px'
+        }}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>Vissza</span>
+      </div>
 
-      <div className="page-header fu">
+      <div className="page-header fu" style={{ marginLeft: '15px', marginRight: '15px', marginBottom: '15px', marginTop: '5px' }}>
         <div>
           <div className="pg-greet">Mini Könyvelőiroda</div>
           <div className="pg-title">Pénzügy & Bérek</div>
@@ -235,14 +255,14 @@ export default function Finance() {
       </div>
 
       {error && (
-        <div className="mx-5 mt-4 p-3 rounded-xl text-xs"
-          style={{ background: 'rgba(255,59,48,0.08)', border: '1px solid rgba(255,59,48,0.18)', color: 'var(--red)' }}>
+        <div className="mt-4 p-3 rounded-xl text-xs"
+          style={{ background: 'rgba(255,59,48,0.08)', border: '1px solid rgba(255,59,48,0.18)', color: 'var(--red)', marginLeft: '15px', marginRight: '15px' }}>
           {error}
         </div>
       )}
 
       {/* Tab selector */}
-      <div className="px-5 mt-4">
+      <div style={{ paddingLeft: '15px', paddingRight: '15px', marginTop: '16px' }}>
         <div className="flex p-1 rounded-xl" style={{ background: 'var(--s1)', border: '1px solid var(--b1)' }}>
           <button onClick={() => setActiveTab('projects')} style={tabStyle('projects')}>🏢 Megrendelői Kifizetések</button>
           <button onClick={() => setActiveTab('workers')} style={tabStyle('workers')}>👷 Dolgozói Bérszámfejtés</button>
@@ -251,41 +271,43 @@ export default function Finance() {
 
       {/* Stat cards */}
       {activeTab === 'projects' ? (
-        <div className="stats-grid fu d1 mt-4">
-          <div className="sc" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--b1)' }}>
-            <div className="sc-lbl" style={{ color: 'var(--t2)' }}>Szerződéses állomás</div>
-            <div className="sc-val" style={{ color: 'var(--t1)', fontSize: '24px', fontWeight: '800' }}>{totalContractVolume.toLocaleString('hu-HU')} Ft</div>
-            <div className="sc-sub">Összes rögzített projektérték</div>
+        <div className="fu d1" style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginLeft: '15px', marginRight: '15px', marginTop: '16px' }}>
+          <div className="sc active:scale-[0.99] transition-all" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', padding: '16px' }}>
+            <div className="sc-lbl" style={{ color: 'var(--t3)', fontSize: '9px', fontWeight: '800', letterSpacing: '0.08em', marginBottom: '6px' }}>Szerződéses állomány</div>
+            <div className="sc-val" style={{ color: 'var(--t1)', fontSize: '26px', fontWeight: '800', letterSpacing: '-0.5px' }}>{totalContractVolume.toLocaleString('hu-HU')} Ft</div>
+            <div className="sc-sub" style={{ fontSize: '11px', color: 'var(--t3)', marginTop: '4px' }}>Összes rögzített projektérték</div>
           </div>
-          <div className="sc" style={{ background: 'rgba(46,209,88,0.04)', border: '1px solid rgba(46,209,88,0.2)' }}>
-            <div className="sc-lbl" style={{ color: 'var(--t2)' }}>Beérkezett összeg</div>
-            <div className="sc-val" style={{ color: 'var(--green)', fontSize: '24px', fontWeight: '800' }}>{paidVolume.toLocaleString('hu-HU')} Ft</div>
-            <div className="sc-sub">Kifizetett projektek összege</div>
-          </div>
-          <div className="sc" style={{ background: 'rgba(255,59,48,0.04)', border: '1px solid rgba(255,59,48,0.2)' }}>
-            <div className="sc-lbl" style={{ color: 'var(--t2)' }}>Kinnlövőség</div>
-            <div className="sc-val" style={{ color: 'var(--red)', fontSize: '24px', fontWeight: '800' }}>{unpaidVolume.toLocaleString('hu-HU')} Ft</div>
-            <div className="sc-sub">Fizetésre váró tételek</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <div className="sc active:scale-[0.98] transition-all" style={{ background: 'rgba(46,209,88,0.04)', border: '1px solid rgba(46,209,88,0.2)', borderRadius: '16px', padding: '14px' }}>
+              <div className="sc-lbl" style={{ color: 'var(--t3)', fontSize: '9px', fontWeight: '800', letterSpacing: '0.08em', marginBottom: '6px' }}>Beérkezett összeg</div>
+              <div className="sc-val" style={{ color: 'var(--green)', fontSize: '18px', fontWeight: '800' }}>{paidVolume.toLocaleString('hu-HU')} Ft</div>
+              <div className="sc-sub" style={{ fontSize: '10px', color: 'var(--t3)', marginTop: '4px' }}>Kifizetett projektek</div>
+            </div>
+            <div className="sc active:scale-[0.98] transition-all" style={{ background: 'rgba(255,59,48,0.04)', border: '1px solid rgba(255,59,48,0.2)', borderRadius: '16px', padding: '14px' }}>
+              <div className="sc-lbl" style={{ color: 'var(--t3)', fontSize: '9px', fontWeight: '800', letterSpacing: '0.08em', marginBottom: '6px' }}>Kintlévőség</div>
+              <div className="sc-val" style={{ color: 'var(--red)', fontSize: '18px', fontWeight: '800' }}>{unpaidVolume.toLocaleString('hu-HU')} Ft</div>
+              <div className="sc-sub" style={{ fontSize: '10px', color: 'var(--t3)', marginTop: '4px' }}>Fizetésre vár</div>
+            </div>
           </div>
         </div>
       ) : (
-        <div className="stats-grid fu d1 mt-4">
-          <div className="sc" style={{ background: 'rgba(46,209,88,0.05)', border: '1px solid rgba(46,209,88,0.15)' }}>
-            <div className="sc-lbl">Összes ledolgozott óra</div>
-            <div className="sc-val" style={{ color: 'var(--green)' }}>{totalWorkerHours}</div>
-            <div className="sc-sub">Terepi munkalapok alapján</div>
+        <div className="fu d1" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginLeft: '15px', marginRight: '15px', marginTop: '16px' }}>
+          <div className="sc active:scale-[0.98] transition-all" style={{ background: 'rgba(46,209,88,0.04)', border: '1px solid rgba(46,209,88,0.2)', borderRadius: '16px', padding: '14px' }}>
+            <div className="sc-lbl" style={{ color: 'var(--t3)', fontSize: '9px', fontWeight: '800', letterSpacing: '0.08em', marginBottom: '6px' }}>Összes ledolgozott óra</div>
+            <div className="sc-val" style={{ color: 'var(--green)', fontSize: '20px', fontWeight: '800' }}>{totalWorkerHours} óra</div>
+            <div className="sc-sub" style={{ fontSize: '10px', color: 'var(--t3)', marginTop: '4px' }}>Munkalapok alapján</div>
           </div>
-          <div className="sc" style={{ background: 'rgba(255,214,10,0.05)', border: '1px solid rgba(255,214,10,0.15)' }}>
-            <div className="sc-lbl">Összesített bérköltség</div>
-            <div className="sc-val" style={{ color: 'var(--yellow)', fontSize: '18px' }}>{totalWorkerPayout.toLocaleString('hu-HU')} Ft</div>
-            <div className="sc-sub">Egyedi órabérekkel felszorozva</div>
+          <div className="sc active:scale-[0.98] transition-all" style={{ background: 'rgba(255,214,10,0.04)', border: '1px solid rgba(255,214,10,0.2)', borderRadius: '16px', padding: '14px' }}>
+            <div className="sc-lbl" style={{ color: 'var(--t3)', fontSize: '9px', fontWeight: '800', letterSpacing: '0.08em', marginBottom: '6px' }}>Bérköltség (Hó)</div>
+            <div className="sc-val" style={{ color: 'var(--yellow)', fontSize: '20px', fontWeight: '800' }}>{totalWorkerPayout.toLocaleString('hu-HU')} Ft</div>
+            <div className="sc-sub" style={{ fontSize: '10px', color: 'var(--t3)', marginTop: '4px' }}>Órabérekkel felszorozva</div>
           </div>
         </div>
       )}
 
       {/* MEGRENDELŐI KIFIZETÉSEK */}
       {activeTab === 'projects' && (
-        <div className="mt-4 px-5 pb-24 fu d2 space-y-3">
+        <div className="pb-24 fu d2" style={{ paddingLeft: '15px', paddingRight: '15px', marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div className="flex justify-between items-center mb-1">
             <span style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--t3)' }}>
               PROJEKTEK FIZETÉSI ÁLLAPOTA
@@ -301,23 +323,25 @@ export default function Finance() {
             </div>
           ) : (
             projects.map(proj => (
-              <div key={proj.id} className="p-4 flex flex-col space-y-3" style={{
+              <div key={proj.id} className="p-5 flex flex-col space-y-4 active:scale-[0.99] transition-all" style={{
                 background: 'var(--s1)', borderRadius: '16px',
                 border: proj.paid ? '1px solid rgba(46,209,88,0.18)' : '1px solid rgba(255,59,48,0.15)',
+                padding: '20px'
               }}>
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-start" style={{ display: 'flex', justifyContent: 'between', alignItems: 'start', width: '100%' }}>
                   <div>
-                    <div style={{ fontWeight: '700', color: 'var(--t1)', fontSize: '14px', letterSpacing: '-0.3px' }}>
+                    <div style={{ fontWeight: '700', color: 'var(--t1)', fontSize: '15px', letterSpacing: '-0.3px' }}>
                       {proj.name || 'Névtelen Projekt'}
                     </div>
-                    <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '600', marginTop: '3px' }}>
+                    <div style={{ fontSize: '11px', color: 'var(--t3)', fontWeight: '600', marginTop: '4px' }}>
                       {proj.serial_number ? `${proj.serial_number} · ` : ''}📍 {proj.address || 'Cím nélkül'}
                     </div>
                   </div>
                   <button
                     onClick={() => toggleProjectPaid(proj.id, proj.paid)}
+                    className="active:scale-95 transition-all"
                     style={{
-                      padding: '5px 12px', borderRadius: '20px', fontWeight: '700', fontSize: '10px',
+                      padding: '6px 14px', borderRadius: '20px', fontWeight: '700', fontSize: '10px',
                       textTransform: 'uppercase', letterSpacing: '0.04em', cursor: 'pointer',
                       fontFamily: 'inherit', transition: 'all 0.2s ease', border: 'none',
                       background: proj.paid ? 'rgba(46,209,88,0.12)' : 'rgba(255,59,48,0.08)',
@@ -328,9 +352,9 @@ export default function Finance() {
                     {proj.paid ? '✓ FIZETVE' : '× FIZETÉSRE VÁR'}
                   </button>
                 </div>
-                <div className="flex justify-between items-center pt-2" style={{ borderTop: '1px solid var(--b1)' }}>
-                  <span style={{ fontSize: '12px', color: 'var(--t3)' }}>Megrendelési érték:</span>
-                  <span style={{ fontWeight: '700', color: 'var(--t1)', fontSize: '14px' }}>
+                <div className="flex justify-between items-center pt-3" style={{ borderTop: '1px solid var(--b1)', paddingTop: '12px' }}>
+                  <span style={{ fontSize: '12px', color: 'var(--t3)', fontWeight: '600' }}>Megrendelési érték:</span>
+                  <span style={{ fontWeight: '800', color: 'var(--t1)', fontSize: '15px' }}>
                     {(proj.client_price || 0).toLocaleString('hu-HU')} Ft
                   </span>
                 </div>
@@ -342,7 +366,7 @@ export default function Finance() {
 
       {/* DOLGOZÓI BÉRSZÁMFEJTÉS */}
       {activeTab === 'workers' && (
-        <div className="mt-4 px-5 pb-24 fu d2 space-y-3">
+        <div className="pb-24 fu d2" style={{ paddingLeft: '15px', paddingRight: '15px', marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <div className="flex justify-between items-center mb-1">
             <span style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--t3)' }}>
               Könyvelési adatlapok és bérek
@@ -365,21 +389,22 @@ export default function Finance() {
                 <div key={worker.id} style={{
                   background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px',
                   overflow: 'hidden', boxShadow: isExpanded ? '0 12px 30px rgba(0,0,0,0.35)' : 'none',
+                  transition: 'all 0.25s ease'
                 }}>
                   <div
                     onClick={() => { if (!isEditing) setExpandedWorkerId(isExpanded ? null : worker.id); }}
-                    className="p-4 flex flex-col space-y-3 cursor-pointer"
-                    style={{ background: isExpanded ? 'rgba(255,255,255,0.02)' : 'transparent' }}
+                    className="p-5 flex flex-col space-y-4 cursor-pointer active:scale-[0.99] transition-all"
+                    style={{ background: isExpanded ? 'rgba(255,255,255,0.02)' : 'transparent', padding: '20px' }}
                   >
                     <div className="flex justify-between items-center">
                       <div className="flex items-center space-x-2.5">
                         <div style={{
-                          width: '36px', height: '36px', borderRadius: '10px', flexShrink: 0,
+                          width: '38px', height: '38px', borderRadius: '10px', flexShrink: 0,
                           display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px',
                           background: 'var(--s2)', border: '1px solid var(--b1)',
                         }}>👷</div>
                         <div>
-                          <div style={{ fontWeight: '700', color: 'var(--t1)', fontSize: '14px' }}>{worker.full_name || 'Névtelen'}</div>
+                          <div style={{ fontWeight: '800', color: 'var(--t1)', fontSize: '15px', letterSpacing: '-0.3px' }}>{worker.full_name || 'Névtelen'}</div>
                           <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '2px' }}>
                             {worker.serial_number || 'M-00'} · {worker.job_title || 'Szerelő'}
                           </div>
@@ -387,25 +412,25 @@ export default function Finance() {
                       </div>
                       <div style={{ textAlign: 'right' }}>
                         <div style={{ fontSize: '9px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Órabér</div>
-                        <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--t2)', marginTop: '2px' }}>
+                        <div style={{ fontSize: '13px', fontWeight: '800', color: 'var(--t2)', marginTop: '2px' }}>
                           {(worker.hourly_wage || 3500).toLocaleString('hu-HU')} Ft
                         </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 pt-2.5" style={{ borderTop: '1px solid var(--b1)' }}>
+                    <div className="grid grid-cols-2 gap-4 pt-3.5" style={{ borderTop: '1px solid var(--b1)', gap: '16px', paddingTop: '14px' }}>
                       <div>
-                        <div style={{ fontSize: '9px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '3px' }}>Ledolgozott idő</div>
+                        <div style={{ fontSize: '9px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Ledolgozott idő</div>
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                          <span style={{ fontSize: '17px', fontWeight: '700', color: 'var(--blue)' }}>{worker.totalHours}</span>
-                          <span style={{ fontSize: '12px', color: 'var(--t2)' }}>óra ({worker.totalLogs} nap)</span>
+                          <span style={{ fontSize: '18px', fontWeight: '800', color: 'var(--blue)' }}>{worker.totalHours}</span>
+                          <span style={{ fontSize: '11px', color: 'var(--t2)', fontWeight: '500' }}>óra ({worker.totalLogs} nap)</span>
                         </div>
                       </div>
                       <div>
-                        <div style={{ fontSize: '9px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '3px' }}>Kereset (Hó)</div>
+                        <div style={{ fontSize: '9px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Kereset (Hó)</div>
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                          <span style={{ fontSize: '17px', fontWeight: '700', color: 'var(--yellow)' }}>{worker.estimatedPay.toLocaleString('hu-HU')}</span>
-                          <span style={{ fontSize: '12px', color: 'var(--t2)' }}>Ft</span>
+                          <span style={{ fontSize: '18px', fontWeight: '800', color: 'var(--yellow)' }}>{worker.estimatedPay.toLocaleString('hu-HU')}</span>
+                          <span style={{ fontSize: '11px', color: 'var(--t2)', fontWeight: '500' }}>Ft</span>
                         </div>
                       </div>
                     </div>
@@ -418,44 +443,60 @@ export default function Finance() {
                   </div>
 
                   {isExpanded && (
-                    <div className="p-4 space-y-4 fu" style={{ background: 'rgba(0,0,0,0.35)', borderTop: '1px solid var(--b1)' }}>
-                      <div className="flex justify-between items-center">
-                        <span style={{ fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--green)' }}>
-                          🔒 Bizalmas adatok
+                    <div className="p-5 space-y-4 fu" style={{ background: 'rgba(0,0,0,0.35)', borderTop: '1px solid var(--b1)', padding: '20px' }}>
+                      <div className="flex justify-between items-center" style={{ marginBottom: '8px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--green)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span>🔒</span> <span>Bizalmas adatok</span>
                         </span>
                         {!isEditing ? (
                           <div className="flex space-x-2">
-                            <button onClick={() => startEditing(worker)} style={{
-                              padding: '5px 12px', borderRadius: '8px', fontWeight: '700', fontSize: '10px',
-                              textTransform: 'uppercase', letterSpacing: '0.04em', cursor: 'pointer',
-                              background: 'var(--s1)', color: 'var(--t1)', border: '1px solid var(--b1)',
-                              fontFamily: 'inherit',
-                            }}>✏️ Szerkesztés</button>
-                            <button onClick={() => handleDeleteWorker(worker.id, worker.full_name)} style={{
-                              padding: '5px 12px', borderRadius: '8px', fontWeight: '700', fontSize: '10px',
-                              textTransform: 'uppercase', letterSpacing: '0.04em', cursor: 'pointer',
-                              background: 'rgba(255, 59, 48, 0.08)', color: 'var(--red)', border: '1px solid rgba(255, 59, 48, 0.15)',
-                              fontFamily: 'inherit',
-                            }}>🗑️ Törlés</button>
+                            <button 
+                              onClick={() => startEditing(worker)} 
+                              className="active:scale-95 transition-all"
+                              style={{
+                                padding: '6px 14px', borderRadius: '8px', fontWeight: '700', fontSize: '10px',
+                                textTransform: 'uppercase', letterSpacing: '0.04em', cursor: 'pointer',
+                                background: 'var(--s1)', color: 'var(--t1)', border: '1px solid var(--b1)',
+                                fontFamily: 'inherit',
+                              }}
+                            >✏️ Szerkesztés</button>
+                            <button 
+                              onClick={() => handleDeleteWorker(worker.id, worker.full_name)} 
+                              className="active:scale-95 transition-all"
+                              style={{
+                                padding: '6px 14px', borderRadius: '8px', fontWeight: '700', fontSize: '10px',
+                                textTransform: 'uppercase', letterSpacing: '0.04em', cursor: 'pointer',
+                                background: 'rgba(255, 59, 48, 0.08)', color: 'var(--red)', border: '1px solid rgba(255, 59, 48, 0.15)',
+                                fontFamily: 'inherit',
+                              }}
+                            >🗑️ Törlés</button>
                           </div>
                         ) : (
                           <div className="flex space-x-2">
-                            <button onClick={() => setEditingWorkerId(null)} style={{
-                              padding: '5px 12px', borderRadius: '8px', fontWeight: '700', fontSize: '10px',
-                              cursor: 'pointer', background: 'rgba(255,59,48,0.08)', color: 'var(--red)',
-                              border: '1px solid rgba(255,59,48,0.15)', fontFamily: 'inherit',
-                            }}>Mégse</button>
-                            <button onClick={() => saveWorkerEdit(worker.id)} style={{
-                              padding: '5px 12px', borderRadius: '8px', fontWeight: '700', fontSize: '10px',
-                              cursor: 'pointer', background: 'linear-gradient(135deg,#2ed158,#1a8a38)',
-                              color: '#fff', border: 'none', fontFamily: 'inherit',
-                            }}>Mentés</button>
+                            <button 
+                              onClick={() => setEditingWorkerId(null)} 
+                              className="active:scale-95 transition-all"
+                              style={{
+                                padding: '6px 14px', borderRadius: '8px', fontWeight: '700', fontSize: '10px',
+                                cursor: 'pointer', background: 'rgba(255,59,48,0.08)', color: 'var(--red)',
+                                border: '1px solid rgba(255,59,48,0.15)', fontFamily: 'inherit',
+                              }}
+                            >Mégse</button>
+                            <button 
+                              onClick={() => saveWorkerEdit(worker.id)} 
+                              className="active:scale-95 transition-all"
+                              style={{
+                                padding: '6px 14px', borderRadius: '8px', fontWeight: '700', fontSize: '10px',
+                                cursor: 'pointer', background: 'linear-gradient(135deg,#2ed158,#1a8a38)',
+                                color: '#fff', border: 'none', fontFamily: 'inherit',
+                              }}
+                            >Mentés</button>
                           </div>
                         )}
                       </div>
 
                       {!isEditing ? (
-                        <div className="grid grid-cols-2 gap-y-3 gap-x-4 pt-1">
+                        <div className="grid grid-cols-2 gap-y-4 gap-x-4 pt-1">
                           {[
                             ['Szerződéses órabér', `${(worker.hourly_wage || 3500).toLocaleString('hu-HU')} Ft / óra`],
                             ['E-mail cím', worker.email || '—'],
@@ -465,47 +506,75 @@ export default function Finance() {
                           ].map(([lbl, val]) => (
                             <div key={lbl}>
                               <div style={labelXs}>{lbl}</div>
-                              <div style={{ fontWeight: '600', color: 'var(--t1)', fontSize: '12px' }}>{val}</div>
+                              <div style={{ fontWeight: '700', color: 'var(--t1)', fontSize: '12px' }}>{val}</div>
                             </div>
                           ))}
                           <div className="col-span-2">
                             <div style={labelXs}>Állandó Lakcím</div>
-                            <div style={{ fontWeight: '600', color: 'var(--t1)', fontSize: '12px' }}>{worker.address || '—'}</div>
+                            <div style={{ fontWeight: '700', color: 'var(--t1)', fontSize: '12px' }}>{worker.address || '—'}</div>
                           </div>
                           {[['Adóazonosító', worker.tax_id || '—'], ['TAJ / TB', worker.tb_number || '—']].map(([lbl, val]) => (
                             <div key={lbl}>
                               <div style={labelXs}>{lbl}</div>
-                              <div style={{ fontWeight: '600', color: 'var(--t2)', fontSize: '12px', letterSpacing: '0.03em' }}>{val}</div>
+                              <div style={{ fontWeight: '700', color: 'var(--t2)', fontSize: '12px', letterSpacing: '0.03em' }}>{val}</div>
                             </div>
                           ))}
                           <div className="col-span-2">
                             <div style={labelXs}>Bankszámlaszám</div>
-                            <div style={{ fontWeight: '600', color: 'var(--t1)', fontSize: '12px', letterSpacing: '0.03em' }}>{worker.bank_account || '—'}</div>
+                            <div style={{ fontWeight: '700', color: 'var(--t1)', fontSize: '12px', letterSpacing: '0.03em' }}>{worker.bank_account || '—'}</div>
                           </div>
                           <div>
                             <div style={labelXs}>Személyi Igazolvány</div>
-                            <div style={{ fontWeight: '600', color: 'var(--t2)', fontSize: '12px' }}>{worker.id_card_number || '—'}</div>
+                            <div style={{ fontWeight: '700', color: 'var(--t2)', fontSize: '12px' }}>{worker.id_card_number || '—'}</div>
                           </div>
                         </div>
                       ) : (
-                        <div className="space-y-3 pt-1">
-                          <div><label style={labelXs}>Teljes Név</label><input type="text" value={editFullName} onChange={(e) => setEditFullName(e.target.value)} style={inputStyle} /></div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <div><label style={labelXs}>Órabér (Ft)</label><input type="number" value={editWage} onChange={(e) => setEditWage(e.target.value)} style={inputStyle} /></div>
-                            <div><label style={labelXs}>Munkakör</label><input type="text" value={editJobTitle} onChange={(e) => setEditJobTitle(e.target.value)} style={inputStyle} /></div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }} className="pt-1">
+                          <div>
+                            <label style={labelXs}>Teljes Név</label>
+                            <input type="text" value={editFullName} onChange={(e) => setEditFullName(e.target.value)} style={inputStyle} />
                           </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <div><label style={labelXs}>Telefonszám</label><input type="text" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} style={inputStyle} /></div>
-                            <div><label style={labelXs}>Vészhelyzeti</label><input type="text" value={editEmergency} onChange={(e) => setEditEmergency(e.target.value)} style={inputStyle} /></div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label style={labelXs}>Órabér (Ft)</label>
+                              <input type="number" value={editWage} onChange={(e) => setEditWage(e.target.value)} style={inputStyle} />
+                            </div>
+                            <div>
+                              <label style={labelXs}>Munkakör</label>
+                              <input type="text" value={editJobTitle} onChange={(e) => setEditJobTitle(e.target.value)} style={inputStyle} />
+                            </div>
                           </div>
-                          <div><label style={labelXs}>Állandó Lakcím</label><input type="text" value={editAddress} onChange={(e) => setEditAddress(e.target.value)} style={inputStyle} /></div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <div><label style={labelXs}>Adószám</label><input type="text" value={editTaxId} onChange={(e) => setEditTaxId(e.target.value)} style={inputStyle} /></div>
-                            <div><label style={labelXs}>TB (TAJ)</label><input type="text" value={editTbNumber} onChange={(e) => setEditTbNumber(e.target.value)} style={inputStyle} /></div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label style={labelXs}>Telefonszám</label>
+                              <input type="text" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} style={inputStyle} />
+                            </div>
+                            <div>
+                              <label style={labelXs}>Vészhelyzeti</label>
+                              <input type="text" value={editEmergency} onChange={(e) => setEditEmergency(e.target.value)} style={inputStyle} />
+                            </div>
                           </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <div><label style={labelXs}>Bankszámlaszám</label><input type="text" value={editBankAccount} onChange={(e) => setEditBankAccount(e.target.value)} style={inputStyle} /></div>
-                            <div><label style={labelXs}>Személyi Ig.</label><input type="text" value={editIdCard} onChange={(e) => setEditIdCard(e.target.value)} style={inputStyle} /></div>
+                          <div>
+                            <label style={labelXs}>Állandó Lakcím</label>
+                            <input type="text" value={editAddress} onChange={(e) => setEditAddress(e.target.value)} style={inputStyle} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label style={labelXs}>Adószám</label>
+                              <input type="text" value={editTaxId} onChange={(e) => setEditTaxId(e.target.value)} style={inputStyle} />
+                            </div>
+                            <div>
+                              <label style={labelXs}>TB (TAJ)</label>
+                              <input type="text" value={editTbNumber} onChange={(e) => setEditTbNumber(e.target.value)} style={inputStyle} />
+                            </div>
+                          </div>
+                          <div>
+                            <label style={labelXs}>Bankszámlaszám</label>
+                            <input type="text" value={editBankAccount} onChange={(e) => setEditBankAccount(e.target.value)} style={inputStyle} />
+                          </div>
+                          <div>
+                            <label style={labelXs}>Személyi Igazolvány Száma</label>
+                            <input type="text" value={editIdCard} onChange={(e) => setEditIdCard(e.target.value)} style={inputStyle} />
                           </div>
                         </div>
                       )}

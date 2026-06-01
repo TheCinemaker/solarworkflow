@@ -156,7 +156,7 @@ export default function Timesheet() {
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: '0.07em',
-    marginBottom: '2px',
+    marginBottom: '4px',
     display: 'block'
   };
 
@@ -170,9 +170,29 @@ export default function Timesheet() {
 
   return (
     <div className="page active" id="p-daily">
-      <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
+      {/* Elegáns Vissza gomb */}
+      <div 
+        onClick={() => navigate('/')}
+        className="cursor-pointer transition-all active:scale-95 flex items-center"
+        style={{ 
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px', 
+          fontSize: '13px', 
+          fontWeight: 'bold', 
+          color: 'var(--t2)', 
+          marginLeft: '15px', 
+          marginTop: '15px',
+          marginBottom: '5px'
+        }}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>Vissza</span>
+      </div>
       
-      <div className="page-header fu">
+      <div className="page-header fu" style={{ marginLeft: '15px', marginRight: '15px', marginBottom: '15px' }}>
         <div>
           <div className="pg-greet">{new Date().toLocaleDateString('hu-HU')}</div>
           <div className="pg-title">Napi lap</div>
@@ -181,18 +201,18 @@ export default function Timesheet() {
       </div>
 
       {error && (
-        <div style={{ marginLeft: '15px', marginRight: '15px', marginTop: '16px', padding: '12px', background: 'rgba(255, 59, 48, 0.1)', border: '1px solid rgba(255, 59, 48, 0.2)', color: 'var(--red)', borderRadius: 'var(--card-r)', fontSize: '12px' }}>
+        <div style={{ marginLeft: '15px', marginRight: '15px', marginTop: '16px', padding: '12px', background: 'rgba(255, 59, 48, 0.1)', border: '1px solid rgba(255, 59, 48, 0.2)', color: 'var(--red)', borderRadius: '16px', fontSize: '12px' }}>
           {error}
         </div>
       )}
 
       {/* 1. Munkalap rögzítése űrlap */}
-      <div className="shdr fu d1">
+      <div className="shdr fu d1" style={{ marginLeft: '15px', marginRight: '15px', marginBottom: '10px' }}>
         <div className="shdr-t">Új Munkalap Rögzítése</div>
       </div>
 
-      <div className="gcard fu d1" style={{ background: 'var(--s1)', border: '1px solid var(--b1)' }}>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="gcard fu d1" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', marginLeft: '15px', marginRight: '15px', marginBottom: '25px', padding: '16px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <div>
             <label style={labelStyle}>Projekt / Helyszín</label>
             <select 
@@ -245,7 +265,7 @@ export default function Timesheet() {
           </div>
 
           {computedHours > 0 && (
-            <div className="p-2.5 text-xs font-semibold text-center" style={{ background: 'rgba(46, 209, 88, 0.1)', border: '1px solid rgba(46, 209, 88, 0.2)', color: 'var(--green)', borderRadius: 'var(--card-r)' }}>
+            <div className="p-2.5 text-xs font-semibold text-center" style={{ background: 'rgba(46, 209, 88, 0.1)', border: '1px solid rgba(46, 209, 88, 0.2)', color: 'var(--green)', borderRadius: '12px' }}>
               ⏱ Számolt munkaidő: {computedHours} óra
             </div>
           )}
@@ -256,73 +276,100 @@ export default function Timesheet() {
               value={description} 
               onChange={(e) => setDescription(e.target.value)} 
               placeholder="pl. Napelemek felrakása a tetőre, inverter bekötése..."
-              style={{ ...inputStyle, minHeight: '60px', resize: 'vertical' }}
+              style={{ ...inputStyle, minHeight: '120px', resize: 'vertical' }}
             />
           </div>
 
-          <button 
-            type="submit" 
-            disabled={saving} 
-            className="w-full font-bold transition-all disabled:opacity-50 flex items-center justify-center pt-3.5 pb-3.5" 
-            style={{ 
-              background: 'linear-gradient(135deg, #4f8ef7, #2a5ccc)', 
-              border: 'none', 
-              borderRadius: 'var(--btn-r)', 
-              color: '#fff', 
-              fontSize: '14px', 
-              boxShadow: '0 6px 20px rgba(79, 142, 247, 0.30)' 
-            }}
-          >
-            {saving ? 'Mentés...' : 'Munkalap Beküldése'}
-          </button>
+          <div className="flex justify-center pt-2" style={{ display: 'flex', justifyContent: 'center', width: '100%', paddingTop: '8px' }}>
+            <button 
+              type="submit" 
+              disabled={saving} 
+              className="btn active:scale-95 transition-all flex items-center justify-center cursor-pointer" 
+              style={{ 
+                background: 'linear-gradient(135deg, #4f8ef7, #2a5ccc)', 
+                border: 'none', 
+                borderRadius: '12px', 
+                color: '#fff', 
+                padding: '12px 28px',
+                fontSize: '13px', 
+                fontWeight: '700',
+                gap: '8px',
+                boxShadow: '0 4px 15px rgba(79, 142, 247, 0.25)',
+                animation: 'premium-breathe 3s infinite ease-in-out',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 'fit-content'
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+              <span>{saving ? 'Mentés...' : 'Munkalap Beküldése'}</span>
+            </button>
+          </div>
         </form>
       </div>
 
       {/* 2. Rögzített munkalapok listája */}
-      <div className="shdr fu d2">
+      <div className="shdr fu d2" style={{ marginLeft: '15px', marginRight: '15px', marginBottom: '10px' }}>
         <div className="shdr-t">Rögzített Munkalapok</div>
         <div className="shdr-a">{worklogs.length} db</div>
       </div>
 
-      <div className="space-y-4 pb-20 fu d2" style={{ paddingLeft: '15px', paddingRight: '15px' }}>
+      <div className="space-y-4 pb-20 fu d2" style={{ paddingLeft: '15px', paddingRight: '15px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {worklogs.length === 0 ? (
-          <div className="text-center py-8" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: 'var(--card-r)', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
+          <div className="text-center py-8" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
             Még nincsenek rögzített munkalapok.
           </div>
         ) : (
           worklogs.map(log => (
-            <div key={log.id} className="p-4 flex flex-col space-y-3" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: 'var(--card-r)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
-              <div className="flex justify-between items-start">
+            <div 
+              key={log.id} 
+              className="p-5 flex flex-col space-y-4 active:scale-[0.99] transition-all" 
+              style={{ 
+                background: 'var(--s1)', 
+                border: '1px solid var(--b1)', 
+                borderRadius: '16px', 
+                backdropFilter: 'blur(12px)', 
+                WebkitBackdropFilter: 'blur(12px)',
+                padding: '20px'
+              }}
+            >
+              <div className="flex justify-between items-start" style={{ display: 'flex', justifyContent: 'between', alignItems: 'start', width: '100%' }}>
                 <div>
-                  <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Szerelő</div>
-                  <div style={{ fontWeight: '600', color: 'var(--t1)', fontSize: '14px' }}>
-                    👷 {log.profiles?.full_name || (log.user_id === currentUser?.id ? (currentUser?.user_metadata?.full_name || currentUser?.full_name || 'Én') : 'Ismeretlen')} {log.profiles?.serial_number ? `[${log.profiles.serial_number}]` : (log.user_id === currentUser?.id && currentUser?.role === 'admin' ? '[ADM-01]' : '')}
+                  <div style={{ fontSize: '9px', color: 'var(--t3)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>Szerelő</div>
+                  <div style={{ fontWeight: '700', color: 'var(--t1)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span>👷</span>
+                    <span>{log.profiles?.full_name || (log.user_id === currentUser?.id ? (currentUser?.user_metadata?.full_name || currentUser?.full_name || 'Én') : 'Ismeretlen')} {log.profiles?.serial_number ? `[${log.profiles.serial_number}]` : (log.user_id === currentUser?.id && currentUser?.role === 'admin' ? '[ADM-01]' : '')}</span>
                   </div>
                 </div>
-                <div style={{ fontSize: '10px', color: 'var(--blue)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '3px 9px', borderRadius: '20px', background: 'rgba(79,142,247,0.10)', border: '1px solid rgba(79,142,247,0.18)' }}>
+                <div style={{ fontSize: '10px', color: 'var(--blue)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '4px 10px', borderRadius: '20px', background: 'rgba(79,142,247,0.10)', border: '1px solid rgba(79,142,247,0.18)' }}>
                   {log.date}
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 pt-3" style={{ borderTop: '1px solid var(--b1)' }}>
+              <div className="grid grid-cols-2 gap-4 pt-4" style={{ borderTop: '1px solid var(--b1)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', paddingTop: '16px' }}>
                 <div>
-                  <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Projekt</div>
-                  <div style={{ fontWeight: '600', color: 'var(--t1)', fontSize: '13px' }}>
-                    ⚡ {log.projects?.name || 'Névtelen Projekt'}
+                  <div style={{ fontSize: '9px', color: 'var(--t3)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>Projekt</div>
+                  <div style={{ fontWeight: '700', color: 'var(--t1)', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span>⚡</span>
+                    <span>{log.projects?.name || 'Névtelen Projekt'}</span>
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>Időtartam</div>
-                  <div style={{ fontWeight: '600', color: 'var(--t1)', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>⏱ {log.hours} óra</span>
-                    <span style={{ fontSize: '10px', color: 'var(--t3)' }}>({log.start_time} – {log.end_time})</span>
+                  <div style={{ fontSize: '9px', color: 'var(--t3)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>Időtartam</div>
+                  <div style={{ fontWeight: '700', color: 'var(--t1)', fontSize: '13px', display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'start' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>⏱ {log.hours} óra</span>
+                    <span style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '500' }}>({log.start_time} – {log.end_time})</span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-3" style={{ borderTop: '1px solid var(--b1)' }}>
-                <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>Munkaleírás</div>
-                <div style={{ fontSize: '12px', color: 'var(--t2)', fontStyle: 'italic', background: 'var(--s2)', padding: '10px 12px', borderRadius: 'var(--card-r)', border: '1px solid var(--b1)', lineHeight: '1.5' }}>
+              <div className="pt-4" style={{ borderTop: '1px solid var(--b1)', paddingTop: '16px' }}>
+                <div style={{ fontSize: '9px', color: 'var(--t3)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px', textAlign: 'left' }}>Munkaleírás</div>
+                <div style={{ fontSize: '12px', color: 'var(--t2)', fontStyle: 'italic', background: 'var(--s2)', padding: '12px 14px', borderRadius: '12px', border: '1px solid var(--b1)', lineHeight: '1.6', textAlign: 'left' }}>
                   {log.description}
                 </div>
               </div>

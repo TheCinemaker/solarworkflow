@@ -71,7 +71,7 @@ export default function MainLayout() {
     { to: '/projects', icon: '📁', label: 'Projektek' },
     { to: '/calendar', icon: '📅', label: 'Naptár' },
     { to: '/timesheet', icon: '📋', label: 'Munkalapok' },
-    ...(user?.role === 'admin' ? [{ to: '/finance', icon: '👷', label: 'Dolgozók' }] : []),
+    ...(user?.role === 'admin' ? [{ to: '/finance', icon: '💼', label: 'Pénzügyek' }] : []),
   ];
 
   return (

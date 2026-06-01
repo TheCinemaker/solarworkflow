@@ -107,6 +107,9 @@ export default function CalendarView() {
       border: isToday && !isSelected 
         ? '1px solid rgba(79, 142, 247, 0.4)' 
         : '1px solid transparent',
+      boxShadow: isSelected 
+        ? '0 4px 12px rgba(79, 142, 247, 0.35)' 
+        : 'none',
       color: isSelected 
         ? '#fff' 
         : isToday 
@@ -117,10 +120,30 @@ export default function CalendarView() {
 
   return (
     <div className="page active" id="p-calendar">
-      <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
+      {/* Elegáns Vissza gomb */}
+      <div 
+        onClick={() => navigate('/')}
+        className="cursor-pointer transition-all active:scale-95 flex items-center"
+        style={{ 
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px', 
+          fontSize: '13px', 
+          fontWeight: 'bold', 
+          color: 'var(--t2)', 
+          marginLeft: '15px', 
+          marginTop: '15px',
+          marginBottom: '5px'
+        }}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>Vissza</span>
+      </div>
       
       {/* Fejléc Hónapválasztóval */}
-      <div className="page-header fu flex items-center justify-between">
+      <div className="page-header fu flex items-center justify-between" style={{ marginLeft: '15px', marginRight: '15px', marginBottom: '15px' }}>
         <div>
           <div className="pg-greet">{currentYear}</div>
           <div className="pg-title">{HUNGARIAN_MONTHS[currentMonth]}</div>
@@ -130,8 +153,9 @@ export default function CalendarView() {
             <button
               key={label}
               onClick={handler}
+              className="active:scale-95 transition-all"
               style={{
-                width: '32px', height: '32px', borderRadius: '8px', display: 'flex',
+                width: '32px', height: '32px', borderRadius: '10px', display: 'flex',
                 alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: '700',
                 background: 'var(--s1)', border: '1px solid var(--b1)', color: 'var(--t1)',
                 cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.15s',
@@ -142,7 +166,7 @@ export default function CalendarView() {
       </div>
 
       {/* 📅 NAPTÁR GRID */}
-      <div className="mx-5 mb-5 p-4 fu d1" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px' }}>
+      <div className="mb-5 p-4 fu d1" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', marginLeft: '15px', marginRight: '15px' }}>
         {/* Hét napjai fejléc */}
         <div className="grid grid-cols-7 gap-1 text-center mb-2">
           {['H', 'K', 'Sze', 'Cs', 'P', 'Szo', 'V'].map((d, i) => (
@@ -165,22 +189,24 @@ export default function CalendarView() {
             const isSelected = selectedDay === day;
             const dayProjects = getProjectsForDay(day);
             const hasProjects = dayProjects.length > 0;
+            const hasSolar = dayProjects.some(p => p.is_solar);
+            const dotColor = hasSolar ? '#ffd60a' : '#2ed158';
 
             return (
               <div 
                 key={`day-${day}`}
                 style={getDayCellStyle(day, isSelected, hasProjects)}
                 onClick={() => setSelectedDay(day)}
-                className="hover:bg-white/[0.04] transition-all"
+                className="hover:bg-white/[0.04] active:scale-90 transition-all"
               >
                 <span>{day}</span>
-                {/* Kis zöld pötty ha van munka aznap */}
+                {/* Kis pötty ha van munka aznap */}
                 {hasProjects && (
                   <span 
-                    className="absolute bottom-1.5 w-1 h-1 rounded-full animate-pulse"
+                    className="absolute bottom-1.5 w-1.5 h-1.5 rounded-full"
                     style={{ 
-                      background: isSelected ? '#fff' : '#2ed158',
-                      boxShadow: isSelected ? 'none' : '0 0 4px #2ed158' 
+                      background: isSelected ? '#fff' : dotColor,
+                      boxShadow: isSelected ? 'none' : `0 0 5px ${dotColor}` 
                     }}
                   />
                 )}
@@ -191,7 +217,7 @@ export default function CalendarView() {
       </div>
 
       {/* 📋 NAPI BEOSZTÁS RÉSZLETES LISTÁJA */}
-      <div className="shdr fu d2 flex justify-between items-center px-5 mb-3">
+      <div className="shdr fu d2 flex justify-between items-center mb-3" style={{ marginLeft: '15px', marginRight: '15px' }}>
         <div className="shdr-t">
           {HUNGARIAN_MONTHS[currentMonth]} {selectedDay}. ({selectedDayOfWeekName}) Beosztás
         </div>
@@ -202,9 +228,9 @@ export default function CalendarView() {
         )}
       </div>
 
-      <div className="act-list fu d3" style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: '12px', paddingBottom: '90px' }}>
+      <div className="act-list fu d3" style={{ paddingLeft: '15px', paddingRight: '15px', display: 'flex', flexDirection: 'column', gap: '12px', paddingBottom: '90px' }}>
         {selectedDayProjects.length === 0 ? (
-          <div className="p-6 text-center w-full" style={{ background: 'var(--s1)', border: '1px dashed var(--b2)', borderRadius: '16px', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
+          <div className="p-6 text-center w-full" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
             🍀 Nincs ütemezett munka mára.
           </div>
         ) : (
@@ -217,33 +243,80 @@ export default function CalendarView() {
             return (
               <div
                 key={proj.id}
-                className="p-3.5 flex items-center justify-between cursor-pointer transition-all"
-                style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px' }}
+                className="pc animate-[fadeIn_0.2s_ease-out] active:scale-[0.98] transition-all"
+                style={{
+                  width: '100%',
+                  border: '1px solid var(--b1)',
+                  background: 'var(--s1)',
+                  padding: '16px',
+                  borderRadius: '16px',
+                  cursor: 'pointer',
+                  display: 'block'
+                }}
                 onClick={() => navigate(`/project/${proj.id}`)}
               >
-                <div className="flex items-center space-x-3.5 text-left">
+                {/* Felső jelvény és dátum sor */}
+                <div className="flex items-center justify-between mb-3" style={{ display: 'flex', alignItems: 'center', justifyContent: 'between', width: '100%' }}>
                   <div style={{
-                    width: '40px', height: '40px', borderRadius: '10px', flexShrink: 0,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px',
-                    background: proj.is_solar ? 'rgba(255,214,10,0.12)' : 'rgba(79,142,247,0.12)',
-                    border: proj.is_solar ? '1px solid rgba(255,214,10,0.20)' : '1px solid rgba(79,142,247,0.20)',
+                    background: proj.is_solar ? 'rgba(255, 214, 10, 0.12)' : 'rgba(46, 209, 88, 0.14)',
+                    color: proj.is_solar ? '#ffd60a' : '#2ed158',
+                    fontSize: '10px',
+                    fontWeight: '800',
+                    padding: '4px 10px',
+                    borderRadius: '20px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
                   }}>
-                    {proj.is_solar ? '☀️' : '⚡'}
+                    {proj.is_solar ? '☀️ Napelem' : '⚡ Projekt'} {proj.serial_number ? `· ${proj.serial_number}` : ''}
                   </div>
-                  <div>
-                    <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--t1)' }}>{proj.name}</div>
-                    <div style={{ fontSize: '10px', color: 'var(--t3)', marginTop: '2px' }}>📍 {proj.address}</div>
-                    <div style={{ fontSize: '9px', color: 'var(--t3)', fontWeight: '600', marginTop: '3px' }}>
-                      Ütemezés: {proj.start_time} – {proj.end_time}
-                    </div>
+                  
+                  <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    📅 {proj.start_time} – {proj.end_time}
                   </div>
                 </div>
 
-                <div className="text-right flex flex-col items-end">
-                  <span style={{ fontSize: '10px', fontWeight: '700', color: 'var(--t2)' }}>{progress}% kész</span>
-                  <div style={{ width: '48px', background: 'var(--s2)', height: '3px', borderRadius: '4px', overflow: 'hidden', marginTop: '5px' }}>
-                    <div style={{ height: '100%', borderRadius: '4px', width: `${progress}%`, background: proj.is_solar ? 'var(--yellow)' : 'var(--blue)' }} />
-                  </div>
+                {/* Projekt Név */}
+                <div style={{ fontSize: '14px', fontWeight: '800', color: 'var(--t1)', marginBottom: '6px', textAlign: 'left', lineHeight: '1.3' }}>
+                  {proj.name}
+                </div>
+
+                {/* Cím */}
+                <div style={{ fontSize: '11px', color: 'var(--t2)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '4px', textAlign: 'left' }}>
+                  <span>📍</span>
+                  <span>{proj.address}</span>
+                </div>
+
+                {/* Haladási csík (Teljes szélességű) */}
+                <div style={{ height: '4px', background: 'var(--s2)', borderRadius: '10px', overflow: 'hidden', marginBottom: '8px', width: '100%' }}>
+                  <div 
+                    style={{
+                      height: '100%',
+                      borderRadius: '10px',
+                      width: `${progress}%`,
+                      background: proj.is_solar ? '#ffd60a' : '#2ed158',
+                      boxShadow: proj.is_solar ? '0 0 8px rgba(255, 214, 10, 0.4)' : '0 0 8px rgba(46, 209, 88, 0.4)'
+                    }}
+                  ></div>
+                </div>
+
+                {/* Alsó állapot és százalék sor */}
+                <div className="flex items-center justify-between" style={{ display: 'flex', alignItems: 'center', justifyContent: 'between', fontSize: '11px', fontWeight: '700', width: '100%' }}>
+                  <span style={{ color: 'var(--t2)' }}>
+                    Haladás: <span style={{ color: proj.is_solar ? '#ffd60a' : '#2ed158' }}>{progress}% kész</span>
+                  </span>
+                  <span style={{ 
+                    background: progress === 100 ? 'rgba(46, 209, 88, 0.12)' : 'rgba(79, 142, 247, 0.12)', 
+                    color: progress === 100 ? '#2ed158' : 'var(--blue)', 
+                    border: progress === 100 ? '1px solid rgba(46, 209, 88, 0.2)' : '1px solid rgba(79, 142, 247, 0.2)', 
+                    padding: '2px 8px', 
+                    borderRadius: '12px', 
+                    fontSize: '9px', 
+                    fontWeight: '800', 
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em'
+                  }}>
+                    {progress === 100 ? 'Befejezve ✓' : 'Folyamatban'}
+                  </span>
                 </div>
               </div>
             );

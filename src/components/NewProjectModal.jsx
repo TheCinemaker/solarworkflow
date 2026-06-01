@@ -431,8 +431,8 @@ export default function NewProjectModal({ isOpen, onClose, onSuccess }) {
             </div>
           </div>
 
-          {/* Gombok - Igazítva a gridre (padding: 20px 28px 28px, space-x-4, magasság 56px, lekerekítés 16px) */}
-          <div className="flex space-x-4" style={{ padding: '20px 28px 28px', borderTop: '1px solid var(--b1)', flexShrink: 0 }}>
+          {/* Gombok - Igazítva a gridre (padding: 20px 28px 28px, gap: 10px, magasság 56px, lekerekítés 16px) */}
+          <div style={{ display: 'flex', gap: '10px', padding: '20px 28px 28px', borderTop: '1px solid var(--b1)', flexShrink: 0 }}>
             <button 
               type="button" 
               onClick={onClose} 

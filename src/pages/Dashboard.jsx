@@ -253,14 +253,54 @@ export default function Dashboard() {
         )}
       </div>
 
+      {/* GYORSMŰVELETEK (Csak Adminoknak) */}
+      {isAdmin && (
+        <div className="fu d3" style={{ paddingLeft: '15px', paddingRight: '15px', marginTop: '14px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+          <div 
+            onClick={() => setIsProjectModalOpen(true)}
+            className="cursor-pointer transition-all active:scale-[0.98] hover:scale-[1.01] flex items-center justify-center"
+            style={{
+              background: 'rgba(79, 142, 247, 0.08)',
+              border: '1.5px dashed rgba(79, 142, 247, 0.3)',
+              borderRadius: '16px',
+              height: '56px',
+              color: '#4f8ef7',
+              fontWeight: '800',
+              fontSize: '13px',
+              gap: '6px',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
+            }}
+          >
+            <span>➕</span> <span>Új projekt</span>
+          </div>
+          <div 
+            onClick={() => setIsWorkerModalOpen(true)}
+            className="cursor-pointer transition-all active:scale-[0.98] hover:scale-[1.01] flex items-center justify-center"
+            style={{
+              background: 'rgba(46, 209, 88, 0.08)',
+              border: '1.5px dashed rgba(46, 209, 88, 0.3)',
+              borderRadius: '16px',
+              height: '56px',
+              color: '#2ed158',
+              fontWeight: '800',
+              fontSize: '13px',
+              gap: '6px',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
+            }}
+          >
+            <span>➕</span> <span>Új dolgozó</span>
+          </div>
+        </div>
+      )}
+
       {/* AKTÍV PROJEKTEK SZAKASZ */}
-      <div className="shdr fu d3">
+      <div className="shdr fu d4">
         <div className="shdr-t">Projektek</div>
         <div className="shdr-a" onClick={() => navigate('/projects')}>Mind →</div>
       </div>
       
-      {/* Eredeti horizontális görgetős elrendezés (ha vissza kellene állítani): <div className="hscroll fu d3"> */}
-      <div className="space-y-3 px-[15px] fu d3">
+      {/* Eredeti horizontális görgetős elrendezés (ha vissza kellene állítani): <div className="hscroll fu d4"> */}
+      <div className="space-y-3 px-[15px] fu d4">
         {projects.length === 0 ? (
           <div className="p-4 text-center w-full" style={{ fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>Nincsenek még projektek.</div>
         ) : (
@@ -289,10 +329,10 @@ export default function Dashboard() {
       </div>
 
       {/* FRISS AKTIVITÁS (Dolgozóknak csak a saját órajelentéseik, Adminoknak a teljes csapaté) */}
-      <div className="shdr fu d4">
+      <div className="shdr fu d5">
         <div className="shdr-t">{isAdmin ? 'Friss aktivitás (Csapat)' : 'Utolsó időrögzítéseid'}</div>
       </div>
-      <div className="act-list fu d4" style={{ paddingBottom: '80px' }}>
+      <div className="act-list fu d5" style={{ paddingBottom: '80px' }}>
         {activities.length === 0 ? (
           <div className="p-4 text-center" style={{ fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>Nincs még aktivitás rögzítve.</div>
         ) : (

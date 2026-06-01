@@ -401,7 +401,7 @@ export default function NewWorkerModal({ isOpen, onClose, onSuccess }) {
           </div>
 
           {/* Gombok */}
-          <div className="flex space-x-4" style={{ padding: '20px 28px 28px', borderTop: '1px solid var(--b1)', flexShrink: 0 }}>
+          <div style={{ display: 'flex', gap: '10px', padding: '20px 28px 28px', borderTop: '1px solid var(--b1)', flexShrink: 0 }}>
             <button 
               type="button" 
               onClick={onClose} 

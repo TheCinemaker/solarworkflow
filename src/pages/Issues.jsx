@@ -104,9 +104,29 @@ export default function Issues() {
 
   return (
     <div className="page active" id="p-issues">
-      <div className="back-btn fu" onClick={() => navigate('/')}>‹ Vissza a Dashboardra</div>
+      {/* Elegáns Vissza gomb */}
+      <div 
+        onClick={() => navigate('/')}
+        className="cursor-pointer transition-all active:scale-95 flex items-center"
+        style={{ 
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px', 
+          fontSize: '13px', 
+          fontWeight: 'bold', 
+          color: 'var(--t2)', 
+          marginLeft: '15px', 
+          marginTop: '15px',
+          marginBottom: '5px'
+        }}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>Vissza</span>
+      </div>
 
-      <div className="page-header fu">
+      <div className="page-header fu" style={{ marginLeft: '15px', marginRight: '15px', marginBottom: '15px' }}>
         <div>
           <div className="pg-greet">Központi hibajegy követés</div>
           <div className="pg-title">Hibák / Visszajárás</div>
@@ -115,28 +135,28 @@ export default function Issues() {
       </div>
 
       {error && (
-        <div className="mx-5 mt-4 p-3 rounded-xl text-xs"
-          style={{ background: 'rgba(255,59,48,0.08)', border: '1px solid rgba(255,59,48,0.18)', color: 'var(--red)' }}>
+        <div className="mt-4 p-3 rounded-xl text-xs"
+          style={{ background: 'rgba(255,59,48,0.08)', border: '1px solid rgba(255,59,48,0.18)', color: 'var(--red)', marginLeft: '15px', marginRight: '15px' }}>
           {error}
         </div>
       )}
 
       {/* Tab selector */}
-      <div className="mx-5 my-3 p-1 rounded-xl flex items-center" style={{ background: 'var(--s1)', border: '1px solid var(--b1)' }}>
-        <div onClick={() => { setActiveTab('open'); setExpandedIssueId(null); }} style={tabStyle('open')}>
+      <div className="p-1 rounded-xl flex items-center" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginLeft: '15px', marginRight: '15px', marginTop: '12px', marginBottom: '15px' }}>
+        <div className="active:scale-[0.98] transition-all" onClick={() => { setActiveTab('open'); setExpandedIssueId(null); }} style={tabStyle('open')}>
           🔴 Nyitott hibák ({openIssues.length})
         </div>
-        <div onClick={() => { setActiveTab('resolved'); setExpandedIssueId(null); }} style={tabStyle('resolved')}>
+        <div className="active:scale-[0.98] transition-all" onClick={() => { setActiveTab('resolved'); setExpandedIssueId(null); }} style={tabStyle('resolved')}>
           🟢 Javított ({resolvedIssues.length})
         </div>
       </div>
 
-      <div className="shdr fu d1">
+      <div className="shdr fu d1" style={{ marginLeft: '15px', marginRight: '15px', marginBottom: '10px' }}>
         <div className="shdr-t">{activeTab === 'open' ? 'Elhárításra váró akadályok' : 'Sikeresen lezárt hibajegyek'}</div>
         <div className="shdr-a">{displayedIssues.length} db</div>
       </div>
 
-      <div className="space-y-4 px-5 pb-20 fu d2">
+      <div className="space-y-4 pb-20 fu d2" style={{ paddingLeft: '15px', paddingRight: '15px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {displayedIssues.length === 0 ? (
           <div className="text-center py-10" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '16px', fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>
             Nincsenek {activeTab === 'open' ? 'aktív hibák' : 'javított hibajegyek'} a rendszerben.
@@ -148,14 +168,14 @@ export default function Issues() {
             });
 
             return (
-              <div key={issue.id} className="p-3.5 flex flex-col space-y-3 relative" style={{
+              <div key={issue.id} className="p-3.5 flex flex-col space-y-3 relative active:scale-[0.99] transition-all" style={{
                 background: 'var(--s1)',
                 border: issue.resolved ? '1px solid rgba(46,209,88,0.25)' : '1px solid rgba(255,59,48,0.25)',
                 borderRadius: '16px',
                 backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
               }}>
                 {/* Fejléc */}
-                <div className="flex justify-between items-start cursor-pointer" onClick={() => navigate(`/project/${issue.project_id}`)}>
+                <div className="flex justify-between items-start cursor-pointer" style={{ display: 'flex', justifyContent: 'between', alignItems: 'start', width: '100%' }} onClick={() => navigate(`/project/${issue.project_id}`)}>
                   <div>
                     <span style={{
                       display: 'inline-block', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase',
@@ -176,7 +196,7 @@ export default function Issues() {
                 {/* NYITOTT HIBA */}
                 {!issue.resolved && (
                   <>
-                    <div className="flex space-x-3 items-start pt-2" style={{ borderTop: '1px solid var(--b1)' }}>
+                    <div className="flex space-x-3 items-start pt-2" style={{ borderTop: '1px solid var(--b1)', display: 'flex', gap: '12px', alignItems: 'start' }}>
                       {issue.file_path && (
                         <a href={issue.file_path} target="_blank" rel="noreferrer"
                           style={{
@@ -187,23 +207,24 @@ export default function Issues() {
                         />
                       )}
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '5px' }}>Eredeti Probléma</div>
+                        <div style={{ fontSize: '10px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '5px', textAlign: 'left' }}>Eredeti Probléma</div>
                         <div style={{
                           fontSize: '12px', color: 'var(--red)', fontWeight: '500', lineHeight: '1.45',
                           fontStyle: 'italic', background: 'rgba(255,59,48,0.06)', padding: '8px 10px',
-                          borderRadius: '8px', border: '1px solid rgba(255,59,48,0.10)',
+                          borderRadius: '8px', border: '1px solid rgba(255,59,48,0.10)', textAlign: 'left'
                         }}>
                           ⚠️ {issue.description || 'Hiba leírás nélkül feltöltve.'}
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-center pt-2" style={{ borderTop: '1px solid var(--b1)' }}>
+                    <div className="flex justify-between items-center pt-2" style={{ borderTop: '1px solid var(--b1)', display: 'flex', justifyContent: 'between', alignItems: 'center', width: '100%' }}>
                       <span style={{ fontSize: '10px', color: 'var(--t3)' }}>
                         Bejelentette: <b style={{ color: 'var(--t2)' }}>👷 {issue.profiles?.full_name || 'Szerelő'}</b>
                       </span>
                       <button
                         onClick={() => setExpandedIssueId(expandedIssueId === issue.id ? null : issue.id)}
+                        className="active:scale-95 transition-all"
                         style={{
                           padding: '6px 12px', borderRadius: '8px', fontWeight: '700', fontSize: '10px',
                           cursor: 'pointer', border: 'none', fontFamily: 'inherit',
@@ -217,29 +238,50 @@ export default function Issues() {
 
                     {/* Javítás panel */}
                     {expandedIssueId === issue.id && (
-                      <div className="mt-2 p-3 space-y-3" style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--b1)' }}>
+                      <div className="mt-2 p-3 space-y-3" style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--b1)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--yellow)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                           🔧 Hiba elhárításának rögzítése
                         </div>
-                        <form onSubmit={(e) => handleResolveIssue(e, issue)} className="space-y-3">
+                        <form onSubmit={(e) => handleResolveIssue(e, issue)} className="space-y-3" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                           <div>
-                            <label style={{ display: 'block', fontSize: '9px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '5px' }}>
+                            <label style={{ display: 'block', fontSize: '9px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '8px', textAlign: 'left' }}>
                               Fénykép a javításról (KÖTELEZŐ)
                             </label>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => setFixFile(e.target.files?.[0] || null)}
-                              required
-                              style={{
-                                width: '100%', fontSize: '12px', color: 'var(--t2)',
-                                background: 'var(--s1)', border: '1px solid var(--b1)',
-                                borderRadius: '8px', padding: '7px 10px',
-                              }}
-                            />
+                            
+                            <div className="flex flex-col items-center justify-center pt-1" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                              <label 
+                                className="btn active:scale-95 transition-all flex items-center justify-center cursor-pointer"
+                                style={{
+                                  background: 'rgba(79, 142, 247, 0.15)',
+                                  border: '1px solid rgba(79, 142, 247, 0.35)',
+                                  borderRadius: '12px',
+                                  color: 'var(--blue)',
+                                  padding: '10px 14px',
+                                  fontSize: '12px',
+                                  fontWeight: '700',
+                                  gap: '8px',
+                                  width: 'fit-content',
+                                  boxShadow: '0 4px 12px rgba(79, 142, 247, 0.1)'
+                                }}
+                              >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                  <polyline points="17 8 12 3 7 8" />
+                                  <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                                <span>{fixFile ? fixFile.name : 'Fotó Kiválasztása'}</span>
+                                <input 
+                                  type="file" 
+                                  accept="image/*" 
+                                  onChange={(e) => setFixFile(e.target.files?.[0] || null)} 
+                                  style={{ display: 'none' }} 
+                                  required
+                                />
+                              </label>
+                            </div>
                           </div>
                           <div>
-                            <label style={{ display: 'block', fontSize: '9px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '5px' }}>
+                            <label style={{ display: 'block', fontSize: '9px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '5px', textAlign: 'left' }}>
                               Rövid leírás (opcionális)
                             </label>
                             <input
@@ -257,6 +299,7 @@ export default function Issues() {
                           <button
                             type="submit"
                             disabled={savingFix}
+                            className="active:scale-[0.98] transition-all"
                             style={{
                               width: '100%', padding: '10px', borderRadius: '10px', fontWeight: '700',
                               fontSize: '13px', cursor: savingFix ? 'default' : 'pointer', border: 'none',
@@ -275,32 +318,32 @@ export default function Issues() {
                 {/* JAVÍTOTT HIBA - BEFORE / AFTER */}
                 {issue.resolved && (
                   <>
-                    <div className="grid grid-cols-2 gap-3 pt-2" style={{ borderTop: '1px solid var(--b1)' }}>
-                      <div className="flex flex-col space-y-1.5">
-                        <div style={{ fontSize: '9px', color: 'var(--red)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em' }}>🔴 Eredeti hiba</div>
+                    <div className="grid grid-cols-2 gap-3 pt-2" style={{ borderTop: '1px solid var(--b1)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div className="flex flex-col space-y-1.5" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <div style={{ fontSize: '9px', color: 'var(--red)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'left' }}>🔴 Eredeti hiba</div>
                         <a href={issue.file_path} target="_blank" rel="noreferrer" style={{
                           display: 'block', aspectRatio: '4/3', borderRadius: '8px',
                           backgroundImage: `url(${issue.file_path})`, backgroundSize: 'cover', backgroundPosition: 'center',
-                          border: '1px solid rgba(255,59,48,0.18)',
+                          border: '1px solid rgba(255,59,48,0.18)', width: '100%'
                         }} />
-                        <div style={{ fontSize: '10px', color: 'var(--t2)', fontStyle: 'italic', lineHeight: '1.3', padding: '6px 8px', borderRadius: '6px', background: 'var(--s1)', border: '1px solid var(--b1)' }}>
+                        <div style={{ fontSize: '10px', color: 'var(--t2)', fontStyle: 'italic', lineHeight: '1.3', padding: '6px 8px', borderRadius: '6px', background: 'var(--s1)', border: '1px solid var(--b1)', textAlign: 'left' }}>
                           {issue.description || 'Nem volt leírás.'}
                         </div>
                       </div>
-                      <div className="flex flex-col space-y-1.5">
-                        <div style={{ fontSize: '9px', color: 'var(--green)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em' }}>🟢 Elvégzett javítás</div>
+                      <div className="flex flex-col space-y-1.5" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <div style={{ fontSize: '9px', color: 'var(--green)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'left' }}>🟢 Elvégzett javítás</div>
                         <a href={issue.resolved_file_path} target="_blank" rel="noreferrer" style={{
                           display: 'block', aspectRatio: '4/3', borderRadius: '8px',
                           backgroundImage: `url(${issue.resolved_file_path})`, backgroundSize: 'cover', backgroundPosition: 'center',
-                          border: '1px solid rgba(46,209,88,0.18)',
+                          border: '1px solid rgba(46,209,88,0.18)', width: '100%'
                         }} />
-                        <div style={{ fontSize: '10px', color: 'var(--green)', fontStyle: 'italic', lineHeight: '1.3', padding: '6px 8px', borderRadius: '6px', background: 'rgba(46,209,88,0.05)', border: '1px solid rgba(46,209,88,0.10)' }}>
+                        <div style={{ fontSize: '10px', color: 'var(--green)', fontStyle: 'italic', lineHeight: '1.3', padding: '6px 8px', borderRadius: '6px', background: 'rgba(46,209,88,0.05)', border: '1px solid rgba(46,209,88,0.10)', textAlign: 'left' }}>
                           {issue.resolved_comment || 'Javítva.'}
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-center pt-2" style={{ borderTop: '1px solid var(--b1)' }}>
+                    <div className="flex justify-between items-center pt-2" style={{ borderTop: '1px solid var(--b1)', display: 'flex', justifyContent: 'between', alignItems: 'center', width: '100%' }}>
                       <span style={{ fontSize: '9px', color: 'var(--t3)' }}>
                         Jelentette: <b style={{ color: 'var(--t2)' }}>{issue.profiles?.full_name || 'Ismeretlen'}</b>
                       </span>

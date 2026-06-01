@@ -678,56 +678,73 @@ export default function ProjectDetails() {
 
       {/* Megrendelő és projekt adatok */}
       <div className="shdr fu d2">
-        <div className="shdr-t">Megrendelő és Időtartam</div>
+        <div className="shdr-t">Megrendelő és projekt adatai</div>
       </div>
 
-      <div className="gcard fu d2 space-y-3" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginBottom: '15px' }}>
-        <div className="grid grid-cols-2 gap-3 text-sm">
-          <div>
-            <div className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-0.5">Megrendelő</div>
-            <div className="font-semibold text-[var(--t1)]">{project?.client_name || 'Nincs megadva'}</div>
-          </div>
-          <div>
-            <div className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-0.5">Telefonszámok</div>
-            <div className="flex flex-col space-y-1 mt-0.5">
-              {project?.client_phone && (
-                <a href={`tel:${project.client_phone}`} className="font-semibold text-blue-400 hover:underline flex items-center space-x-1">
-                  <span>📱</span> <span>{project.client_phone}</span>
-                </a>
-              )}
-              {project?.client_phone_2 && (
-                <a href={`tel:${project.client_phone_2}`} className="font-semibold text-blue-400 hover:underline flex items-center space-x-1">
-                  <span>📱</span> <span>{project.client_phone_2}</span>
-                </a>
-              )}
-              {project?.client_phone_3 && (
-                <a href={`tel:${project.client_phone_3}`} className="font-semibold text-blue-400 hover:underline flex items-center space-x-1">
-                  <span>📱</span> <span>{project.client_phone_3}</span>
-                </a>
-              )}
-              {!project?.client_phone && !project?.client_phone_2 && !project?.client_phone_3 && (
-                <div className="text-[var(--t3)] italic">Nincs megadva</div>
-              )}
-            </div>
+      <div className="gcard fu d2 space-y-6" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginBottom: '15px', padding: '24px' }}>
+        
+        {/* Megrendelő szakasz */}
+        <div>
+          <div className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-1.5">Megrendelő</div>
+          <div className="font-extrabold text-[var(--t1)] text-lg">{project?.client_name || 'Nincs megadva'}</div>
+        </div>
+
+        {/* Telefonszámok szakasz */}
+        <div className="pt-4 border-t border-white/5">
+          <div className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-2">Telefonszámok</div>
+          <div className="flex flex-col space-y-2.5">
+            {project?.client_phone && (
+              <a href={`tel:${project.client_phone}`} className="font-semibold text-blue-400 hover:underline flex items-center space-x-2 text-sm">
+                <span>📱</span> <span>{project.client_phone}</span>
+              </a>
+            )}
+            {project?.client_phone_2 && (
+              <a href={`tel:${project.client_phone_2}`} className="font-semibold text-blue-400 hover:underline flex items-center space-x-2 text-sm">
+                <span>📱</span> <span>{project.client_phone_2}</span>
+              </a>
+            )}
+            {project?.client_phone_3 && (
+              <a href={`tel:${project.client_phone_3}`} className="font-semibold text-blue-400 hover:underline flex items-center space-x-2 text-sm">
+                <span>📱</span> <span>{project.client_phone_3}</span>
+              </a>
+            )}
+            {!project?.client_phone && !project?.client_phone_2 && !project?.client_phone_3 && (
+              <div className="text-[var(--t3)] italic text-sm">Nincs megadva</div>
+            )}
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 text-sm pt-2 border-t border-white/5">
+        {/* Dátumok szakasz */}
+        <div className="pt-4 border-t border-white/5 grid grid-cols-2 gap-4">
           <div>
-            <div className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-0.5">Kezdési Dátum</div>
-            <div className="font-semibold text-[var(--t1)]">{project?.start_time || 'Nincs megadva'}</div>
+            <div className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-1.5">Kezdési Dátum</div>
+            <div className="font-semibold text-[var(--t1)] text-sm">{project?.start_time || 'Nincs megadva'}</div>
           </div>
           <div>
-            <div className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-0.5">Befejezési Dátum</div>
-            <div className="font-semibold text-[var(--t1)]">{project?.end_time || 'Nincs megadva'}</div>
+            <div className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-1.5">Befejezési Dátum</div>
+            <div className="font-semibold text-[var(--t1)] text-sm">{project?.end_time || 'Nincs megadva'}</div>
           </div>
         </div>
 
+        {/* Fontos információk toast */}
         {project?.important_info && (
-          <div className="mt-2 p-2.5 rounded-xl text-xs flex items-center space-x-2" style={{ background: 'rgba(255, 159, 10, 0.1)', border: '1px solid rgba(255, 159, 10, 0.2)', color: 'var(--orange)' }}>
-            <span>🔑</span>
-            <div>
-              <span className="font-bold">Fontos infó: </span>
+          <div 
+            className="flex items-start" 
+            style={{ 
+              background: 'rgba(255, 159, 10, 0.08)', 
+              border: '1px solid rgba(255, 159, 10, 0.25)', 
+              color: 'var(--orange)',
+              padding: '12px 16px',
+              margin: '21px 8px 0 8px',
+              borderRadius: '12px',
+              gap: '10px',
+              fontSize: '13px',
+              lineHeight: '1.5'
+            }}
+          >
+            <span style={{ fontSize: '16px', lineHeight: 1 }}>🔑</span>
+            <div style={{ flex: 1, wordBreak: 'break-word' }}>
+              <span className="font-bold block mb-1" style={{ textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.05em', color: 'rgba(255, 159, 10, 0.8)' }}>Fontos információ</span>
               {project.important_info}
             </div>
           </div>
@@ -739,18 +756,21 @@ export default function ProjectDetails() {
         <div className="shdr-a">{messages.length} üzenet</div>
       </div>
 
-      <div className="gcard fu d2_5 flex flex-col" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginBottom: '15px', padding: '12px' }}>
+      <div className="gcard fu d2_5 flex flex-col" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginBottom: '15px', padding: '18px' }}>
         {/* Üzenetek görgethető doboza */}
         <div 
           ref={chatContainerRef}
-          className="custom-scroll flex flex-col space-y-2 mb-3 pr-1"
+          className="custom-scroll"
           style={{ 
             maxHeight: '260px', 
             overflowY: 'auto', 
             minHeight: '120px',
             scrollBehavior: 'smooth',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            gap: '14px',
+            marginBottom: '16px',
+            paddingRight: '4px'
           }}
         >
           {messages.length === 0 ? (
@@ -758,46 +778,51 @@ export default function ProjectDetails() {
               Nincsenek még üzenetek ebben a chatben.<br/>Küldd el az első bejegyzést!
             </div>
           ) : (
-            <div className="flex flex-col space-y-2">
-              {messages.map(msg => {
-                const isOwn = msg.user_id === currentUser?.id;
-                const senderName = msg.profiles?.full_name || 'Ismeretlen';
-                const senderRole = msg.profiles?.role === 'admin' ? 'Admin' : 'Szerelő';
-                const senderSerial = msg.profiles?.serial_number ? `[${msg.profiles.serial_number}]` : '';
+            messages.map(msg => {
+              const isOwn = msg.user_id === currentUser?.id;
+              const senderName = msg.profiles?.full_name || 'Ismeretlen';
+              const senderRole = msg.profiles?.role === 'admin' ? 'Admin' : 'Szerelő';
+              const senderSerial = msg.profiles?.serial_number ? `[${msg.profiles.serial_number}]` : '';
 
-                return (
-                  <div 
-                    key={msg.id} 
-                    className={`flex flex-col max-w-[85%] rounded-[6px] p-2.5 text-xs transition-all ${
-                      isOwn 
-                        ? 'self-end bg-gradient-to-br from-[#0088cc] to-[#005580] text-white border border-[#0088cc]/20 shadow-md shadow-[#0088cc]/10' 
-                        : 'self-start bg-white/5 text-[var(--t1)] border border-white/5'
-                    }`}
-                    style={{
-                      alignSelf: isOwn ? 'flex-end' : 'flex-start',
-                      background: isOwn ? 'linear-gradient(135deg, #0088cc, #005580)' : 'rgba(255, 255, 255, 0.05)',
-                      border: isOwn ? '1px solid rgba(0, 136, 204, 0.2)' : '1px solid var(--b1)',
-                      borderRadius: '6px',
-                      padding: '8px 12px'
-                    }}
-                  >
-                    <div className="flex items-center space-x-1.5 mb-1 opacity-75 font-bold text-[9px] uppercase tracking-wider">
-                      <span style={{ color: isOwn ? '#fff' : 'var(--blue)' }}>{senderName}</span>
-                      <span className="opacity-60">{senderRole} {senderSerial}</span>
-                    </div>
-                    <div className="whitespace-pre-wrap leading-relaxed">{msg.content}</div>
-                    <div className="text-[8px] text-right mt-1 opacity-50">
-                      {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </div>
+              return (
+                <div 
+                  key={msg.id} 
+                  className="flex flex-col max-w-[85%] text-xs transition-all"
+                  style={{
+                    alignSelf: isOwn ? 'flex-end' : 'flex-start',
+                    background: isOwn ? 'linear-gradient(135deg, #0088cc, #005580)' : 'rgba(255, 255, 255, 0.05)',
+                    border: isOwn ? '1px solid rgba(0, 136, 204, 0.2)' : '1px solid var(--b1)',
+                    borderRadius: isOwn ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                    padding: '10px 14px',
+                    boxShadow: isOwn ? '0 3px 12px rgba(0, 136, 204, 0.12)' : 'none',
+                    color: isOwn ? '#fff' : 'var(--t1)'
+                  }}
+                >
+                  <div className="flex items-center space-x-1.5 mb-1 opacity-80 font-bold text-[9px] uppercase tracking-wider">
+                    <span style={{ color: isOwn ? '#fff' : 'var(--blue)' }}>{senderName}</span>
+                    <span className="opacity-60">{senderRole} {senderSerial}</span>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="whitespace-pre-wrap leading-relaxed">{msg.content}</div>
+                  <div className="text-[8px] text-right mt-1.5 opacity-55">
+                    {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                </div>
+              );
+            })
           )}
         </div>
 
         {/* Üzenet küldő sáv */}
-        <form onSubmit={handleSendMessage} className="flex items-center space-x-2 pt-2 border-t border-white/5">
+        <form 
+          onSubmit={handleSendMessage} 
+          className="border-t border-white/5"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            paddingTop: '16px'
+          }}
+        >
           <input 
             type="text" 
             value={newMessage}
@@ -807,10 +832,11 @@ export default function ProjectDetails() {
             style={{
               background: 'var(--s2)',
               border: '1px solid var(--b1)',
-              borderRadius: '6px',
-              padding: '8px 12px',
+              borderRadius: '12px',
+              padding: '0 16px',
+              height: '46px',
               color: 'var(--t1)',
-              fontSize: '16px',
+              fontSize: '14px',
               width: '100%',
               outline: 'none'
             }}
@@ -818,18 +844,34 @@ export default function ProjectDetails() {
           <button 
             type="submit" 
             disabled={sendingMsg || !newMessage.trim()}
-            className="flex items-center justify-center p-2 rounded-[6px] transition-all disabled:opacity-50"
+            className="flex items-center justify-center transition-all disabled:opacity-50 hover:scale-[1.03] active:scale-97"
             style={{ 
-              background: 'linear-gradient(135deg, #0088cc, #005580)', 
+              background: 'linear-gradient(135deg, #2ed158, #1a8a38)', 
               color: '#fff',
               border: 'none',
-              width: '35px',
-              height: '35px',
+              width: '46px',
+              height: '46px',
               cursor: 'pointer',
-              borderRadius: '6px'
+              borderRadius: '12px',
+              boxShadow: '0 4px 15px rgba(46, 209, 88, 0.25)',
+              flexShrink: 0
             }}
           >
-            ✈️
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="16" 
+              height="16" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2.5" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+              style={{ transform: 'translateX(1px) translateY(-0.5px)' }}
+            >
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
           </button>
         </form>
       </div>
@@ -840,28 +882,55 @@ export default function ProjectDetails() {
         <div className="shdr-a">{completedTasks.length}/{tasks.length} kész</div>
       </div>
 
-      <div className="gcard fu d3" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginBottom: '15px' }}>
+      <div className="gcard fu d3" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginBottom: '15px', padding: '20px' }}>
         {tasks.length === 0 ? (
-          <div className="text-center text-xs text-[var(--t3)] italic py-3">
+          <div className="text-center text-xs text-[var(--t3)] italic py-4">
             Ehhez a projekthez nincs feladatlista megadva.
           </div>
         ) : (
-          <div className="divide-y divide-white/5">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {tasks.map((task, idx) => {
               const isDone = completedTasks.includes(task);
               return (
-                <div key={idx} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0 cursor-pointer" onClick={() => handleToggleTask(task)}>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-5 h-5 rounded-md flex items-center justify-center border transition-all" style={{
-                      background: isDone ? 'var(--green)' : 'rgba(255,255,255,0.05)',
-                      borderColor: isDone ? 'var(--green)' : 'rgba(255,255,255,0.2)'
-                    }}>
-                      {isDone && <span className="text-white text-xs">✓</span>}
-                    </div>
-                    <span className={`text-sm font-medium transition-all ${isDone ? 'text-[var(--t3)] line-through' : 'text-[var(--t1)]'}`}>
-                      {task}
-                    </span>
+                <div 
+                  key={idx} 
+                  className="flex items-start cursor-pointer transition-all active:scale-[0.98]" 
+                  onClick={() => handleToggleTask(task)}
+                  style={{ gap: '12px' }}
+                >
+                  {/* Kör alakú prémium checkbox */}
+                  <div 
+                    className="flex-shrink-0 transition-all flex items-center justify-center"
+                    style={{
+                      width: '22px',
+                      height: '22px',
+                      borderRadius: '50%',
+                      border: isDone ? 'none' : '1.5px solid rgba(255, 255, 255, 0.25)',
+                      background: isDone ? 'linear-gradient(135deg, #2ed158, #1a8a38)' : 'rgba(255, 255, 255, 0.03)',
+                      boxShadow: isDone ? '0 3px 8px rgba(46, 209, 88, 0.2)' : 'none'
+                    }}
+                  >
+                    {isDone && (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    )}
                   </div>
+                  
+                  {/* Feladat szöveg */}
+                  <span 
+                    className="text-sm font-medium transition-all"
+                    style={{
+                      color: isDone ? 'var(--t3)' : 'var(--t1)',
+                      textDecoration: isDone ? 'line-through' : 'none',
+                      flex: 1,
+                      wordBreak: 'break-word',
+                      lineHeight: '1.4',
+                      paddingTop: '1px'
+                    }}
+                  >
+                    {task}
+                  </span>
                 </div>
               );
             })}
@@ -876,8 +945,47 @@ export default function ProjectDetails() {
       </div>
 
       {/* Kép feltöltése zóna */}
-      <div className="gcard fu d4" style={{ padding: 0, border: 'none', background: 'transparent', marginBottom: '15px' }}>
-        <label className="upload-area block relative overflow-hidden" style={{ background: 'var(--s1)', border: '1.5px dashed var(--b2)', borderRadius: '6px' }}>
+      <div className="fu d4 flex justify-center" style={{ marginBottom: '20px', width: '100%' }}>
+        <style>{`
+          @keyframes subtle-breathe {
+            0% {
+              transform: scale(1);
+              box-shadow: 0 4px 15px rgba(0, 136, 204, 0.25);
+            }
+            50% {
+              transform: scale(1.025);
+              box-shadow: 0 8px 24px rgba(0, 136, 204, 0.45);
+            }
+            100% {
+              transform: scale(1);
+              box-shadow: 0 4px 15px rgba(0, 136, 204, 0.25);
+            }
+          }
+          .breathe-btn {
+            animation: subtle-breathe 2.8s ease-in-out infinite;
+          }
+          .breathe-btn:active {
+            transform: scale(0.95) !important;
+            animation: none !important;
+          }
+        `}</style>
+        <label 
+          className="breathe-btn cursor-pointer transition-all flex items-center justify-center" 
+          style={{ 
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'linear-gradient(135deg, #0088cc, #005580)', 
+            border: 'none', 
+            borderRadius: '23px',
+            height: '46px',
+            padding: '0 24px',
+            color: '#ffffff',
+            fontSize: '13px',
+            fontWeight: '700',
+            cursor: 'pointer'
+          }}
+        >
           <input 
             type="file" 
             accept="image/*" 
@@ -886,16 +994,30 @@ export default function ProjectDetails() {
             className="hidden" 
           />
           {uploading ? (
-            <div className="py-6 flex flex-col items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-2"></div>
-              <div className="ua-t">Feltöltés folyamatban...</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent"></div>
+              <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Feltöltés...</span>
             </div>
           ) : (
-            <div className="py-4 text-center cursor-pointer">
-              <span className="ua-ico text-3xl block mb-1">📸</span>
-              <span className="ua-t text-sm font-bold text-[var(--t1)]">Fénykép készítése és beküldése</span>
-              <span className="ua-s text-[10px] text-[var(--t3)] block mt-1">Kattints a kamera megnyitásához</span>
-            </div>
+            <>
+              {/* SVG Camera Icon */}
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="16" 
+                height="16" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2.5" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                style={{ flexShrink: 0, color: '#ffffff' }}
+              >
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+              <span>Fénykép készítése</span>
+            </>
           )}
         </label>
       </div>
@@ -903,30 +1025,50 @@ export default function ProjectDetails() {
       {/* KÉPFELTÖLTÉSI VARÁZSLÓ MODAL (Apple-stílusú overlay) */}
       {selectedFile && (
         <div 
-          className="fixed inset-0 z-[1000] flex items-center justify-center p-4" 
+          className="fixed inset-0 z-[1000] flex items-center justify-center p-4 overflow-y-auto" 
           style={{ 
-            background: 'rgba(7, 9, 15, 0.85)', 
-            backdropFilter: 'blur(20px)', 
-            WebkitBackdropFilter: 'blur(20px)' 
+            background: 'rgba(7, 9, 15, 0.90)', 
+            backdropFilter: 'blur(25px)', 
+            WebkitBackdropFilter: 'blur(25px)' 
           }}
         >
           <div 
-            className="w-full max-w-sm overflow-hidden animate-[scaleUp_0.25s_ease-out]" 
+            className="w-full max-w-sm animate-[scaleUp_0.25s_ease-out]" 
             style={{ 
-              background: 'var(--s1)', 
-              border: '1px solid var(--b1)', 
-              borderRadius: '6px', 
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' 
+              background: 'rgba(255, 255, 255, 0.03)', 
+              border: '1px solid rgba(255, 255, 255, 0.08)', 
+              borderRadius: '24px', 
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6)',
+              backdropFilter: 'blur(30px)',
+              WebkitBackdropFilter: 'blur(30px)',
+              maxHeight: 'calc(100vh - 32px)',
+              display: 'flex',
+              flexDirection: 'column'
             }}
           >
             {/* Modal Fejléc */}
-            <div className="p-4 border-b border-white/5 flex justify-between items-center">
-              <span className="text-xs font-bold text-[var(--t1)]">📸 Fénykép ellenőrzése</span>
-              <button type="button" onClick={cancelPhotoUpload} className="text-[var(--t3)] hover:text-white text-xs">Bezárás</button>
+            <div className="p-5 pb-2 flex justify-between items-center flex-shrink-0">
+              <span className="text-sm font-bold text-[var(--t1)]" style={{ fontSize: '15px', fontWeight: '800', letterSpacing: '-0.3px' }}>📸 Fénykép ellenőrzése</span>
+              <button 
+                type="button" 
+                onClick={cancelPhotoUpload} 
+                className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-95 hover:bg-white/10"
+                style={{ 
+                  background: 'rgba(255, 255, 255, 0.05)', 
+                  border: '1px solid rgba(255, 255, 255, 0.1)', 
+                  color: 'var(--t2)', 
+                  cursor: 'pointer' 
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
             </div>
 
-            <form onSubmit={submitPhotoUpload} className="p-4 space-y-4">
-              {/* Fotó előnézet */}
+            <form onSubmit={submitPhotoUpload} className="p-5 pt-2" style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto', flex: 1 }}>
+              {/* Fotó előnézet fehér hajszálvékony kerettel */}
               {filePreview && (
                 <div 
                   className="w-full aspect-video rounded-xl"
@@ -934,7 +1076,8 @@ export default function ProjectDetails() {
                     backgroundImage: `url(${filePreview})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                    border: '1px solid var(--b1)',
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
                     aspectRatio: '16 / 9'
                   }}
                 />
@@ -942,16 +1085,15 @@ export default function ProjectDetails() {
 
               {/* TÍPUS KIVÁLASZTÁSA (2 hatalmas, gyönyörű Apple kártya egymás mellett) */}
               <div>
-                <label className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-2 block">Mi látható ezen a képen?</label>
                 <div className="grid grid-cols-2 gap-3">
                   {/* Kártya 1: Munkafolyamat */}
                   <div 
                     onClick={() => setIsIssue(false)}
-                    className="p-3 rounded-xl cursor-pointer flex flex-col items-center justify-center space-y-1 transition-all"
+                    className="p-3.5 rounded-2xl cursor-pointer flex flex-col items-center justify-center space-y-1.5 transition-all active:scale-95"
                     style={{
-                      background: 'rgba(255, 255, 255, 0.02)',
-                      border: !isIssue ? '2px solid var(--green)' : '1px solid var(--b1)',
-                      boxShadow: !isIssue ? '0 4px 15px rgba(46, 209, 88, 0.15)' : 'none'
+                      background: !isIssue ? 'rgba(46, 209, 88, 0.04)' : 'rgba(255, 255, 255, 0.02)',
+                      border: !isIssue ? '2px solid var(--green)' : '1px solid rgba(255, 255, 255, 0.06)',
+                      boxShadow: !isIssue ? '0 8px 20px rgba(46, 209, 88, 0.12)' : 'none'
                     }}
                   >
                     <span className="text-xl">🟢</span>
@@ -961,11 +1103,11 @@ export default function ProjectDetails() {
                   {/* Kártya 2: Hiba */}
                   <div 
                     onClick={() => setIsIssue(true)}
-                    className="p-3 rounded-xl cursor-pointer flex flex-col items-center justify-center space-y-1 transition-all"
+                    className="p-3.5 rounded-2xl cursor-pointer flex flex-col items-center justify-center space-y-1.5 transition-all active:scale-95"
                     style={{
-                      background: 'rgba(255, 255, 255, 0.02)',
-                      border: isIssue ? '2px solid var(--red)' : '1px solid var(--b1)',
-                      boxShadow: isIssue ? '0 4px 15px rgba(255, 59, 48, 0.15)' : 'none'
+                      background: isIssue ? 'rgba(255, 59, 48, 0.04)' : 'rgba(255, 255, 255, 0.02)',
+                      border: isIssue ? '2px solid var(--red)' : '1px solid rgba(255, 255, 255, 0.06)',
+                      boxShadow: isIssue ? '0 8px 20px rgba(255, 59, 48, 0.12)' : 'none'
                     }}
                   >
                     <span className="text-xl">⚠️</span>
@@ -974,56 +1116,87 @@ export default function ProjectDetails() {
                 </div>
               </div>
 
-              {/* MEGJEGYZÉS (Ha hiba, akkor KÖTELEZŐ) */}
+              {/* MEGJEGYZÉS (Textarea, ha hiba, akkor KÖTELEZŐ) */}
               <div>
-                <label className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider mb-1 block">
+                <label className="text-[10px] text-[var(--t3)] uppercase font-bold tracking-wider block" style={{ marginBottom: '4px' }}>
                   {isIssue ? '🔴 Probléma leírása (KÖTELEZŐ)' : 'Megjegyzés a képhez (Opcionális)'}
                 </label>
-                <input 
-                  type="text" 
+                <textarea 
                   value={photoComment} 
                   onChange={(e) => setPhotoComment(e.target.value)}
                   required={isIssue}
+                  rows="3"
                   placeholder={isIssue ? "pl. Törött a napelem sarka..." : "pl. Sínek felszerelve a tetőre..."}
                   style={{
-                    background: 'var(--s2)',
-                    border: isIssue && !photoComment.trim() ? '1px solid rgba(255, 59, 48, 0.5)' : '1px solid var(--b1)',
-                    borderRadius: '10px',
-                    padding: '8px 12px',
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    border: isIssue && !photoComment.trim() ? '1px solid rgba(255, 59, 48, 0.5)' : '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '14px',
+                    padding: '12px 14px',
                     color: 'var(--t1)',
-                    fontSize: '12px',
+                    fontSize: '13px',
                     width: '100%',
-                    outline: 'none'
+                    outline: 'none',
+                    fontFamily: 'inherit',
+                    resize: 'none'
                   }}
                 />
               </div>
 
-              {/* AKCIÓ GOMBOK */}
-              <div className="flex space-x-3 pt-2">
+              {/* AKCIÓ GOMBOK (Egységesítve az EditProjectModal dizájnnal: magasság 56px, lekerekítés 16px, gap 10px) */}
+              <div style={{ display: 'flex', gap: '10px', paddingTop: '8px' }}>
                 <button 
                   type="button" 
                   onClick={cancelPhotoUpload} 
-                  className="flex-1 py-2 font-bold text-xs rounded-xl"
-                  style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--t2)', border: '1px solid var(--b1)' }}
+                  className="flex-1 font-bold transition-all active:scale-95 flex items-center justify-center"
+                  style={{ 
+                    background: 'var(--s2)', 
+                    color: 'var(--t1)', 
+                    border: '1px solid var(--b1)',
+                    borderRadius: '16px',
+                    height: '56px',
+                    fontSize: '14px',
+                    cursor: 'pointer'
+                  }}
                 >
                   Mégsem
                 </button>
                 <button 
                   type="submit" 
                   disabled={uploading}
-                  className="flex-1 py-2 font-bold text-xs rounded-xl transition-all"
+                  className="flex-1 font-bold transition-all active:scale-95 flex items-center justify-center premium-breathe"
                   style={{
                     background: isIssue 
                       ? 'linear-gradient(135deg, #ff3b30, #ff453a)' 
                       : 'linear-gradient(135deg, #2ed158, #1ca542)',
                     color: '#fff',
                     border: 'none',
+                    borderRadius: '16px',
+                    height: '56px',
+                    fontSize: '14px',
+                    cursor: 'pointer',
                     boxShadow: isIssue 
-                      ? '0 6px 15px rgba(255, 59, 48, 0.2)' 
-                      : '0 6px 15px rgba(46, 209, 88, 0.2)'
+                      ? '0 8px 25px rgba(255, 59, 48, 0.35)' 
+                      : '0 8px 25px rgba(46, 209, 88, 0.35)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
                   }}
                 >
-                  {uploading ? 'Feltöltés...' : 'Fotó Beküldése'}
+                  {uploading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                      <span>Küldés...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                      </svg>
+                      <span>Fotó Beküldése</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>
@@ -1050,12 +1223,13 @@ export default function ProjectDetails() {
               return (
                 <div 
                   key={photo.id || index} 
-                  className="rounded-md overflow-hidden flex flex-col relative"
+                  className="overflow-hidden flex flex-col relative"
                   style={{
                     background: 'var(--s1)',
                     border: photo.resolved 
                       ? '1px solid rgba(46, 209, 88, 0.4)' 
                       : (photo.is_issue ? '1px solid rgba(255, 59, 48, 0.4)' : '1px solid var(--b1)'),
+                    borderRadius: '14px',
                     backdropFilter: 'blur(8px)',
                     WebkitBackdropFilter: 'blur(8px)'
                   }}
@@ -1068,7 +1242,8 @@ export default function ProjectDetails() {
                       backgroundImage: `url(${photo.file_path})`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
-                      aspectRatio: '4 / 3'
+                      aspectRatio: '4 / 3',
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.12)'
                     }}
                   >
                     {/* Hiba vs Munkafolyamat Jelvény ráúsztatva a képre */}
@@ -1120,12 +1295,13 @@ export default function ProjectDetails() {
                               profiles: photo.profiles,
                               created_at: photo.resolved_at || photo.created_at
                             })}
-                            className="block aspect-video rounded-lg overflow-hidden border border-emerald-500/20 relative cursor-pointer"
+                            className="block aspect-video rounded-lg overflow-hidden relative cursor-pointer"
                             style={{
                               backgroundImage: `url(${photo.resolved_file_path})`,
                               backgroundSize: 'cover',
                               backgroundPosition: 'center',
-                              aspectRatio: '16 / 9'
+                              aspectRatio: '16 / 9',
+                              border: '1px solid rgba(255, 255, 255, 0.15)'
                             }}
                           >
                             <div className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-emerald-500/80 text-[7px] text-white font-bold">Nagyítás</div>
@@ -1173,17 +1349,19 @@ export default function ProjectDetails() {
           </div>
 
           <div 
-            className="w-full max-w-lg flex items-center justify-center relative rounded-md overflow-hidden" 
+            className="w-full max-w-lg flex items-center justify-center relative overflow-hidden" 
             style={{ 
               maxHeight: '70vh', 
               boxShadow: '0 20px 50px rgba(0,0,0,0.8)',
-              border: '1px solid rgba(255,255,255,0.05)'
+              border: '1px solid rgba(255,255,255,0.15)',
+              borderRadius: '12px'
             }}
           >
             <img 
               src={previewImage.file_path} 
               alt={previewImage.description || 'Fénykép'} 
-              className="max-w-full max-h-[70vh] object-contain rounded-md"
+              className="max-w-full max-h-[70vh] object-contain"
+              style={{ borderRadius: '12px' }}
             />
           </div>
 

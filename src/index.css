@@ -363,4 +363,13 @@ select option{background:#07090f}
   display: none;
 }
 
+@keyframes premium-breathe {
+  0%, 100% {
+    box-shadow: 0 4px 14px rgba(79, 142, 247, 0.25);
+  }
+  50% {
+    box-shadow: 0 4px 22px rgba(79, 142, 247, 0.50);
+  }
+}
+
 
