@@ -1247,14 +1247,28 @@ export default function ProjectDetails() {
                     }}
                   >
                     {/* Hiba vs Munkafolyamat Jelvény ráúsztatva a képre */}
-                    <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[8px] font-extrabold uppercase tracking-wider text-white" style={{
-                      background: photo.resolved 
-                        ? 'rgba(46, 209, 88, 0.9)' 
-                        : (photo.is_issue ? 'rgba(255, 59, 48, 0.9)' : 'rgba(46, 209, 88, 0.85)'),
-                      backdropFilter: 'blur(4px)',
-                      WebkitBackdropFilter: 'blur(4px)'
-                    }}>
-                      {photo.resolved ? '🟢 Kijavítva' : (photo.is_issue ? '⚠️ Hiba' : '🟢 Haladás')}
+                    <div 
+                      className="absolute top-2.5 left-2.5 rounded-full text-[9px] font-black uppercase tracking-wider text-white" 
+                      style={{
+                        background: photo.resolved 
+                          ? 'rgba(46, 209, 88, 0.95)' 
+                          : (photo.is_issue ? 'rgba(255, 59, 48, 0.95)' : 'rgba(46, 209, 88, 0.9)'),
+                        border: photo.resolved
+                          ? '1px solid rgba(46, 209, 88, 0.3)'
+                          : (photo.is_issue ? '1px solid rgba(255, 59, 48, 0.3)' : '1px solid rgba(46, 209, 88, 0.2)'),
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        padding: '3.5px 8px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        whiteSpace: 'nowrap',
+                        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.25)',
+                        lineHeight: '1'
+                      }}
+                    >
+                      <span>{photo.resolved ? '🟢' : (photo.is_issue ? '⚠️' : '🟢')}</span>
+                      <span style={{ fontSize: '8px' }}>{photo.resolved ? 'Kijavítva' : (photo.is_issue ? 'Hiba' : 'Haladás')}</span>
                     </div>
                   </div>
                   
@@ -1304,7 +1318,24 @@ export default function ProjectDetails() {
                               border: '1px solid rgba(255, 255, 255, 0.15)'
                             }}
                           >
-                            <div className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-emerald-500/80 text-[7px] text-white font-bold">Nagyítás</div>
+                            <div 
+                              className="absolute bottom-1.5 right-1.5 rounded text-[8px] text-white font-black uppercase tracking-wider"
+                              style={{
+                                background: 'rgba(46, 209, 88, 0.95)',
+                                border: '1px solid rgba(46, 209, 88, 0.3)',
+                                backdropFilter: 'blur(4px)',
+                                WebkitBackdropFilter: 'blur(4px)',
+                                padding: '2px 6px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '3px',
+                                whiteSpace: 'nowrap',
+                                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
+                                lineHeight: '1'
+                              }}
+                            >
+                              🔍 Nagyítás
+                            </div>
                           </div>
                         )}
                         <div className="text-[10px] text-[var(--t2)] italic p-1.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 leading-snug">
