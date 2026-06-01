@@ -48,6 +48,27 @@ export default function Finance() {
   const [editEmergency, setEditEmergency] = useState('');
   const [editFullName, setEditFullName] = useState('');
   const [activeTab, setActiveTab] = useState('projects');
+  const [expandedMonths, setExpandedMonths] = useState({});
+
+  const getMonthName = (dateStr) => {
+    if (!dateStr) return 'Ismeretlen';
+    const dateObj = new Date(dateStr);
+    if (isNaN(dateObj.getTime())) return 'Ismeretlen';
+    const year = dateObj.getFullYear();
+    const monthNames = [
+      'Január', 'Február', 'Március', 'Április', 'Május', 'Június',
+      'Július', 'Augusztus', 'Szeptember', 'Október', 'November', 'December'
+    ];
+    return `${year}. ${monthNames[dateObj.getMonth()]}`;
+  };
+
+  const toggleMonthExpand = (workerId, monthName) => {
+    const key = `${workerId}-${monthName}`;
+    setExpandedMonths(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
 
   async function loadFinanceData() {
     try {
@@ -535,10 +556,9 @@ export default function Finance() {
                             <div style={{ fontWeight: '700', color: 'var(--t2)', fontSize: '12px' }}>{worker.id_card_number || '—'}</div>
                           </div>
 
-                          {/* Részletes munkalapok listája a dolgozónál */}
                           <div className="col-span-2 pt-4 mt-2" style={{ borderTop: '1px solid var(--b1)' }}>
-                            <div style={{ ...labelXs, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                              <span>📋 Részletes Munkalapok</span>
+                            <div style={{ ...labelXs, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                              <span>📋 Havi munkalap elszámolások</span>
                               <span style={{ fontSize: '9px', background: 'rgba(255,255,255,0.05)', padding: '1px 6px', borderRadius: '10px', color: 'var(--t2)' }}>{worker.logs?.length || 0} nap</span>
                             </div>
                             
@@ -546,33 +566,91 @@ export default function Finance() {
                               <div style={{ fontSize: '11px', color: 'var(--t3)', fontStyle: 'italic', padding: '12px', background: 'var(--s2)', borderRadius: '12px', border: '1px solid var(--b1)', textAlign: 'center' }}>
                                 Még nem küldött be munkalapot ez a dolgozó.
                               </div>
-                            ) : (
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '180px', overflowY: 'auto', paddingRight: '4px' }} className="custom-scroll">
-                                {worker.logs.map(log => (
-                                  <div key={log.id} style={{ background: 'var(--s2)', padding: '10px 12px', borderRadius: '12px', border: '1px solid var(--b1)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                      <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--t1)' }}>
-                                        ⚡ {log.projects?.name || 'Névtelen projekt'}
-                                      </span>
-                                      <span style={{ fontSize: '10px', fontWeight: '800', color: 'var(--blue)' }}>
-                                        {log.date}
-                                      </span>
-                                    </div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10px', color: 'var(--t2)', fontWeight: '600' }}>
-                                      <span>⏱ {log.hours} óra ({log.start_time} – {log.end_time})</span>
-                                      <span style={{ color: 'var(--green)', fontWeight: '700' }}>
-                                        +{(log.hours * (worker.hourly_wage || 3500)).toLocaleString('hu-HU')} Ft
-                                      </span>
-                                    </div>
-                                    {log.description && (
-                                      <div style={{ fontSize: '10px', color: 'var(--t3)', fontStyle: 'italic', marginTop: '2px', background: 'rgba(0,0,0,0.15)', padding: '4px 8px', borderRadius: '6px', lineHeight: '1.4' }}>
-                                        {log.description}
+                            ) : (() => {
+                              // Csoportosítás hónapok szerint
+                              const grouped = {};
+                              worker.logs.forEach(log => {
+                                const mKey = getMonthName(log.date);
+                                if (!grouped[mKey]) {
+                                  grouped[mKey] = { name: mKey, hours: 0, pay: 0, items: [] };
+                                }
+                                grouped[mKey].hours += Number(log.hours);
+                                grouped[mKey].pay += Number(log.hours) * (worker.hourly_wage || 3500);
+                                grouped[mKey].items.push(log);
+                              });
+                              
+                              const sortedMonths = Object.values(grouped).sort((a, b) => b.name.localeCompare(a.name));
+                              
+                              return (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                  {sortedMonths.map(month => {
+                                    const monthKey = `${worker.id}-${month.name}`;
+                                    const isMonthExpanded = !!expandedMonths[monthKey];
+                                    
+                                    return (
+                                      <div key={month.name} style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--b1)', borderRadius: '12px', overflow: 'hidden' }}>
+                                        {/* Hónap Accordion Fejléc */}
+                                        <div 
+                                          onClick={() => toggleMonthExpand(worker.id, month.name)}
+                                          className="cursor-pointer hover:bg-white/[0.02] active:scale-[0.99] transition-all"
+                                          style={{ 
+                                            padding: '10px 12px', 
+                                            display: 'flex', 
+                                            justifyContent: 'space-between', 
+                                            alignItems: 'center',
+                                            background: isMonthExpanded ? 'rgba(255,255,255,0.03)' : 'transparent'
+                                          }}
+                                        >
+                                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--t1)' }}>📅 {month.name}</span>
+                                            <span style={{ fontSize: '9px', background: 'rgba(79,142,247,0.1)', border: '1px solid rgba(79,142,247,0.15)', color: 'var(--blue)', padding: '1px 5px', borderRadius: '10px', fontWeight: '700' }}>
+                                              {month.items.length} nap
+                                            </span>
+                                          </div>
+                                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <div style={{ textAlign: 'right', fontSize: '10px', fontWeight: '700' }}>
+                                              <span style={{ color: 'var(--t2)' }}>{month.hours} óra</span> · <span style={{ color: 'var(--green)' }}>{month.pay.toLocaleString('hu-HU')} Ft</span>
+                                            </div>
+                                            <span style={{ fontSize: '10px', color: 'var(--t3)', transition: 'transform 0.2s', transform: isMonthExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                                              ▼
+                                            </span>
+                                          </div>
+                                        </div>
+                                        
+                                        {/* Hónapon belüli napi bejegyzések */}
+                                        {isMonthExpanded && (
+                                          <div style={{ padding: '8px 10px', background: 'rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid var(--b1)' }}>
+                                            {month.items.map(log => (
+                                              <div key={log.id} style={{ background: 'var(--s2)', padding: '8px 10px', borderRadius: '8px', border: '1px solid var(--b1)', display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                  <span style={{ fontSize: '10.5px', fontWeight: '700', color: 'var(--t1)' }}>
+                                                    ⚡ {log.projects?.name || 'Névtelen projekt'}
+                                                  </span>
+                                                  <span style={{ fontSize: '9.5px', fontWeight: '700', color: 'var(--blue)' }}>
+                                                    {log.date}
+                                                  </span>
+                                                </div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '9.5px', color: 'var(--t2)', fontWeight: '600' }}>
+                                                  <span>⏱ {log.hours} óra ({log.start_time} – {log.end_time})</span>
+                                                  <span style={{ color: 'var(--green)', fontWeight: '700' }}>
+                                                    +{(log.hours * (worker.hourly_wage || 3500)).toLocaleString('hu-HU')} Ft
+                                                  </span>
+                                                </div>
+                                                {log.description && (
+                                                  <div style={{ fontSize: '9.5px', color: 'var(--t3)', fontStyle: 'italic', marginTop: '1px', background: 'rgba(0,0,0,0.12)', padding: '3px 6px', borderRadius: '4px', lineHeight: '1.3' }}>
+                                                    {log.description}
+                                                  </div>
+                                                )}
+                                              </div>
+                                            ))}
+                                          </div>
+                                        )}
                                       </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
+                                    );
+                                  })}
+                                </div>
+                              );
+                            })()}
                           </div>
                         </div>
                       ) : (
