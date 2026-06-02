@@ -163,12 +163,12 @@ export default function Issues() {
       )}
 
       {/* Projekt szűrő */}
-      <div style={{ marginLeft: '15px', marginRight: '15px', marginTop: '12px', marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+      <div style={{ marginLeft: '15px', marginRight: '15px', marginTop: '12px', marginBottom: '10px' }}>
         <select
           value={selectedProjectId}
           onChange={(e) => { setSelectedProjectId(e.target.value); setExpandedIssueId(null); }}
           style={{
-            flex: 1, padding: '9px 12px', borderRadius: '10px', fontSize: '12px', fontWeight: '600',
+            width: '100%', padding: '9px 12px', borderRadius: '10px', fontSize: '12px', fontWeight: '600',
             background: 'var(--s1)', border: '1px solid var(--b1)', color: 'var(--t1)',
             fontFamily: 'inherit', outline: 'none', cursor: 'pointer',
             appearance: 'none', WebkitAppearance: 'none',
@@ -187,16 +187,26 @@ export default function Issues() {
           onClick={() => setHideArchived(!hideArchived)}
           className="active:scale-95 transition-all"
           style={{
-            padding: '8px 10px', borderRadius: '10px', fontSize: '10px', fontWeight: '700',
-            cursor: 'pointer', whiteSpace: 'nowrap',
-            background: hideArchived ? 'rgba(255,214,10,0.12)' : 'var(--s1)',
-            border: hideArchived ? '1px solid rgba(255,214,10,0.30)' : '1px solid var(--b1)',
-            color: hideArchived ? 'var(--yellow)' : 'var(--t3)',
-            display: 'inline-flex', alignItems: 'center', gap: '4px',
+            marginTop: '6px', fontSize: '10px', fontWeight: '600',
+            cursor: 'pointer', color: 'var(--t3)',
+            display: 'inline-flex', alignItems: 'center', gap: '5px',
           }}
         >
-          <Icon name="archive" size={11} strokeWidth={2.2} />
-          {hideArchived ? 'Archív rejtve' : 'Archív látszik'}
+          <div style={{
+            width: '28px', height: '16px', borderRadius: '8px', position: 'relative',
+            background: hideArchived ? 'var(--yellow)' : 'var(--b1)',
+            transition: 'background 0.2s ease',
+          }}>
+            <div style={{
+              width: '12px', height: '12px', borderRadius: '50%', background: '#fff',
+              position: 'absolute', top: '2px',
+              left: hideArchived ? '14px' : '2px',
+              transition: 'left 0.2s ease',
+            }} />
+          </div>
+          <span style={{ color: hideArchived ? 'var(--t2)' : 'var(--t3)' }}>
+            Archivált projektek {hideArchived ? 'elrejtve' : 'megjelenítve'}
+          </span>
         </div>
       </div>
 
