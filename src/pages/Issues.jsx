@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Icon } from '../components/Icon';
+import { exportCSV, exportExcel, exportPDF } from '../lib/exportIssues';
 
 export default function Issues() {
   const navigate = useNavigate();
@@ -16,6 +17,8 @@ export default function Issues() {
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedProjectId, setSelectedProjectId] = useState('all');
   const [hideArchived, setHideArchived] = useState(true);
+  const [exporting, setExporting] = useState(null); // 'pdf' | 'csv' | 'excel' | null
+  const [exportProgress, setExportProgress] = useState('');
 
   async function loadIssues() {
     try {
@@ -218,6 +221,68 @@ export default function Issues() {
         <div className="active:scale-[0.98] transition-all" onClick={() => { setActiveTab('resolved'); setExpandedIssueId(null); }} style={{ ...tabStyle('resolved'), display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
           <Icon name="dot-green" size={10} /> Javított ({resolvedIssues.length})
         </div>
+      </div>
+
+      {/* Export gombok */}
+      <div style={{ marginLeft: '15px', marginRight: '15px', marginBottom: '12px', display: 'flex', gap: '6px' }}>
+        <button
+          disabled={!!exporting || displayedIssues.length === 0}
+          onClick={async () => {
+            setExporting('pdf');
+            setExportProgress('Képek letöltése...');
+            try {
+              await exportPDF(displayedIssues, (cur, total) => setExportProgress(`${cur}/${total} feldolgozva...`));
+            } catch (e) { alert('PDF hiba: ' + e.message); }
+            setExporting(null); setExportProgress('');
+          }}
+          className="active:scale-95 transition-all"
+          style={{
+            flex: 1, padding: '8px 0', borderRadius: '10px', fontSize: '10px', fontWeight: '700',
+            cursor: exporting ? 'default' : 'pointer', border: 'none', fontFamily: 'inherit',
+            background: exporting === 'pdf' ? 'var(--blue)' : 'rgba(79,142,247,0.12)',
+            color: exporting === 'pdf' ? '#fff' : 'var(--blue)',
+            border: '1px solid rgba(79,142,247,0.25)',
+            opacity: displayedIssues.length === 0 ? 0.4 : 1,
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
+          }}
+        >
+          <Icon name="file" size={11} strokeWidth={2.2} />
+          {exporting === 'pdf' ? exportProgress : 'PDF'}
+        </button>
+        <button
+          disabled={!!exporting || displayedIssues.length === 0}
+          onClick={() => { setExporting('excel'); exportExcel(displayedIssues); setExporting(null); }}
+          className="active:scale-95 transition-all"
+          style={{
+            flex: 1, padding: '8px 0', borderRadius: '10px', fontSize: '10px', fontWeight: '700',
+            cursor: exporting ? 'default' : 'pointer', border: 'none', fontFamily: 'inherit',
+            background: 'rgba(46,209,88,0.12)',
+            color: 'var(--green)',
+            border: '1px solid rgba(46,209,88,0.25)',
+            opacity: displayedIssues.length === 0 ? 0.4 : 1,
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
+          }}
+        >
+          <Icon name="table" size={11} strokeWidth={2.2} />
+          Excel
+        </button>
+        <button
+          disabled={!!exporting || displayedIssues.length === 0}
+          onClick={() => { setExporting('csv'); exportCSV(displayedIssues); setExporting(null); }}
+          className="active:scale-95 transition-all"
+          style={{
+            flex: 1, padding: '8px 0', borderRadius: '10px', fontSize: '10px', fontWeight: '700',
+            cursor: exporting ? 'default' : 'pointer', border: 'none', fontFamily: 'inherit',
+            background: 'rgba(255,214,10,0.12)',
+            color: 'var(--yellow)',
+            border: '1px solid rgba(255,214,10,0.25)',
+            opacity: displayedIssues.length === 0 ? 0.4 : 1,
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
+          }}
+        >
+          <Icon name="download" size={11} strokeWidth={2.2} />
+          CSV
+        </button>
       </div>
 
       <div className="shdr fu d1" style={{ marginLeft: '15px', marginRight: '15px', marginBottom: '10px' }}>
