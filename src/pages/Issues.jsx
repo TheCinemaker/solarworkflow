@@ -168,7 +168,7 @@ export default function Issues() {
           value={selectedProjectId}
           onChange={(e) => { setSelectedProjectId(e.target.value); setExpandedIssueId(null); }}
           style={{
-            width: '100%', padding: '9px 12px', borderRadius: '10px', fontSize: '12px', fontWeight: '600',
+            width: '100%', padding: '9px 12px', borderRadius: '10px', fontSize: '11px', fontWeight: '600',
             background: 'var(--s1)', border: '1px solid var(--b1)', color: 'var(--t1)',
             fontFamily: 'inherit', outline: 'none', cursor: 'pointer',
             appearance: 'none', WebkitAppearance: 'none',
