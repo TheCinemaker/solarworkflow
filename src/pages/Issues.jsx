@@ -14,6 +14,8 @@ export default function Issues() {
   const [fixFile, setFixFile] = useState(null);
   const [savingFix, setSavingFix] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [selectedProjectId, setSelectedProjectId] = useState('all');
+  const [hideArchived, setHideArchived] = useState(true);
 
   async function loadIssues() {
     try {
@@ -26,7 +28,7 @@ export default function Issues() {
           id, file_path, description, is_issue, resolved, resolved_at,
           resolved_comment, resolved_file_path, project_id, created_at,
           profiles:profiles!user_id (full_name, serial_number),
-          projects (name, serial_number),
+          projects (name, serial_number, archived),
           resolved_by_profile:profiles!media_resolved_by_fkey (full_name, serial_number)
         `)
         .eq('is_issue', true)
@@ -81,9 +83,27 @@ export default function Issues() {
     }
   };
 
-  const openIssues = issues.filter(i => !i.resolved);
-  const resolvedIssues = issues.filter(i => i.resolved);
+  // Archivált projektek szűrése
+  const filteredByArchive = hideArchived ? issues.filter(i => !i.projects?.archived) : issues;
+  // Projekt szűrés
+  const filteredByProject = selectedProjectId === 'all' ? filteredByArchive : filteredByArchive.filter(i => i.project_id === selectedProjectId);
+
+  const openIssues = filteredByProject.filter(i => !i.resolved);
+  const resolvedIssues = filteredByProject.filter(i => i.resolved);
   const displayedIssues = activeTab === 'open' ? openIssues : resolvedIssues;
+
+  // Egyedi projektek listája a szűrőhöz
+  const uniqueProjects = [...new Map(
+    (hideArchived ? issues.filter(i => !i.projects?.archived) : issues)
+      .filter(i => i.projects)
+      .map(i => [i.project_id, { id: i.project_id, name: i.projects.name, serial: i.projects.serial_number, archived: i.projects.archived }])
+  ).values()];
+
+  // Projektenként számláló
+  const projectCounts = uniqueProjects.map(p => {
+    const pIssues = (hideArchived ? issues.filter(i => !i.projects?.archived) : issues).filter(i => i.project_id === p.id);
+    return { ...p, open: pIssues.filter(i => !i.resolved).length, resolved: pIssues.filter(i => i.resolved).length };
+  });
 
   const tabStyle = (tabName) => ({
     flex: 1, padding: '9px 0', textAlign: 'center', fontSize: '12px', fontWeight: '700',
@@ -142,8 +162,46 @@ export default function Issues() {
         </div>
       )}
 
+      {/* Projekt szűrő */}
+      <div style={{ marginLeft: '15px', marginRight: '15px', marginTop: '12px', marginBottom: '10px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+        <select
+          value={selectedProjectId}
+          onChange={(e) => { setSelectedProjectId(e.target.value); setExpandedIssueId(null); }}
+          style={{
+            flex: 1, padding: '9px 12px', borderRadius: '10px', fontSize: '12px', fontWeight: '600',
+            background: 'var(--s1)', border: '1px solid var(--b1)', color: 'var(--t1)',
+            fontFamily: 'inherit', outline: 'none', cursor: 'pointer',
+            appearance: 'none', WebkitAppearance: 'none',
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`,
+            backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center',
+          }}
+        >
+          <option value="all">Összes projekt ({uniqueProjects.reduce((s, p) => s + p.open + p.resolved, 0)} hiba)</option>
+          {projectCounts.map(p => (
+            <option key={p.id} value={p.id}>
+              {p.serial ? `${p.serial} · ` : ''}{p.name} ({p.open} nyitott, {p.resolved} javított)
+            </option>
+          ))}
+        </select>
+        <div
+          onClick={() => setHideArchived(!hideArchived)}
+          className="active:scale-95 transition-all"
+          style={{
+            padding: '8px 10px', borderRadius: '10px', fontSize: '10px', fontWeight: '700',
+            cursor: 'pointer', whiteSpace: 'nowrap',
+            background: hideArchived ? 'rgba(255,214,10,0.12)' : 'var(--s1)',
+            border: hideArchived ? '1px solid rgba(255,214,10,0.30)' : '1px solid var(--b1)',
+            color: hideArchived ? 'var(--yellow)' : 'var(--t3)',
+            display: 'inline-flex', alignItems: 'center', gap: '4px',
+          }}
+        >
+          <Icon name="archive" size={11} strokeWidth={2.2} />
+          {hideArchived ? 'Archív rejtve' : 'Archív látszik'}
+        </div>
+      </div>
+
       {/* Tab selector */}
-      <div className="p-1 rounded-xl flex items-center" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginLeft: '15px', marginRight: '15px', marginTop: '12px', marginBottom: '15px' }}>
+      <div className="p-1 rounded-xl flex items-center" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginLeft: '15px', marginRight: '15px', marginBottom: '15px' }}>
         <div className="active:scale-[0.98] transition-all" onClick={() => { setActiveTab('open'); setExpandedIssueId(null); }} style={{ ...tabStyle('open'), display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
           <Icon name="dot-red" size={10} /> Nyitott hibák ({openIssues.length})
         </div>
