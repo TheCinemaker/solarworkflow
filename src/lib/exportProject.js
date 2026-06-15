@@ -308,6 +308,21 @@ export async function exportProjectPDF(projectId, onProgress) {
   }
 
   // ═══════════════════════════════════════
+  // HIÁNYZÓ ANYAGOK ÉS AKADÁLYOK
+  // ═══════════════════════════════════════
+  if (project.missing_materials) {
+    sectionTitle('Hiányzó anyagok és akadályok');
+    
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(40, 40, 40);
+    
+    const materialsLines = doc.splitTextToSize(normalizeText(project.missing_materials), contentW);
+    doc.text(materialsLines, margin, y);
+    y += materialsLines.length * 4.5 + 6;
+  }
+
+  // ═══════════════════════════════════════
   // 6. MUNKANAPLÓ (WORKLOGS TÁBLÁZAT)
   // ═══════════════════════════════════════
 

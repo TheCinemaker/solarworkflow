@@ -17,6 +17,7 @@ export default function EditProjectModal({ isOpen, onClose, project, onSuccess }
   const [tasks, setTasks] = useState('');
   const [telegramLink, setTelegramLink] = useState('');
   const [clientPrice, setClientPrice] = useState('');
+  const [missingMaterials, setMissingMaterials] = useState('');
 
   // Napelem és inverter mezők
   const [isSolar, setIsSolar] = useState(false);
@@ -42,6 +43,7 @@ export default function EditProjectModal({ isOpen, onClose, project, onSuccess }
       setTasks(project.tasks || '');
       setTelegramLink(project.telegram_link || '');
       setClientPrice(project.client_price || '');
+      setMissingMaterials(project.missing_materials || '');
       setIsSolar(project.is_solar || false);
       setInverterBrand(project.inverter_brand || '');
       setInverterId(project.inverter_id || '');
@@ -73,6 +75,7 @@ export default function EditProjectModal({ isOpen, onClose, project, onSuccess }
         tasks,
         telegram_link: telegramLink,
         client_price: parseInt(clientPrice) || 0,
+        missing_materials: missingMaterials,
         is_solar: isSolar,
         inverter_brand: isSolar ? (inverterBrand || null) : null,
         inverter_id: isSolar ? (inverterId || null) : null,
@@ -388,6 +391,17 @@ export default function EditProjectModal({ isOpen, onClose, project, onSuccess }
                   value={importantInfo} 
                   onChange={(e) => setImportantInfo(e.target.value)} 
                   placeholder="pl. Kulcs a kapu melletti postaládában..." 
+                  rows={2} 
+                  style={{ ...inputStyle, paddingTop: '24px', resize: 'none', minHeight: '68px' }} 
+                />
+              </div>
+
+              <div style={{ position: 'relative' }} className="w-full">
+                <span style={floatingLabelStyle}>Hiányzó Anyagok / Akadályok</span>
+                <textarea 
+                  value={missingMaterials} 
+                  onChange={(e) => setMissingMaterials(e.target.value)} 
+                  placeholder="pl. Hiányzik 10m 5x10-es kábel, a másik cég nem fejezte be a védőcsövezést..." 
                   rows={2} 
                   style={{ ...inputStyle, paddingTop: '24px', resize: 'none', minHeight: '68px' }} 
                 />

@@ -29,6 +29,18 @@ export default function ProjectDetails() {
   const [selectedFile, setSelectedFile] = useState(null); // Feltöltendő fájl átmenetileg
   const [filePreview, setFilePreview] = useState(null); // Előnézet URL
   const [previewImage, setPreviewImage] = useState(null); // Nagyított kép overlay-hez
+  const [zoomScale, setZoomScale] = useState(1); // Kép nagyítás mértéke (1 - 3)
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [startY, setStartY] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [scrollTop, setScrollTop] = useState(0);
+  const [hasMoved, setHasMoved] = useState(false);
+  const imageContainerRef = useRef(null);
+  
+  // Hiányzó anyagok és terepi akadályok
+  const [isEditingMaterials, setIsEditingMaterials] = useState(false);
+  const [tempMaterials, setTempMaterials] = useState('');
   
   // Belső Chat állapotok
   const [messages, setMessages] = useState([]);
@@ -58,6 +70,43 @@ export default function ProjectDetails() {
     }
     return () => clearInterval(interval);
   }, [showLiveTelemetry]);
+
+  // Fénykép nagyítás és drag-to-pan kezelése
+  useEffect(() => {
+    setZoomScale(1);
+    setIsDragging(false);
+    setHasMoved(false);
+  }, [previewImage]);
+
+  const handleMouseDown = (e) => {
+    if (zoomScale === 1 || !imageContainerRef.current) return;
+    setIsDragging(true);
+    setHasMoved(false);
+    setStartX(e.pageX - imageContainerRef.current.offsetLeft);
+    setStartY(e.pageY - imageContainerRef.current.offsetTop);
+    setScrollLeft(imageContainerRef.current.scrollLeft);
+    setScrollTop(imageContainerRef.current.scrollTop);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging || zoomScale === 1 || !imageContainerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - imageContainerRef.current.offsetLeft;
+    const y = e.pageY - imageContainerRef.current.offsetTop;
+    const walkX = (x - startX) * 1.5;
+    const walkY = (y - startY) * 1.5;
+    
+    if (Math.abs(x - startX) > 5 || Math.abs(y - startY) > 5) {
+      setHasMoved(true);
+    }
+    
+    imageContainerRef.current.scrollLeft = scrollLeft - walkX;
+    imageContainerRef.current.scrollTop = scrollTop - walkY;
+  };
+
+  const handleMouseUpOrLeave = () => {
+    setIsDragging(false);
+  };
 
   // Projekt adatok és fényképek betöltése
   async function loadData() {
@@ -277,6 +326,28 @@ export default function ProjectDetails() {
 
     if (updateErr) {
       console.error("Nem sikerült menteni a feladat állapotot:", updateErr);
+    }
+  };
+
+  // Hiányzó anyagok szinkronizálása és mentése
+  useEffect(() => {
+    if (project && !isEditingMaterials) {
+      setTempMaterials(project.missing_materials || '');
+    }
+  }, [project, isEditingMaterials]);
+
+  const handleSaveMaterials = async () => {
+    const { error: updateErr } = await supabase
+      .from('projects')
+      .update({ missing_materials: tempMaterials })
+      .eq('id', id);
+
+    if (updateErr) {
+      console.error("Hiba a hiányzó anyagok mentésekor:", updateErr);
+      alert("Nem sikerült menteni a hiányzó anyagokat. Kérlek győződj meg róla, hogy a Supabase SQL Editorban lefuttattad a 'supabase/add_missing_materials.sql' migrációt!");
+    } else {
+      setIsEditingMaterials(false);
+      setProject(prev => prev ? { ...prev, missing_materials: tempMaterials } : null);
     }
   };
 
@@ -1004,6 +1075,103 @@ export default function ProjectDetails() {
             </svg>
           </button>
         </form>
+      </div>
+
+      {/* Hiányzó anyagok / Terepi akadályok */}
+      <div className="shdr fu d3">
+        <div className="shdr-t" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <Icon name="warning" size={14} color="var(--yellow)" strokeWidth={2.5} />
+          <span>Hiányzó anyagok & Akadályok</span>
+        </div>
+        {!isEditingMaterials && (
+          <button 
+            onClick={() => {
+              setTempMaterials(project?.missing_materials || '');
+              setIsEditingMaterials(true);
+            }}
+            className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center space-x-1 transition-all hover:bg-white/10 active:scale-95 cursor-pointer"
+            style={{ 
+              background: 'var(--s2)', 
+              border: '1px solid var(--b2)', 
+              color: 'var(--t2)'
+            }}
+          >
+            <span>Módosítás</span>
+          </button>
+        )}
+      </div>
+
+      <div className="gcard fu d3" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', marginBottom: '15px', padding: '20px' }}>
+        {isEditingMaterials ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <label style={{ display: 'block', fontSize: '9px', color: 'var(--t3)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '2px', textAlign: 'left' }}>
+              Sorold fel a hiányzó anyagokat vagy akadályokat (pl. másik cég hibái)
+            </label>
+            <textarea
+              value={tempMaterials}
+              onChange={(e) => setTempMaterials(e.target.value)}
+              placeholder="Írd le a hiányzó dolgokat ide..."
+              rows={3}
+              style={{
+                background: 'var(--s1)',
+                border: '1px solid var(--b1)',
+                borderRadius: '10px',
+                padding: '7px 12px',
+                color: 'var(--t1)',
+                fontSize: '13px',
+                width: '100%',
+                outline: 'none',
+                resize: 'none'
+              }}
+            />
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
+              <button
+                onClick={() => setIsEditingMaterials(false)}
+                className="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all hover:bg-white/5 cursor-pointer"
+                style={{
+                  background: 'var(--s2)',
+                  border: '1px solid var(--b1)',
+                  color: 'var(--t2)'
+                }}
+              >
+                Mégse
+              </button>
+              <button
+                onClick={handleSaveMaterials}
+                className="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all hover:scale-[1.02] cursor-pointer"
+                style={{
+                  background: 'var(--gradient-blue)',
+                  border: 'none',
+                  color: '#fff',
+                  boxShadow: '0 4px 15px rgba(79, 142, 247, 0.25)'
+                }}
+              >
+                Mentés
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            {project?.missing_materials ? (
+              <div 
+                style={{ 
+                  fontSize: '13px', 
+                  color: 'var(--t1)', 
+                  whiteSpace: 'pre-wrap', 
+                  lineHeight: '1.5',
+                  paddingLeft: '10px',
+                  borderLeft: '3px solid var(--yellow)'
+                }}
+              >
+                {project.missing_materials}
+              </div>
+            ) : (
+              <div className="text-center text-xs text-[var(--t3)] italic py-2">
+                Nincs jelentett hiányzó anyag vagy terepi akadály.
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Feladatlista Teendők */}
@@ -1743,17 +1911,167 @@ export default function ProjectDetails() {
             }}
           >
           {/* Immerzív kép - keret nélkül, önmagában lebegő árnyékkal */}
-          <div className="w-full max-w-2xl flex items-center justify-center relative" style={{ flexShrink: 0 }}>
-            <img
-              src={previewImage.file_path}
-              alt={previewImage.description || 'Fénykép'}
-              className="max-w-full object-contain rounded-2xl"
+          <div 
+            className="w-full max-w-2xl flex flex-col items-center justify-center relative" 
+            style={{ flexShrink: 0 }}
+          >
+            {/* Scrollable image container */}
+            <div 
+              ref={imageContainerRef}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUpOrLeave}
+              onMouseLeave={handleMouseUpOrLeave}
+              className="w-full select-none"
               style={{
                 maxHeight: '70dvh',
+                overflow: zoomScale === 1 ? 'hidden' : 'auto',
+                borderRadius: '16px',
+                border: '1px solid var(--b2)',
                 boxShadow: 'var(--shadow-strong)',
-                border: '1px solid var(--b2)'
+                background: 'rgba(0,0,0,0.3)',
+                display: 'flex',
+                alignItems: zoomScale === 1 ? 'center' : 'flex-start',
+                justifyContent: zoomScale === 1 ? 'center' : 'flex-start',
+                position: 'relative',
+                cursor: zoomScale === 1 ? 'zoom-in' : (isDragging ? 'grabbing' : 'grab')
               }}
-            />
+            >
+              <img
+                src={previewImage.file_path}
+                alt={previewImage.description || 'Fénykép'}
+                draggable="false"
+                style={{
+                  width: zoomScale === 1 ? 'auto' : `${zoomScale * 100}%`,
+                  height: 'auto',
+                  maxWidth: zoomScale === 1 ? '100%' : 'none',
+                  maxHeight: zoomScale === 1 ? '70dvh' : 'none',
+                  objectFit: 'contain',
+                  borderRadius: zoomScale === 1 ? '16px' : '0px',
+                  transition: isDragging ? 'none' : 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                  margin: 'auto',
+                  pointerEvents: 'auto'
+                }}
+                onClick={(e) => {
+                  if (zoomScale > 1 && hasMoved) {
+                    return; // Prevent click-to-zoom-out if user dragged to pan
+                  }
+                  setZoomScale(zoomScale === 1 ? 2 : 1);
+                }}
+              />
+            </div>
+            
+            {/* Lebegő Nagyító Kezelőszervek (Floating Zoom Controls) */}
+            <div 
+              style={{
+                position: 'absolute',
+                bottom: '16px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: 'rgba(7, 9, 15, 0.85)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                border: '1px solid var(--b2)',
+                borderRadius: '24px',
+                padding: '4px 10px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                zIndex: 10
+              }}
+              onClick={(e) => e.stopPropagation()} // Stop modal closure or image clicks
+            >
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setZoomScale(prev => Math.max(1, prev - 0.5));
+                }}
+                disabled={zoomScale <= 1}
+                className="transition-all hover:bg-white/10 active:scale-90"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: zoomScale <= 1 ? 'var(--t3)' : '#fff',
+                  cursor: zoomScale <= 1 ? 'not-allowed' : 'pointer',
+                  fontWeight: '800',
+                  fontSize: '15px',
+                  width: '24px',
+                  height: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%'
+                }}
+                title="Kicsinyítés"
+              >
+                —
+              </button>
+              
+              <span 
+                style={{ 
+                  fontSize: '11px', 
+                  color: '#fff', 
+                  fontWeight: '800', 
+                  fontFamily: 'monospace',
+                  minWidth: '40px',
+                  textAlign: 'center'
+                }}
+              >
+                {Math.round(zoomScale * 100)}%
+              </span>
+              
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setZoomScale(prev => Math.min(3, prev + 0.5));
+                }}
+                disabled={zoomScale >= 3}
+                className="transition-all hover:bg-white/10 active:scale-90"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: zoomScale >= 3 ? 'var(--t3)' : '#fff',
+                  cursor: zoomScale >= 3 ? 'not-allowed' : 'pointer',
+                  fontWeight: '800',
+                  fontSize: '15px',
+                  width: '24px',
+                  height: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%'
+                }}
+                title="Nagyítás"
+              >
+                +
+              </button>
+
+              {zoomScale !== 1 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setZoomScale(1);
+                  }}
+                  className="transition-all hover:bg-white/20 active:scale-95"
+                  style={{
+                    background: 'rgba(255,255,255,0.1)',
+                    border: 'none',
+                    color: '#fff',
+                    cursor: 'pointer',
+                    fontSize: '9px',
+                    fontWeight: '800',
+                    padding: '3px 8px',
+                    borderRadius: '12px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    marginLeft: '4px'
+                  }}
+                >
+                  Alaphelyzet
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Alsó Adatlap Kártya (Információk a képről) */}

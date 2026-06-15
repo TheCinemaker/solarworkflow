@@ -238,7 +238,7 @@ export default function Issues() {
           className="active:scale-95 transition-all"
           style={{
             flex: 1, padding: '8px 0', borderRadius: '10px', fontSize: '10px', fontWeight: '700',
-            cursor: exporting ? 'default' : 'pointer', border: 'none', fontFamily: 'inherit',
+            cursor: exporting ? 'default' : 'pointer', fontFamily: 'inherit',
             background: exporting === 'pdf' ? 'var(--blue)' : 'rgba(79,142,247,0.12)',
             color: exporting === 'pdf' ? '#fff' : 'var(--blue)',
             border: '1px solid rgba(79,142,247,0.25)',
@@ -255,7 +255,7 @@ export default function Issues() {
           className="active:scale-95 transition-all"
           style={{
             flex: 1, padding: '8px 0', borderRadius: '10px', fontSize: '10px', fontWeight: '700',
-            cursor: exporting ? 'default' : 'pointer', border: 'none', fontFamily: 'inherit',
+            cursor: exporting ? 'default' : 'pointer', fontFamily: 'inherit',
             background: 'rgba(46,209,88,0.12)',
             color: 'var(--green)',
             border: '1px solid rgba(46,209,88,0.25)',
@@ -272,7 +272,7 @@ export default function Issues() {
           className="active:scale-95 transition-all"
           style={{
             flex: 1, padding: '8px 0', borderRadius: '10px', fontSize: '10px', fontWeight: '700',
-            cursor: exporting ? 'default' : 'pointer', border: 'none', fontFamily: 'inherit',
+            cursor: exporting ? 'default' : 'pointer', fontFamily: 'inherit',
             background: 'rgba(255,214,10,0.12)',
             color: 'var(--yellow)',
             border: '1px solid rgba(255,214,10,0.25)',
