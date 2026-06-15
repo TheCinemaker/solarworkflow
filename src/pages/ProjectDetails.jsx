@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 import EditProjectModal from '../components/EditProjectModal';
 import { useUser } from '../context/UserContext';
 import { Icon } from '../components/Icon';
+import { exportProjectPDF } from '../lib/exportProject';
 
 export default function ProjectDetails() {
   const navigate = useNavigate();
@@ -34,6 +35,10 @@ export default function ProjectDetails() {
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // PDF Export állapotok
+  const [pdfExporting, setPdfExporting] = useState(false);
+  const [pdfProgress, setPdfProgress] = useState({ current: 0, total: 0, stage: '' });
 
   // Élő Napelem Telemetria Demo állapotok
   const [showLiveTelemetry, setShowLiveTelemetry] = useState(false);
@@ -391,30 +396,72 @@ export default function ProjectDetails() {
           Projekt részletei
         </div>
 
-        {/* Szerkesztés gomb */}
-        {isAdmin ? (
-          <div 
-            onClick={() => setIsEditModalOpen(true)}
+        {/* Műveleti gombok (PDF + Szerkesztés) */}
+        <div className="flex items-center" style={{ gap: '8px' }}>
+          {/* PDF Export gomb (mindenki számára elérhető) */}
+          <div
+            onClick={async () => {
+              if (pdfExporting) return;
+              setPdfExporting(true);
+              setPdfProgress({ current: 0, total: 0, stage: 'Indítás...' });
+              try {
+                await exportProjectPDF(id, (current, total, stage) => {
+                  setPdfProgress({ current, total, stage });
+                });
+              } catch (err) {
+                console.error('PDF export hiba:', err);
+                alert('Hiba a PDF generálásakor: ' + err.message);
+              } finally {
+                setPdfExporting(false);
+              }
+            }}
             className="flex items-center justify-center cursor-pointer transition-all hover:scale-[1.05] active:scale-95"
             style={{
               width: '32px',
               height: '32px',
               borderRadius: '10px',
-              background: 'rgba(79, 142, 247, 0.12)',
-              color: 'var(--blue)',
-              border: '1px solid rgba(79, 142, 247, 0.25)'
+              background: pdfExporting ? 'rgba(46, 209, 88, 0.2)' : 'rgba(46, 209, 88, 0.12)',
+              color: 'var(--green)',
+              border: '1px solid rgba(46, 209, 88, 0.25)',
+              opacity: pdfExporting ? 0.6 : 1,
+              pointerEvents: pdfExporting ? 'none' : 'auto'
             }}
-            title="Projekt Szerkesztése"
+            title="Projekt PDF Letöltése"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-              <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-            </svg>
+            {pdfExporting ? (
+              <div className="animate-spin rounded-full" style={{ width: '14px', height: '14px', border: '2px solid var(--green)', borderTopColor: 'transparent' }} />
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <polyline points="9 15 12 18 15 15"></polyline>
+              </svg>
+            )}
           </div>
-        ) : (
-          /* Placeholder, hogy a justify-between megtartsa a középre igazítást */
-          <div style={{ width: '32px' }} />
-        )}
+
+          {/* Szerkesztés gomb (csak admin) */}
+          {isAdmin ? (
+            <div 
+              onClick={() => setIsEditModalOpen(true)}
+              className="flex items-center justify-center cursor-pointer transition-all hover:scale-[1.05] active:scale-95"
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '10px',
+                background: 'rgba(79, 142, 247, 0.12)',
+                color: 'var(--blue)',
+                border: '1px solid rgba(79, 142, 247, 0.25)'
+              }}
+              title="Projekt Szerkesztése"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {/* Archivált Banner */}
@@ -1493,6 +1540,72 @@ export default function ProjectDetails() {
               </div>
             )}
           </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* PDF EXPORT LOADING OVERLAY */}
+      {pdfExporting && createPortal(
+        <div
+          className="fixed inset-0 z-[3000] flex items-center justify-center"
+          style={{
+            background: 'var(--backdrop)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)'
+          }}
+        >
+          <div
+            className="flex flex-col items-center space-y-5 p-8 rounded-2xl"
+            style={{
+              background: 'var(--s1)',
+              border: '1px solid var(--b1)',
+              boxShadow: 'var(--shadow-strong)',
+              minWidth: '260px'
+            }}
+          >
+            {/* Spinner */}
+            <div
+              className="animate-spin rounded-full"
+              style={{
+                width: '44px',
+                height: '44px',
+                border: '3px solid var(--b2)',
+                borderTopColor: 'var(--green)',
+                borderRadius: '50%'
+              }}
+            />
+
+            {/* Fő szöveg */}
+            <div className="text-center">
+              <div className="text-sm font-extrabold text-[var(--t1)] tracking-tight mb-1">
+                PDF Generálás
+              </div>
+              <div className="text-xs text-[var(--t3)] font-medium">
+                {pdfProgress.stage}
+              </div>
+            </div>
+
+            {/* Progress bar */}
+            {pdfProgress.total > 1 && (
+              <div className="w-full">
+                <div
+                  className="w-full rounded-full overflow-hidden"
+                  style={{ height: '4px', background: 'var(--s2)' }}
+                >
+                  <div
+                    className="h-full rounded-full transition-all duration-300"
+                    style={{
+                      width: `${Math.round((pdfProgress.current / pdfProgress.total) * 100)}%`,
+                      background: 'var(--gradient-green)'
+                    }}
+                  />
+                </div>
+                <div className="text-[10px] text-[var(--t3)] text-center mt-1.5 font-bold">
+                  {pdfProgress.current} / {pdfProgress.total}
+                </div>
+              </div>
+            )}
           </div>
         </div>,
         document.body

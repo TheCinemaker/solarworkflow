@@ -325,7 +325,7 @@ export default function Dashboard() {
       </div>
       
       {/* Eredeti horizontális görgetős elrendezés (ha vissza kellene állítani): <div className="hscroll fu d4"> */}
-      <div className="space-y-3 px-[15px] fu d4">
+      <div className="fu d4" style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingLeft: '15px', paddingRight: '15px' }}>
         {projects.length === 0 ? (
           <div className="p-4 text-center w-full" style={{ fontSize: '13px', color: 'var(--t3)', fontStyle: 'italic' }}>Nincsenek még projektek.</div>
         ) : (
