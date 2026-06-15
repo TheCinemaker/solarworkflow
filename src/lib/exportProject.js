@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { supabase } from './supabase';
+import { FEATURE_FLAGS } from '../config/features';
 
 // ═══════════════════════════════════════════════════════════════
 // VoltDesk – Teljes Projekt PDF Export
@@ -604,6 +605,65 @@ export async function exportProjectPDF(projectId, onProgress) {
       y += 8;
     }
   }
+
+  // ═══════════════════════════════════════
+  // 9. ÁTVÉTEL ÉS ALÁÍRÁS
+  // ═══════════════════════════════════════
+  sectionTitle('Átvétel és Aláírás');
+  checkNewPage(45);
+
+  const startY = y;
+
+  // Bal oszlop - Kivitelező
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(100, 100, 100);
+  doc.text(normalizeText('Kivitelezö:'), col1X, startY);
+
+  doc.setDrawColor(200, 200, 200);
+  doc.setLineWidth(0.2);
+  doc.line(col1X, startY + 16, col1X + 70, startY + 16);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(120, 120, 120);
+  doc.text(normalizeText('Aláírás (Kivitelezö)'), col1X, startY + 20);
+
+  // Jobb oszlop - Megrendelő
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(100, 100, 100);
+  doc.text(normalizeText('Megrendelö / Átvevö:'), col2X, startY);
+
+  if (FEATURE_FLAGS.CLIENT_SIGNATURE && project.client_signature) {
+    try {
+      // Aláírás kép kirajzolása (PNG)
+      doc.addImage(project.client_signature, 'PNG', col2X, startY + 1, 40, 20);
+    } catch (err) {
+      console.error('Hiba az aláírás PDF-be helyezésekor:', err);
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(8);
+      doc.text(normalizeText('[Digitális aláírás kép betöltési hiba]'), col2X, startY + 10);
+    }
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(80, 80, 80);
+    doc.text(normalizeText(`Aláíró: ${project.client_signature_name}`), col2X, startY + 24);
+    doc.text(normalizeText(`Dátum: ${formatDate(project.client_signature_date)}`), col2X, startY + 28);
+  } else {
+    // Fallback: fizikai aláírás helye
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.2);
+    doc.line(col2X, startY + 16, col2X + 70, startY + 16);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(120, 120, 120);
+    doc.text(normalizeText('Aláírás (Megrendelö) / Név és Dátum'), col2X, startY + 20);
+  }
+
+  y = startY + 32;
 
   // ═══════════════════════════════════════
   // LÁBLÉC ALKALMAZÁSA (minden oldalra)

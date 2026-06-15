@@ -6,6 +6,8 @@ import EditProjectModal from '../components/EditProjectModal';
 import { useUser } from '../context/UserContext';
 import { Icon } from '../components/Icon';
 import { exportProjectPDF } from '../lib/exportProject';
+import SignatureModal from '../components/SignatureModal';
+import { FEATURE_FLAGS } from '../config/features';
 
 export default function ProjectDetails() {
   const navigate = useNavigate();
@@ -21,6 +23,8 @@ export default function ProjectDetails() {
   const [photoComment, setPhotoComment] = useState('');
   const [isIssue, setIsIssue] = useState(false); // Hiba/Munkafolyamat megkülönböztetés
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSignatureModalOpen, setIsSignatureModalOpen] = useState(false);
+  const [review, setReview] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null); // Feltöltendő fájl átmenetileg
   const [filePreview, setFilePreview] = useState(null); // Előnézet URL
@@ -125,6 +129,13 @@ export default function ProjectDetails() {
       if (messagesData) {
         setMessages(messagesData);
       }
+      // 5. Ügyfél visszajelzés (review) betöltése
+      const { data: reviewData } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('project_id', id)
+        .maybeSingle();
+      setReview(reviewData);
     } catch (err) {
       console.error("Hiba az adatok betöltésekor:", err);
       setError(err.message);
@@ -179,6 +190,14 @@ export default function ProjectDetails() {
             return [...prev, fullMsg];
           });
         }
+      })
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'reviews', 
+        filter: `project_id=eq.${id}` 
+      }, () => {
+        loadData();
       })
       .subscribe();
 
@@ -362,6 +381,60 @@ export default function ProjectDetails() {
     else {
       alert("Projekt visszaállítva aktív állapotba!");
       await loadData();
+    }
+  };
+
+  const handleSaveSignature = async ({ signatureData, signerName, date }) => {
+    try {
+      const { error } = await supabase
+        .from('projects')
+        .update({
+          client_signature: signatureData,
+          client_signature_name: signerName,
+          client_signature_date: date
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setProject(prev => ({
+        ...prev,
+        client_signature: signatureData,
+        client_signature_name: signerName,
+        client_signature_date: date
+      }));
+      setIsSignatureModalOpen(false);
+      alert('Munkalap sikeresen aláírva!');
+    } catch (err) {
+      console.error('Hiba az aláírás mentésekor:', err);
+      alert('Sikertelen mentés: ' + err.message);
+    }
+  };
+
+  const handleDeleteSignature = async () => {
+    if (!window.confirm("Biztosan törölni szeretnéd a megrendelő aláírását? Ezzel az aláírás állapota visszaáll.")) return;
+    try {
+      const { error } = await supabase
+        .from('projects')
+        .update({
+          client_signature: null,
+          client_signature_name: null,
+          client_signature_date: null
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setProject(prev => ({
+        ...prev,
+        client_signature: null,
+        client_signature_name: null,
+        client_signature_date: null
+      }));
+      alert('Aláírás sikeresen törölve.');
+    } catch (err) {
+      console.error('Hiba az aláírás törlésekor:', err);
+      alert('Sikertelen törlés: ' + err.message);
     }
   };
 
@@ -694,6 +767,8 @@ export default function ProjectDetails() {
           </a>
         </div>
       )}
+
+
 
       {/* Archiválás Gomb (Csak ha még nincs lezárva és Admin) */}
       {!project?.archived && isAdmin && (
@@ -1260,7 +1335,7 @@ export default function ProjectDetails() {
       )}
 
       {/* Galéria Rács (Modern 2-oszlopos Kártyarendszer megjegyzésekkel) */}
-      <div className="gcard mt-4 pb-20 fu d5" style={{ padding: 0, border: 'none', background: 'transparent' }}>
+      <div className="gcard mt-4 fu d5" style={{ padding: 0, border: 'none', background: 'transparent' }}>
         {photos.length === 0 ? (
           <div className="text-center text-xs text-[var(--t3)] italic py-6" style={{ background: 'var(--s1)', border: '1px solid var(--b1)', borderRadius: '20px' }}>
             Még nincs feltöltött fotó ehhez a projekthez.
@@ -1409,6 +1484,187 @@ export default function ProjectDetails() {
           </div>
         )}
       </div>
+
+      {/* Digitális Aláírás Szekció */}
+      {FEATURE_FLAGS.CLIENT_SIGNATURE && project && (
+        <div className="gcard fu d5" style={{ marginTop: '20px', padding: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--t1)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Icon name="check" size={13} color="var(--blue)" strokeWidth={2.5} />
+              <span>Megrendelői átvétel / Aláírás</span>
+            </div>
+            {project.client_signature && (
+              <span className="pill p-ok" style={{ fontSize: '9px' }}>Aláírva</span>
+            )}
+          </div>
+
+          {project.client_signature ? (
+            <div>
+              <div style={{ 
+                background: '#ffffff', 
+                border: '1px solid var(--b1)', 
+                borderRadius: '10px', 
+                padding: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100px',
+                marginBottom: '10px'
+              }}>
+                <img 
+                  src={project.client_signature} 
+                  alt="Aláírás" 
+                  style={{ maxHeight: '80px', objectFit: 'contain' }} 
+                />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                <div>
+                  <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--t1)' }}>{project.client_signature_name}</div>
+                  <div style={{ fontSize: '10px', color: 'var(--t3)', marginTop: '2px' }}>
+                    Dátum: {new Date(project.client_signature_date).toLocaleString('hu-HU')}
+                  </div>
+                </div>
+                <button
+                  onClick={handleDeleteSignature}
+                  style={{
+                    background: 'rgba(255, 59, 48, 0.1)',
+                    border: '1px solid rgba(255, 59, 48, 0.2)',
+                    color: 'var(--red)',
+                    borderRadius: '8px',
+                    padding: '6px 12px',
+                    fontSize: '11px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  Törlés
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p style={{ fontSize: '12px', color: 'var(--t3)', marginBottom: '14px', lineHeight: '1.4' }}>
+                A munkalap lezárásához és átvételéhez a megrendelő digitálisan aláírhatja a projektet közvetlenül a képernyőn.
+              </p>
+              <button
+                onClick={() => setIsSignatureModalOpen(true)}
+                className="w-full font-bold flex items-center justify-center space-x-2 pt-2.5 pb-2.5 text-center text-sm transition-all hover:scale-[1.01] active:scale-[0.99]"
+                style={{
+                  background: 'rgba(79, 142, 247, 0.12)',
+                  borderRadius: '12px',
+                  color: 'var(--blue)',
+                  border: '1px solid rgba(79, 142, 247, 0.25)',
+                  boxShadow: 'var(--shadow-soft)',
+                  cursor: 'pointer'
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 20h9"/>
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                </svg>
+                <span>Aláírás rögzítése</span>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Ügyfél Visszajelzés Szekció */}
+      {FEATURE_FLAGS.CLIENT_FEEDBACK && project && (
+        <div className="gcard fu d5" style={{ marginTop: '20px', padding: '16px', marginBottom: '25px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--t1)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Icon name="check" size={13} color="var(--yellow)" strokeWidth={2.5} />
+              <span>Ügyfél visszajelzése</span>
+            </div>
+            {review && (
+              <span className="pill p-ok" style={{ fontSize: '9px', background: 'rgba(255, 214, 10, 0.12)', color: 'var(--yellow)' }}>Leadva</span>
+            )}
+          </div>
+
+          {review ? (
+            <div>
+              {/* Csillagok megjelenítése */}
+              <div style={{ display: 'flex', gap: '4px', marginBottom: '10px' }}>
+                {[1, 2, 3, 4, 5].map((starIdx) => {
+                  const isFilled = starIdx <= review.rating;
+                  return (
+                    <svg
+                      key={starIdx}
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill={isFilled ? 'var(--yellow)' : 'none'}
+                      stroke={isFilled ? 'var(--yellow)' : 'rgba(255,255,255,0.2)'}
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      style={{
+                        filter: isFilled ? 'drop-shadow(0 0 4px rgba(255, 214, 10, 0.3))' : 'none'
+                      }}
+                    >
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  );
+                })}
+              </div>
+              
+              {review.comment ? (
+                <p style={{ 
+                  fontSize: '12.5px', 
+                  color: 'var(--t2)', 
+                  lineHeight: '1.45', 
+                  background: 'rgba(255,255,255,0.02)', 
+                  border: '1px solid var(--b1)', 
+                  borderRadius: '10px', 
+                  padding: '10px',
+                  marginBottom: '6px'
+                }}>
+                  "{review.comment}"
+                </p>
+              ) : (
+                <p style={{ fontSize: '12px', color: 'var(--t3)', fontStyle: 'italic', marginBottom: '6px' }}>
+                  Nem érkezett szöveges vélemény.
+                </p>
+              )}
+
+              <div style={{ fontSize: '10px', color: 'var(--t3)', textAlign: 'right' }}>
+                Beküldve: {new Date(review.created_at).toLocaleString('hu-HU')}
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p style={{ fontSize: '12px', color: 'var(--t3)', marginBottom: '14px', lineHeight: '1.4' }}>
+                Küldj el egy nyilvános linket a megrendelőnek, ahol értékelheti a munka minőségét.
+              </p>
+              <button
+                onClick={() => {
+                  const url = `${window.location.origin}/feedback/${id}`;
+                  navigator.clipboard.writeText(url)
+                    .then(() => alert('Értékelési link sikeresen másolva a vágólapra!'))
+                    .catch(() => alert('Sikertelen másolás, a link: ' + url));
+                }}
+                className="w-full font-bold flex items-center justify-center space-x-2 pt-2.5 pb-2.5 text-center text-sm transition-all hover:scale-[1.01] active:scale-[0.99]"
+                style={{
+                  background: 'rgba(255, 214, 10, 0.08)',
+                  borderRadius: '12px',
+                  color: 'var(--yellow)',
+                  border: '1px solid rgba(255, 214, 10, 0.25)',
+                  boxShadow: 'var(--shadow-soft)',
+                  cursor: 'pointer'
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+                <span>Értékelési link másolása</span>
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* IN-APP APPLE STÍLUSÚ IMMERZÍV FÉNYKÉP NÉZEGETŐ OVERLAY */}
       {previewImage && createPortal(
@@ -1619,6 +1875,15 @@ export default function ProjectDetails() {
           loadData();
         }}
       />
+
+      {FEATURE_FLAGS.CLIENT_SIGNATURE && (
+        <SignatureModal
+          isOpen={isSignatureModalOpen}
+          onClose={() => setIsSignatureModalOpen(false)}
+          onSave={handleSaveSignature}
+          defaultName={project?.client_name || ''}
+        />
+      )}
     </div>
   );
 }

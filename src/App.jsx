@@ -12,6 +12,7 @@ import Finance from './pages/Finance';
 import Issues from './pages/Issues';
 import CalendarView from './pages/CalendarView';
 import Info from './pages/Info';
+import ClientFeedback from './pages/ClientFeedback';
 
 export default function App() {
   const { user, loading } = useUser();
@@ -30,6 +31,11 @@ export default function App() {
         <Route 
           path="/login" 
           element={!user ? <Login /> : <Navigate to="/" />} 
+        />
+        
+        <Route 
+          path="/feedback/:id" 
+          element={<ClientFeedback />} 
         />
         
         <Route 
