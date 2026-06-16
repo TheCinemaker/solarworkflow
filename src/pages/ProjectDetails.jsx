@@ -42,6 +42,11 @@ export default function ProjectDetails() {
   // Hiányzó anyagok és terepi akadályok
   const [isEditingMaterials, setIsEditingMaterials] = useState(false);
   const [tempMaterials, setTempMaterials] = useState('');
+
+  // Kép leírás szerkesztési állapotok
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [editDescription, setEditDescription] = useState('');
+  const [savingDescription, setSavingDescription] = useState(false);
   
   // Belső Chat állapotok
   const [messages, setMessages] = useState([]);
@@ -78,6 +83,8 @@ export default function ProjectDetails() {
     setRotation(0);
     setIsDragging(false);
     setHasMoved(false);
+    setIsEditingDescription(false);
+    setEditDescription(previewImage?.description || '');
   }, [previewImage]);
 
   // Billentyűzet kezelés a képnézegető léptetéséhez (jobbra-balra nyilak) és bezárásához (Esc)
@@ -596,6 +603,43 @@ export default function ProjectDetails() {
       alert("Hiba a kép törlésekor: " + err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Kép leírásának szerkesztése és mentése
+  const handleSaveDescription = async () => {
+    if (!previewImage) return;
+    setSavingDescription(true);
+    try {
+      const isVerification = !!previewImage.is_verification;
+      const updatePayload = isVerification 
+        ? { resolved_comment: editDescription.trim() }
+        : { description: editDescription.trim() };
+
+      const { error: dbErr } = await supabase
+        .from('media')
+        .update(updatePayload)
+        .eq('id', previewImage.id);
+
+      if (dbErr) throw dbErr;
+
+      // Helyi előnézet állapot frissítése
+      setPreviewImage(prev => prev ? { ...prev, description: editDescription.trim() } : null);
+      
+      // Projekt frissítése a realtime szinkronizációhoz
+      await supabase
+        .from('projects')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', id);
+
+      setIsEditingDescription(false);
+      await loadData();
+      alert("Leírás sikeresen elmentve!");
+    } catch (err) {
+      console.error("Hiba a leírás mentésekor:", err);
+      alert("Hiba a leírás mentésekor: " + err.message);
+    } finally {
+      setSavingDescription(false);
     }
   };
 
@@ -2268,13 +2312,85 @@ export default function ProjectDetails() {
                   })}</span>
                 </div>
                 
-                {previewImage.description ? (
-                  <div className="text-xs font-semibold text-[var(--t1)] leading-snug pt-1" style={{ letterSpacing: '0.01em', display: 'flex', alignItems: 'flex-start', gap: '5px' }}>
-                    <Icon name="chat" size={13} color="var(--t1)" strokeWidth={2.2} style={{ marginTop: '2px' }} />
-                    <span>{previewImage.description}</span>
+                {isEditingDescription ? (
+                  <div className="flex flex-col space-y-1.5 pt-1" onClick={(e) => e.stopPropagation()}>
+                    <label className="text-[10px] font-bold text-[var(--t3)] uppercase tracking-wider">Leírás szerkesztése</label>
+                    <textarea
+                      value={editDescription}
+                      onChange={(e) => setEditDescription(e.target.value)}
+                      placeholder="Írd be a leírást..."
+                      rows={2}
+                      className="w-full text-xs font-semibold p-2 rounded-lg border focus:border-blue-500 outline-none transition-all"
+                      style={{
+                        background: 'rgba(255,255,255,0.03)',
+                        borderColor: 'var(--b1)',
+                        color: 'var(--t1)',
+                        resize: 'none',
+                        fontFamily: 'inherit'
+                      }}
+                    />
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsEditingDescription(false);
+                        }}
+                        className="px-2.5 py-1 rounded text-[10px] font-bold transition-all hover:bg-white/5 active:scale-95 cursor-pointer"
+                        style={{
+                          background: 'rgba(255,255,255,0.05)',
+                          border: '1px solid var(--b1)',
+                          color: 'var(--t2)'
+                        }}
+                      >
+                        Mégse
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSaveDescription();
+                        }}
+                        disabled={savingDescription}
+                        className="px-2.5 py-1 rounded text-[10px] font-bold transition-all active:scale-95 cursor-pointer"
+                        style={{
+                          background: 'var(--gradient-blue)',
+                          border: 'none',
+                          color: '#fff',
+                          opacity: savingDescription ? 0.6 : 1
+                        }}
+                      >
+                        {savingDescription ? 'Mentés...' : 'Mentés'}
+                      </button>
+                    </div>
                   </div>
                 ) : (
-                  <div className="text-xs text-[var(--t3)] italic pt-1">Nincs megjegyzés ehhez a képhez.</div>
+                  <div className="flex justify-between items-start pt-1 gap-2">
+                    <div className="text-xs font-semibold text-[var(--t1)] leading-snug" style={{ letterSpacing: '0.01em', display: 'flex', alignItems: 'flex-start', gap: '5px' }}>
+                      <Icon name="chat" size={13} color="var(--t1)" strokeWidth={2.2} style={{ marginTop: '2px' }} />
+                      {previewImage.description ? (
+                        <span>{previewImage.description}</span>
+                      ) : (
+                        <span className="text-[var(--t3)] italic">Nincs megjegyzés ehhez a képhez.</span>
+                      )}
+                    </div>
+                    
+                    {(isAdmin || (currentUser && previewImage.user_id === currentUser.id)) && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditDescription(previewImage.description || '');
+                          setIsEditingDescription(true);
+                        }}
+                        className="p-1 rounded transition-all hover:bg-white/10 active:scale-90 cursor-pointer flex items-center justify-center"
+                        style={{ background: 'none', border: 'none', color: 'var(--t3)' }}
+                        title="Leírás szerkesztése"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                 )}
 
                 {previewImage.is_verification && (
