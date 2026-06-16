@@ -443,4 +443,29 @@ select option{background:var(--bg);color:var(--t1)}
   }
 }
 
+/* Galéria navigációs nyilak - mindig jól láthatóak, a kép színeitől függetlenül.
+   Tömör sötét háttér + fehér ikon + élénk kék pulzáló glow gyűrű. */
+.gallery-nav-arrow {
+  background: rgba(7, 9, 15, 0.78) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.55) !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: gallery-arrow-pulse 1.8s ease-in-out infinite;
+}
+.gallery-nav-arrow:disabled {
+  animation: none;
+}
+
+@keyframes gallery-arrow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(79, 142, 247, 0.55), 0 4px 14px rgba(0, 0, 0, 0.6);
+    border-color: rgba(255, 255, 255, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(79, 142, 247, 0), 0 4px 18px rgba(0, 0, 0, 0.7);
+    border-color: rgba(120, 170, 255, 0.95);
+  }
+}
+
 

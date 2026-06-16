@@ -13,6 +13,7 @@ import Issues from './pages/Issues';
 import CalendarView from './pages/CalendarView';
 import Info from './pages/Info';
 import ClientFeedback from './pages/ClientFeedback';
+import ClientSign from './pages/ClientSign';
 
 export default function App() {
   const { user, loading } = useUser();
@@ -36,6 +37,11 @@ export default function App() {
         <Route 
           path="/feedback/:id" 
           element={<ClientFeedback />} 
+        />
+
+        <Route 
+          path="/sign/:id" 
+          element={<ClientSign />} 
         />
         
         <Route 

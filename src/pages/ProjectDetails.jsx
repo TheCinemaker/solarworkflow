@@ -30,6 +30,7 @@ export default function ProjectDetails() {
   const [filePreview, setFilePreview] = useState(null); // Előnézet URL
   const [previewImage, setPreviewImage] = useState(null); // Nagyított kép overlay-hez
   const [zoomScale, setZoomScale] = useState(1); // Kép nagyítás mértéke (1 - 3)
+  const [rotation, setRotation] = useState(0); // Kép forgatási szöge (0, 90, 180, 270)
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [startY, setStartY] = useState(0);
@@ -74,9 +75,28 @@ export default function ProjectDetails() {
   // Fénykép nagyítás és drag-to-pan kezelése
   useEffect(() => {
     setZoomScale(1);
+    setRotation(0);
     setIsDragging(false);
     setHasMoved(false);
   }, [previewImage]);
+
+  // Billentyűzet kezelés a képnézegető léptetéséhez (jobbra-balra nyilak) és bezárásához (Esc)
+  useEffect(() => {
+    if (!previewImage) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowRight') {
+        handleNextPhoto();
+      } else if (e.key === 'ArrowLeft') {
+        handlePrevPhoto();
+      } else if (e.key === 'Escape') {
+        setPreviewImage(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [previewImage, photos]);
 
   const handleMouseDown = (e) => {
     if (zoomScale === 1 || !imageContainerRef.current) return;
@@ -204,8 +224,19 @@ export default function ProjectDetails() {
         schema: 'public', 
         table: 'projects', 
         filter: `id=eq.${id}` 
-      }, () => {
-        loadData();
+      }, (payload) => {
+        if (payload.new) {
+          setProject(payload.new);
+          if (payload.new.tasks) {
+            const parsed = payload.new.tasks.split('\n').map(t => t.trim()).filter(Boolean);
+            setTasks(parsed);
+          }
+          if (payload.new.completed_tasks) {
+            setCompletedTasks(payload.new.completed_tasks);
+          }
+        } else {
+          loadData();
+        }
       })
       .on('postgres_changes', { 
         event: '*', 
@@ -254,6 +285,46 @@ export default function ProjectDetails() {
       supabase.removeChannel(channel);
     };
   }, [id]);
+
+  // Valós idejű aláírás-érzékelés (ha a megrendelő a saját mobilján írja alá a munkalapot)
+  useEffect(() => {
+    if (project?.client_signature && isSignatureModalOpen) {
+      setIsSignatureModalOpen(false);
+      alert("A megrendelő sikeresen aláírta a munkalapot a saját készülékén!");
+    }
+  }, [project?.client_signature, isSignatureModalOpen]);
+
+  // Biztonsági lekérdezés (poll) az aláírásra, amíg a modal nyitva van (ha a Supabase Realtime nem működik/nincs bekapcsolva)
+  useEffect(() => {
+    let intervalId;
+    if (isSignatureModalOpen && !project?.client_signature) {
+      intervalId = setInterval(async () => {
+        try {
+          const { data, error } = await supabase
+            .from('projects')
+            .select('client_signature, client_signature_name, client_signature_date')
+            .eq('id', id)
+            .single();
+          
+          if (!error && data && data.client_signature) {
+            setProject(prev => prev ? { 
+              ...prev, 
+              client_signature: data.client_signature,
+              client_signature_name: data.client_signature_name,
+              client_signature_date: data.client_signature_date
+            } : null);
+            setIsSignatureModalOpen(false);
+            alert("A megrendelő sikeresen aláírta a munkalapot a saját készülékén!");
+          }
+        } catch (err) {
+          console.error("Hiba az aláírás lekérdezésekor (polling):", err);
+        }
+      }, 2500);
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [isSignatureModalOpen, project?.client_signature, id]);
 
   // Görgetés a legújabb chat üzenethez (csak a chat dobozon belül)
   useEffect(() => {
@@ -433,6 +504,158 @@ export default function ProjectDetails() {
     setFilePreview(null);
     setPhotoComment('');
     setIsIssue(false);
+  };
+
+  // Kép elérési útjának kinyerése a nyilvános URL-ből
+  const getStoragePathFromUrl = (url) => {
+    if (!url) return null;
+    const parts = url.split('/project-photos/');
+    if (parts.length > 1) {
+      return decodeURIComponent(parts[1]);
+    }
+    return null;
+  };
+
+  // Fénykép törlése (csak adminoknak)
+  const handleDeletePhoto = async (photo) => {
+    try {
+      setLoading(true);
+      
+      if (photo.is_verification) {
+        // Hibajavítás igazoló képének törlése (csak a mezők törlése a bejegyzésből)
+        const storagePath = getStoragePathFromUrl(photo.file_path);
+        if (storagePath) {
+          const { error: storageErr } = await supabase.storage
+            .from('project-photos')
+            .remove([storagePath]);
+          if (storageErr) {
+            console.error("Storage törlési hiba (igazolás):", storageErr);
+          }
+        }
+        
+        const { error: dbErr } = await supabase
+          .from('media')
+          .update({
+            resolved: false,
+            resolved_at: null,
+            resolved_comment: null,
+            resolved_file_path: null,
+            resolved_by: null
+          })
+          .eq('id', photo.id);
+          
+        if (dbErr) throw dbErr;
+        
+        alert("Igazoló kép sikeresen törölve, a hiba állapota visszaállt nyitottra.");
+      } else {
+        // Normál kép vagy teljes hiba-kép törlése
+        const storagePath = getStoragePathFromUrl(photo.file_path);
+        if (storagePath) {
+          const { error: storageErr } = await supabase.storage
+            .from('project-photos')
+            .remove([storagePath]);
+          if (storageErr) {
+            console.error("Storage törlési hiba (fő kép):", storageErr);
+          }
+        }
+        
+        // Ha van hozzá igazoló kép is, azt is töröljük a Storage-ból
+        if (photo.resolved_file_path) {
+          const resStoragePath = getStoragePathFromUrl(photo.resolved_file_path);
+          if (resStoragePath) {
+            const { error: storageErr } = await supabase.storage
+              .from('project-photos')
+              .remove([resStoragePath]);
+            if (storageErr) {
+              console.error("Storage törlési hiba (igazoló kép):", storageErr);
+            }
+          }
+        }
+        
+        // Törlés a media táblából
+        const { error: dbErr } = await supabase
+          .from('media')
+          .delete()
+          .eq('id', photo.id);
+          
+        if (dbErr) throw dbErr;
+        
+        alert("Fénykép sikeresen törölve.");
+      }
+      
+      // Projekt frissítése a realtime szinkronizáció kényszerítéséhez
+      await supabase
+        .from('projects')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', id);
+        
+      setPreviewImage(null);
+      await loadData();
+    } catch (err) {
+      console.error("Hiba a kép törlésekor:", err);
+      alert("Hiba a kép törlésekor: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Kép letöltése a kliensre
+  const handleDownloadPhoto = async (photoUrl, fileName) => {
+    try {
+      const response = await fetch(photoUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName || 'voltdesk-foto.jpg';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error("Letöltési hiba:", err);
+      // Fallback: megnyitás új lapon
+      window.open(photoUrl, '_blank');
+    }
+  };
+
+  // Összes megtekinthető kép listája (eredeti és igazoló fotók)
+  const getViewablePhotos = () => {
+    const list = [];
+    photos.forEach(photo => {
+      list.push({
+        ...photo,
+        is_verification: false
+      });
+      if (photo.resolved && photo.resolved_file_path) {
+        list.push({
+          ...photo,
+          file_path: photo.resolved_file_path,
+          description: photo.resolved_comment || 'Sikeresen javítva.',
+          created_at: photo.resolved_at || photo.created_at,
+          is_verification: true
+        });
+      }
+    });
+    return list;
+  };
+
+  const handleNextPhoto = () => {
+    const list = getViewablePhotos();
+    if (list.length <= 1 || !previewImage) return;
+    const currentIndex = list.findIndex(vp => vp.id === previewImage.id && !!vp.is_verification === !!previewImage.is_verification);
+    if (currentIndex === -1) return;
+    const nextIndex = (currentIndex + 1) % list.length;
+    setPreviewImage(list[nextIndex]);
+  };
+
+  const handlePrevPhoto = () => {
+    const list = getViewablePhotos();
+    if (list.length <= 1 || !previewImage) return;
+    const currentIndex = list.findIndex(vp => vp.id === previewImage.id && !!vp.is_verification === !!previewImage.is_verification);
+    if (currentIndex === -1) return;
+    const prevIndex = (currentIndex - 1 + list.length) % list.length;
+    setPreviewImage(list[prevIndex]);
   };
 
   const handleArchiveProject = async () => {
@@ -1533,8 +1756,8 @@ export default function ProjectDetails() {
                   }}
                 >
                   {/* Kép kattintható változata nagyban megnyitáshoz (in-app overlay) */}
-                  <div 
-                    onClick={() => setPreviewImage(photo)}
+                  <div
+                    onClick={() => setPreviewImage({ ...photo, is_verification: false })}
                     className="block aspect-video relative cursor-pointer"
                     style={{
                       backgroundImage: `url(${photo.file_path})`,
@@ -1837,31 +2060,310 @@ export default function ProjectDetails() {
       {/* IN-APP APPLE STÍLUSÚ IMMERZÍV FÉNYKÉP NÉZEGETŐ OVERLAY */}
       {previewImage && createPortal(
         <div
-          className="fixed inset-0 z-[2000]"
+          className="fixed inset-0 z-[2000] overflow-hidden"
           style={{
             background: 'var(--backdrop)',
             backdropFilter: 'blur(25px)',
             WebkitBackdropFilter: 'blur(25px)',
-            animation: 'fadeIn 0.25s ease-out',
-            overflowY: 'auto',
-            overflowX: 'hidden',
-            WebkitOverflowScrolling: 'touch',
-            overscrollBehavior: 'contain'
+            animation: 'fadeIn 0.25s ease-out'
           }}
         >
-          {/* Felső Navigációs és státusz sáv (rögzített, mindig látható) */}
-          <div className="fixed left-5 right-5 flex justify-between items-center z-[2010]" style={{ top: 'calc(20px + env(safe-area-inset-top))' }}>
-            <button 
-              onClick={() => setPreviewImage(null)}
-              className="px-4 py-2 rounded-full font-extrabold text-xs flex items-center space-x-1.5 transition-all hover:bg-white/10 active:scale-95 cursor-pointer"
-              style={{ 
-                background: 'var(--s2)', 
-                border: '1px solid var(--b2)', 
-                color: '#fff'
-              }}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon name="close" size={12} strokeWidth={2.5} /> Bezárás</span>
-            </button>
+          {/* Görgethető tartalom zóna */}
+          <div
+            className="absolute inset-0 overflow-y-auto"
+            style={{
+              WebkitOverflowScrolling: 'touch',
+              overscrollBehavior: 'contain',
+              padding: 'calc(80px + env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom))'
+            }}
+          >
+            <div className="flex flex-col items-center justify-start w-full min-h-full" style={{ gap: '20px' }}>
+              {/* Immerzív kép - keret nélkül, önmagában lebegő árnyékkal */}
+              <div 
+                className="w-full max-w-2xl flex flex-col items-center justify-center relative" 
+                style={{ flexShrink: 0 }}
+              >
+                {/* Scrollable image container */}
+                <div 
+                  ref={imageContainerRef}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUpOrLeave}
+                  onMouseLeave={handleMouseUpOrLeave}
+                  className="w-full select-none"
+                  style={{
+                    maxHeight: '70dvh',
+                    overflow: zoomScale === 1 ? 'hidden' : 'auto',
+                    borderRadius: '16px',
+                    border: '1px solid var(--b2)',
+                    boxShadow: 'var(--shadow-strong)',
+                    background: 'rgba(0,0,0,0.3)',
+                    display: 'flex',
+                    alignItems: zoomScale === 1 ? 'center' : 'flex-start',
+                    justifyContent: zoomScale === 1 ? 'center' : 'flex-start',
+                    position: 'relative',
+                    cursor: zoomScale === 1 ? 'zoom-in' : (isDragging ? 'grabbing' : 'grab')
+                  }}
+                >
+                  <img
+                    src={previewImage.file_path}
+                    alt={previewImage.description || 'Fénykép'}
+                    draggable="false"
+                    style={{
+                      width: zoomScale === 1 ? 'auto' : `${zoomScale * 100}%`,
+                      height: 'auto',
+                      maxWidth: zoomScale === 1 ? '100%' : 'none',
+                      maxHeight: zoomScale === 1 ? '70dvh' : 'none',
+                      objectFit: 'contain',
+                      borderRadius: zoomScale === 1 ? '16px' : '0px',
+                      transform: `rotate(${rotation}deg)`,
+                      transition: isDragging ? 'none' : 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                      margin: 'auto',
+                      pointerEvents: 'auto'
+                    }}
+                    onClick={(e) => {
+                      if (zoomScale > 1 && hasMoved) {
+                        return; // Prevent click-to-zoom-out if user dragged to pan
+                      }
+                      setZoomScale(zoomScale === 1 ? 2 : 1);
+                    }}
+                  />
+                </div>
+                
+                {/* Lebegő Nagyító Kezelőszervek (Floating Zoom Controls) */}
+                <div 
+                  style={{
+                    position: 'absolute',
+                    bottom: '16px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: 'rgba(7, 9, 15, 0.85)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    border: '1px solid var(--b2)',
+                    borderRadius: '24px',
+                    padding: '4px 10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                    zIndex: 10
+                  }}
+                  onClick={(e) => e.stopPropagation()} // Stop modal closure or image clicks
+                >
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setZoomScale(prev => Math.max(1, prev - 0.5));
+                    }}
+                    disabled={zoomScale <= 1}
+                    className="transition-all hover:bg-white/10 active:scale-90"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: zoomScale <= 1 ? 'var(--t3)' : '#fff',
+                      cursor: zoomScale <= 1 ? 'not-allowed' : 'pointer',
+                      fontWeight: '800',
+                      fontSize: '15px',
+                      width: '24px',
+                      height: '24px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '50%'
+                    }}
+                    title="Kicsinyítés"
+                  >
+                    —
+                  </button>
+                  
+                  <span 
+                    style={{ 
+                      fontSize: '11px', 
+                      color: '#fff', 
+                      fontWeight: '800', 
+                      fontFamily: 'monospace',
+                      minWidth: '40px',
+                      textAlign: 'center'
+                    }}
+                  >
+                    {Math.round(zoomScale * 100)}%
+                  </span>
+                  
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setZoomScale(prev => Math.min(3, prev + 0.5));
+                    }}
+                    disabled={zoomScale >= 3}
+                    className="transition-all hover:bg-white/10 active:scale-90"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: zoomScale >= 3 ? 'var(--t3)' : '#fff',
+                      cursor: zoomScale >= 3 ? 'not-allowed' : 'pointer',
+                      fontWeight: '800',
+                      fontSize: '15px',
+                      width: '24px',
+                      height: '24px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '50%'
+                    }}
+                    title="Nagyítás"
+                  >
+                    +
+                  </button>
+
+                  {zoomScale !== 1 && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setZoomScale(1);
+                      }}
+                      className="transition-all hover:bg-white/20 active:scale-95"
+                      style={{
+                        background: 'rgba(255,255,255,0.1)',
+                        border: 'none',
+                        color: '#fff',
+                        cursor: 'pointer',
+                        fontSize: '9px',
+                        fontWeight: '800',
+                        padding: '3px 8px',
+                        borderRadius: '12px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        marginLeft: '4px'
+                      }}
+                    >
+                      Alaphelyzet
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Alsó Adatlap Kártya (Információk a képről) */}
+              <div
+                className="w-full max-w-md p-4 rounded-xl flex flex-col space-y-2 text-left transition-all"
+                style={{
+                  background: 'var(--s1)',
+                  border: '1px solid var(--b1)',
+                  borderLeft: previewImage.is_verification || previewImage.resolved
+                    ? '4px solid var(--green)'
+                    : (previewImage.is_issue ? '4px solid var(--red)' : '4px solid var(--blue)'),
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  boxShadow: 'var(--shadow-soft)',
+                  flexShrink: 0
+                }}
+              >
+                <div className="flex justify-between items-center text-[10px] text-[var(--t3)] font-black uppercase tracking-wider" style={{ borderBottom: '1px solid var(--b1)', paddingBottom: '6px' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}><Icon name="worker" size={11} color="var(--t3)" strokeWidth={2} /> Feltöltötte: {previewImage.profiles?.full_name || 'Dolgozó'}</span>
+                  <span>{previewImage.created_at && new Date(previewImage.created_at).toLocaleDateString('hu-HU', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}</span>
+                </div>
+                
+                {previewImage.description ? (
+                  <div className="text-xs font-semibold text-[var(--t1)] leading-snug pt-1" style={{ letterSpacing: '0.01em', display: 'flex', alignItems: 'flex-start', gap: '5px' }}>
+                    <Icon name="chat" size={13} color="var(--t1)" strokeWidth={2.2} style={{ marginTop: '2px' }} />
+                    <span>{previewImage.description}</span>
+                  </div>
+                ) : (
+                  <div className="text-xs text-[var(--t3)] italic pt-1">Nincs megjegyzés ehhez a képhez.</div>
+                )}
+
+                {previewImage.is_verification && (
+                  <div className="text-[9px] text-emerald-400 font-extrabold uppercase tracking-wider pt-1 flex items-center gap-1">
+                    <Icon name="shield" size={10} color="var(--green)" strokeWidth={2.2} /> Ez a fotó az eredeti hibajelentés sikeres javítását igazolja.
+                  </div>
+                )}
+
+                {isAdmin && (
+                  <div style={{ paddingTop: '8px', borderTop: '1px solid var(--b1)', marginTop: '8px', display: 'flex', justifyContent: 'flex-end' }}>
+                    <button
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        if (window.confirm("Biztosan törölni szeretnéd ezt a fényképet? Ez a művelet nem vonható vissza.")) {
+                          await handleDeletePhoto(previewImage);
+                        }
+                      }}
+                      className="px-3 py-1.5 rounded-md text-[11px] font-extrabold flex items-center space-x-1 transition-all hover:bg-red-500/20 active:scale-95 cursor-pointer"
+                      style={{
+                        background: 'rgba(255, 59, 48, 0.12)',
+                        border: '1px solid rgba(255, 59, 48, 0.25)',
+                        color: 'var(--red)'
+                      }}
+                    >
+                      <Icon name="trash" size={12} color="var(--red)" strokeWidth={2.5} style={{ marginRight: '4px' }} />
+                      <span>Kép törlése</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Felső Navigációs és státusz sáv (Rögzített a görgetőn kívül, így mindig kattintható!) */}
+          <div className="fixed left-5 right-5 flex justify-between items-center gap-2 z-[2010]" style={{ top: 'calc(20px + env(safe-area-inset-top))' }}>
+            <div className="flex items-center flex-wrap" style={{ gap: '6px' }}>
+              <button 
+                onClick={() => setPreviewImage(null)}
+                className="px-4 py-2.5 font-extrabold text-sm flex items-center space-x-1.5 transition-all hover:bg-white/10 active:scale-95 cursor-pointer"
+                style={{ 
+                  background: 'var(--s2)', 
+                  border: '1px solid var(--b2)', 
+                  color: 'var(--t1)',
+                  borderRadius: '10px',
+                  flexShrink: 0,
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon name="close" size={14} strokeWidth={2.5} /> Bezárás</span>
+              </button>
+
+              <button 
+                onClick={() => setRotation(prev => (prev + 90) % 360)}
+                className="px-4 py-2.5 font-extrabold text-sm flex items-center space-x-1.5 transition-all hover:bg-white/10 active:scale-95 cursor-pointer"
+                style={{ 
+                  background: 'var(--s2)', 
+                  border: '1px solid var(--b2)', 
+                  color: 'var(--t1)',
+                  borderRadius: '10px',
+                  flexShrink: 0,
+                  whiteSpace: 'nowrap'
+                }}
+                title="Kép forgatása 90 fokkal"
+              >
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                  </svg>
+                  Forgatás
+                </span>
+              </button>
+
+              <button 
+                onClick={() => handleDownloadPhoto(previewImage.file_path, `voltdesk-foto-${previewImage.id || Date.now()}.jpg`)}
+                className="px-4 py-2.5 font-extrabold text-sm flex items-center space-x-1.5 transition-all hover:bg-white/10 active:scale-95 cursor-pointer"
+                style={{ 
+                  background: 'var(--s2)', 
+                  border: '1px solid var(--b2)', 
+                  color: 'var(--t1)',
+                  borderRadius: '10px',
+                  flexShrink: 0,
+                  whiteSpace: 'nowrap'
+                }}
+                title="Kép letöltése"
+              >
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Icon name="download" size={14} strokeWidth={2.5} /> Letöltés</span>
+              </button>
+            </div>
             
             {/* Dinamikus kép státusz toaszt */}
             <div 
@@ -1901,220 +2403,51 @@ export default function ProjectDetails() {
             </div>
           </div>
 
-          {/* Görgethető tartalom — kép + adatlap egymás alatt, padding hagy helyet a fix nav-nak felül és a notch/home indicator-nak */}
-          <div
-            className="flex flex-col items-center"
-            style={{
-              minHeight: '100dvh',
-              padding: 'calc(72px + env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom))',
-              gap: '20px'
-            }}
-          >
-          {/* Immerzív kép - keret nélkül, önmagában lebegő árnyékkal */}
-          <div 
-            className="w-full max-w-2xl flex flex-col items-center justify-center relative" 
-            style={{ flexShrink: 0 }}
-          >
-            {/* Scrollable image container */}
-            <div 
-              ref={imageContainerRef}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUpOrLeave}
-              onMouseLeave={handleMouseUpOrLeave}
-              className="w-full select-none"
-              style={{
-                maxHeight: '70dvh',
-                overflow: zoomScale === 1 ? 'hidden' : 'auto',
-                borderRadius: '16px',
-                border: '1px solid var(--b2)',
-                boxShadow: 'var(--shadow-strong)',
-                background: 'rgba(0,0,0,0.3)',
-                display: 'flex',
-                alignItems: zoomScale === 1 ? 'center' : 'flex-start',
-                justifyContent: zoomScale === 1 ? 'center' : 'flex-start',
-                position: 'relative',
-                cursor: zoomScale === 1 ? 'zoom-in' : (isDragging ? 'grabbing' : 'grab')
-              }}
-            >
-              <img
-                src={previewImage.file_path}
-                alt={previewImage.description || 'Fénykép'}
-                draggable="false"
-                style={{
-                  width: zoomScale === 1 ? 'auto' : `${zoomScale * 100}%`,
-                  height: 'auto',
-                  maxWidth: zoomScale === 1 ? '100%' : 'none',
-                  maxHeight: zoomScale === 1 ? '70dvh' : 'none',
-                  objectFit: 'contain',
-                  borderRadius: zoomScale === 1 ? '16px' : '0px',
-                  transition: isDragging ? 'none' : 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                  margin: 'auto',
-                  pointerEvents: 'auto'
-                }}
-                onClick={(e) => {
-                  if (zoomScale > 1 && hasMoved) {
-                    return; // Prevent click-to-zoom-out if user dragged to pan
-                  }
-                  setZoomScale(zoomScale === 1 ? 2 : 1);
-                }}
-              />
-            </div>
-            
-            {/* Lebegő Nagyító Kezelőszervek (Floating Zoom Controls) */}
-            <div 
-              style={{
-                position: 'absolute',
-                bottom: '16px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                background: 'rgba(7, 9, 15, 0.85)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid var(--b2)',
-                borderRadius: '24px',
-                padding: '4px 10px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-                zIndex: 10
-              }}
-              onClick={(e) => e.stopPropagation()} // Stop modal closure or image clicks
-            >
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setZoomScale(prev => Math.max(1, prev - 0.5));
-                }}
-                disabled={zoomScale <= 1}
-                className="transition-all hover:bg-white/10 active:scale-90"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: zoomScale <= 1 ? 'var(--t3)' : '#fff',
-                  cursor: zoomScale <= 1 ? 'not-allowed' : 'pointer',
-                  fontWeight: '800',
-                  fontSize: '15px',
-                  width: '24px',
-                  height: '24px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: '50%'
-                }}
-                title="Kicsinyítés"
-              >
-                —
-              </button>
-              
-              <span 
-                style={{ 
-                  fontSize: '11px', 
-                  color: '#fff', 
-                  fontWeight: '800', 
-                  fontFamily: 'monospace',
-                  minWidth: '40px',
-                  textAlign: 'center'
-                }}
-              >
-                {Math.round(zoomScale * 100)}%
-              </span>
-              
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setZoomScale(prev => Math.min(3, prev + 0.5));
-                }}
-                disabled={zoomScale >= 3}
-                className="transition-all hover:bg-white/10 active:scale-90"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: zoomScale >= 3 ? 'var(--t3)' : '#fff',
-                  cursor: zoomScale >= 3 ? 'not-allowed' : 'pointer',
-                  fontWeight: '800',
-                  fontSize: '15px',
-                  width: '24px',
-                  height: '24px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: '50%'
-                }}
-                title="Nagyítás"
-              >
-                +
-              </button>
-
-              {zoomScale !== 1 && (
+          {/* Navigációs nyilak (Galéria léptetés - mindig láthatóak, 1 kép esetén letiltva) */}
+          {(() => {
+            const hasMultiple = getViewablePhotos().length > 1;
+            return (
+              <>
+                {/* Bal nyíl */}
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setZoomScale(1);
+                    if (hasMultiple) handlePrevPhoto();
                   }}
-                  className="transition-all hover:bg-white/20 active:scale-95"
+                  disabled={!hasMultiple}
+                  className="gallery-nav-arrow fixed left-4 top-1/2 -translate-y-1/2 z-[2015] w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-90"
                   style={{
-                    background: 'rgba(255,255,255,0.1)',
-                    border: 'none',
-                    color: '#fff',
-                    cursor: 'pointer',
-                    fontSize: '9px',
-                    fontWeight: '800',
-                    padding: '3px 8px',
-                    borderRadius: '12px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    marginLeft: '4px'
+                    opacity: hasMultiple ? 1 : 0.4,
+                    cursor: hasMultiple ? 'pointer' : 'not-allowed'
                   }}
+                  title="Előző kép"
                 >
-                  Alaphelyzet
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
                 </button>
-              )}
-            </div>
-          </div>
 
-          {/* Alsó Adatlap Kártya (Információk a képről) */}
-          <div
-            className="w-full max-w-md p-4 rounded-xl flex flex-col space-y-2 text-left transition-all"
-            style={{
-              background: 'var(--s1)',
-              border: '1px solid var(--b1)',
-              borderLeft: previewImage.is_verification || previewImage.resolved
-                ? '4px solid var(--green)'
-                : (previewImage.is_issue ? '4px solid var(--red)' : '4px solid var(--blue)'),
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              boxShadow: 'var(--shadow-soft)',
-              flexShrink: 0
-            }}
-          >
-            <div className="flex justify-between items-center text-[10px] text-[var(--t3)] font-black uppercase tracking-wider" style={{ borderBottom: '1px solid var(--b1)', paddingBottom: '6px' }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}><Icon name="worker" size={11} color="var(--t3)" strokeWidth={2} /> Feltöltötte: {previewImage.profiles?.full_name || 'Dolgozó'}</span>
-              <span>{previewImage.created_at && new Date(previewImage.created_at).toLocaleDateString('hu-HU', {
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              })}</span>
-            </div>
-            
-            {previewImage.description ? (
-              <div className="text-xs font-semibold text-[var(--t1)] leading-snug pt-1" style={{ letterSpacing: '0.01em', display: 'flex', alignItems: 'flex-start', gap: '5px' }}>
-                <Icon name="chat" size={13} color="var(--t1)" strokeWidth={2.2} style={{ marginTop: '2px' }} />
-                <span>{previewImage.description}</span>
-              </div>
-            ) : (
-              <div className="text-xs text-[var(--t3)] italic pt-1">Nincs megjegyzés ehhez a képhez.</div>
-            )}
-
-            {previewImage.is_verification && (
-              <div className="text-[9px] text-emerald-400 font-extrabold uppercase tracking-wider pt-1 flex items-center gap-1">
-                <Icon name="shield" size={10} color="var(--green)" strokeWidth={2.2} /> Ez a fotó az eredeti hibajelentés sikeres javítását igazolja.
-              </div>
-            )}
-          </div>
-          </div>
+                {/* Jobb nyíl */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (hasMultiple) handleNextPhoto();
+                  }}
+                  disabled={!hasMultiple}
+                  className="gallery-nav-arrow fixed right-4 top-1/2 -translate-y-1/2 z-[2015] w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-90"
+                  style={{
+                    opacity: hasMultiple ? 1 : 0.4,
+                    cursor: hasMultiple ? 'pointer' : 'not-allowed'
+                  }}
+                  title="Következő kép"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </button>
+              </>
+            );
+          })()}
         </div>,
         document.body
       )}
@@ -2200,6 +2533,7 @@ export default function ProjectDetails() {
           onClose={() => setIsSignatureModalOpen(false)}
           onSave={handleSaveSignature}
           defaultName={project?.client_name || ''}
+          projectId={id}
         />
       )}
     </div>
