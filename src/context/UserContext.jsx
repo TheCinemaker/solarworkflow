@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { processOfflineQueue } from '../lib/offlineQueue';
 
 const UserContext = createContext({
   user: null,
@@ -97,6 +98,39 @@ export function UserProvider({ children }) {
       }
     });
   };
+
+  useEffect(() => {
+    if (!user) return;
+
+    const handleOnline = async () => {
+      console.log("Hálózat visszaállt, offline sor ellenőrzése...");
+      try {
+        const result = await processOfflineQueue(supabase);
+        if (result.success && result.count > 0) {
+          alert(`Sikeresen feltöltöttünk ${result.count} db korábban offline rögzített fényképet!`);
+        }
+      } catch (err) {
+        console.error("Hiba az offline szinkronizáció során:", err);
+      }
+    };
+
+    window.addEventListener('online', handleOnline);
+
+    // Ha most jelentkezik be és online van, ellenőrizzük a sort
+    if (navigator.onLine) {
+      processOfflineQueue(supabase).then(result => {
+        if (result.success && result.count > 0) {
+          alert(`Sikeresen feltöltöttünk ${result.count} db korábban offline rögzített fényképet!`);
+        }
+      }).catch(err => {
+        console.error("Hiba a bejelentkezéskori szinkronizációkor:", err);
+      });
+    }
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+    };
+  }, [user]);
 
   return (
     <UserContext.Provider value={{ user, loading, refreshUser }}>

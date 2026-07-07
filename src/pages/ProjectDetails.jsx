@@ -8,6 +8,7 @@ import { Icon } from '../components/Icon';
 import { exportProjectPDF } from '../lib/exportProject';
 import SignatureModal from '../components/SignatureModal';
 import { FEATURE_FLAGS } from '../config/features';
+import { savePhotoToQueue, getQueueCount, processOfflineQueue } from '../lib/offlineQueue';
 
 export default function ProjectDetails() {
   const navigate = useNavigate();
@@ -57,6 +58,52 @@ export default function ProjectDetails() {
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Offline feltöltési állapotok
+  const [offlineQueueCount, setOfflineQueueCount] = useState(0);
+  const [syncingOffline, setSyncingOffline] = useState(false);
+
+  useEffect(() => {
+    // Kezdeti sor méretének lekérdezése
+    getQueueCount().then(setOfflineQueueCount);
+
+    const handleSyncCompleted = (e) => {
+      console.log("Háttér-szinkronizáció befejeződött, adatok frissítése...");
+      loadData();
+      getQueueCount().then(setOfflineQueueCount);
+    };
+
+    window.addEventListener('offline-sync-completed', handleSyncCompleted);
+    return () => {
+      window.removeEventListener('offline-sync-completed', handleSyncCompleted);
+    };
+  }, []);
+
+  const triggerManualSync = async () => {
+    if (!navigator.onLine) {
+      alert("Még mindig offline vagy. Kérlek győződj meg róla, hogy van térerő.");
+      return;
+    }
+    setSyncingOffline(true);
+    try {
+      const result = await processOfflineQueue(supabase);
+      if (result.success) {
+        const count = await getQueueCount();
+        setOfflineQueueCount(count);
+        if (result.count > 0) {
+          alert(`Sikeresen szinkronizáltunk ${result.count} db offline képet!`);
+          await loadData();
+        } else {
+          alert("Nincs szinkronizálandó kép a várólistán.");
+        }
+      }
+    } catch (err) {
+      console.error("Hiba a kézi szinkronizációkor:", err);
+      alert("Hiba történt a szinkronizáció során.");
+    } finally {
+      setSyncingOffline(false);
+    }
+  };
 
   // PDF Export állapotok
   const [pdfExporting, setPdfExporting] = useState(false);
@@ -451,6 +498,38 @@ export default function ProjectDetails() {
     setUploading(true);
     setError(null);
 
+    const saveOffline = async (reason) => {
+      try {
+        await savePhotoToQueue({
+          projectId: id,
+          userId: currentUser?.id,
+          fileBlob: selectedFile,
+          fileName: selectedFile.name,
+          description: photoComment,
+          isIssue
+        });
+        
+        setSelectedFile(null);
+        setFilePreview(null);
+        setPhotoComment('');
+        setIsIssue(false);
+        
+        const count = await getQueueCount();
+        setOfflineQueueCount(count);
+        
+        alert(`Offline mentés sikeres! A kép bekerült a helyi várólistára (${reason}). Amint van térerő, automatikusan feltöltődik.`);
+      } catch (saveErr) {
+        console.error("Nem sikerült elmenteni offline sem:", saveErr);
+        alert("Hiba: Nem sikerült sem feltölteni, sem offline tárolni a képet.");
+      }
+    };
+
+    if (!navigator.onLine) {
+      await saveOffline("nincs internetkapcsolat");
+      setUploading(false);
+      return;
+    }
+
     try {
       // Egyedi fájlnév generálása timestamp-pel
       const fileExt = selectedFile.name.split('.').pop();
@@ -499,7 +578,11 @@ export default function ProjectDetails() {
       alert("Fénykép sikeresen feltöltve!");
     } catch (err) {
       console.error("Feltöltési hiba:", err);
-      setError("Feltöltés sikertelen: " + err.message);
+      if (err.message?.includes('fetch') || err.message?.includes('Network') || err.message?.includes('Failed to fetch')) {
+        await saveOffline("hálózati hiba miatt a közvetlen feltöltés meghiúsult");
+      } else {
+        setError("Feltöltés sikertelen: " + err.message);
+      }
     } finally {
       setUploading(false);
     }
@@ -1508,6 +1591,49 @@ export default function ProjectDetails() {
         <div className="shdr-t">Fényképek / Checkpointok</div>
         <div className="shdr-a">{photos.length} db</div>
       </div>
+
+      {/* Offline várakozó képek jelzése */}
+      {offlineQueueCount > 0 && (
+        <div className="fu d4" style={{ marginLeft: '15px', marginRight: '15px', marginBottom: '12px' }}>
+          <div 
+            className="flex items-center justify-between" 
+            style={{ 
+              background: 'rgba(255, 214, 10, 0.08)', 
+              border: '1px solid rgba(255, 214, 10, 0.25)', 
+              borderRadius: '12px', 
+              padding: '10px 14px',
+              fontSize: '12px',
+              color: 'var(--yellow)',
+              fontWeight: '600'
+            }}
+          >
+            <div className="flex items-center" style={{ gap: '8px' }}>
+              <span className="animate-pulse">⏳</span>
+              <span>{offlineQueueCount} db kép feltöltésre vár (offline mód)</span>
+            </div>
+            {navigator.onLine && (
+              <button 
+                type="button"
+                onClick={triggerManualSync}
+                disabled={syncingOffline}
+                style={{
+                  background: 'rgba(255, 214, 10, 0.15)',
+                  border: '1px solid rgba(255, 214, 10, 0.3)',
+                  borderRadius: '8px',
+                  padding: '3px 8px',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  color: 'var(--yellow)',
+                  outline: 'none'
+                }}
+              >
+                {syncingOffline ? 'Feltöltés...' : 'Feltöltés most'}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Kép feltöltése zóna */}
       <div className="fu d4 flex justify-center" style={{ marginBottom: '20px', width: '100%' }}>
