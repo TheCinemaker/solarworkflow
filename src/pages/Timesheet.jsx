@@ -2,9 +2,11 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Icon } from '../components/Icon';
+import { useUser } from '../context/UserContext';
 
 export default function Timesheet() {
   const navigate = useNavigate();
+  const { user } = useUser();
   
   // Űrlap állapotok
   const [projects, setProjects] = useState([]);
@@ -21,12 +23,19 @@ export default function Timesheet() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
+  // Szerkesztési állapotok (Admin)
+  const [editingLog, setEditingLog] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  const isAdmin = user?.role === 'admin' || currentUser?.role === 'admin';
+
   // Aktív projektek, a bejelentkezett felhasználó és a meglévő munkalapok betöltése
   async function loadData() {
     try {
       // 1. Felhasználó lekérése
-      const { data: { user } } = await supabase.auth.getUser();
-      setCurrentUser(user);
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      setCurrentUser(authUser);
 
       // 2. Aktív projektek lekérése a legördülőhöz
       const { data: projData } = await supabase
@@ -46,8 +55,10 @@ export default function Timesheet() {
           end_time,
           description,
           created_at,
+          user_id,
+          project_id,
           profiles (full_name, serial_number),
-          projects (name, serial_number)
+          projects (id, name, serial_number)
         `)
         .order('date', { ascending: false })
         .order('created_at', { ascending: false });
@@ -94,6 +105,21 @@ export default function Timesheet() {
 
   const computedHours = calculateHours();
 
+  // Munkalap szerkesztési órák kiszámítása
+  const calculateEditHours = () => {
+    if (!editingLog?.start_time || !editingLog?.end_time) return 0;
+    const [startHour, startMin] = editingLog.start_time.split(':').map(Number);
+    const [endHour, endMin] = editingLog.end_time.split(':').map(Number);
+    
+    const startDecimal = startHour + startMin / 60;
+    const endDecimal = endHour + endMin / 60;
+    
+    const diff = endDecimal - startDecimal;
+    return diff > 0 ? parseFloat(diff.toFixed(2)) : 0;
+  };
+
+  const computedEditHours = calculateEditHours();
+
   // Munkalap beküldése
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -136,6 +162,76 @@ export default function Timesheet() {
       setError(err.message);
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Admin szerkesztés indítása
+  const handleOpenEditModal = (log) => {
+    setEditingLog({
+      id: log.id,
+      project_id: log.projects?.id || log.project_id || '',
+      date: log.date || new Date().toISOString().split('T')[0],
+      start_time: log.start_time || '08:00',
+      end_time: log.end_time || '16:00',
+      description: log.description || ''
+    });
+    setShowEditModal(true);
+  };
+
+  // Admin szerkesztés mentése
+  const handleUpdateSubmit = async (e) => {
+    e.preventDefault();
+    if (!editingLog) return;
+    if (!editingLog.project_id) {
+      alert("Kérlek válassz egy projektet!");
+      return;
+    }
+    if (computedEditHours <= 0) {
+      alert("A befejezési időnek a kezdési idő után kell lennie!");
+      return;
+    }
+
+    setSavingEdit(true);
+    try {
+      const { error: updateErr } = await supabase
+        .from('worklogs')
+        .update({
+          project_id: editingLog.project_id,
+          date: editingLog.date,
+          start_time: editingLog.start_time,
+          end_time: editingLog.end_time,
+          hours: computedEditHours,
+          description: editingLog.description || 'Napi munkavégzés'
+        })
+        .eq('id', editingLog.id);
+
+      if (updateErr) throw updateErr;
+
+      setShowEditModal(false);
+      setEditingLog(null);
+      await loadData();
+    } catch (err) {
+      console.error("Hiba a munkalap módosításakor:", err);
+      alert("Hiba a mentés során: " + err.message);
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  // Admin munkalap törlése
+  const handleDeleteLog = async (logId) => {
+    if (!window.confirm("Biztosan törölni szeretnéd ezt a munkalapot? Ez a művelet nem visszavonható.")) return;
+    try {
+      const { error: delErr } = await supabase
+        .from('worklogs')
+        .delete()
+        .eq('id', logId);
+
+      if (delErr) throw delErr;
+      await loadData();
+    } catch (err) {
+      console.error("Hiba a törléskor:", err);
+      alert("Hiba a törlés során: " + err.message);
     }
   };
 
@@ -338,7 +434,7 @@ export default function Timesheet() {
                 padding: '20px'
               }}
             >
-              <div className="flex justify-between items-start" style={{ display: 'flex', justifyContent: 'between', alignItems: 'start', width: '100%' }}>
+              <div className="flex justify-between items-start" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
                 <div>
                   <div style={{ fontSize: '9px', color: 'var(--t3)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>Szerelő</div>
                   <div style={{ fontWeight: '700', color: 'var(--t1)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -346,8 +442,55 @@ export default function Timesheet() {
                     <span>{log.profiles?.full_name || (log.user_id === currentUser?.id ? (currentUser?.user_metadata?.full_name || currentUser?.full_name || 'Én') : 'Ismeretlen')} {log.profiles?.serial_number ? `[${log.profiles.serial_number}]` : (log.user_id === currentUser?.id && currentUser?.role === 'admin' ? '[ADM-01]' : '')}</span>
                   </div>
                 </div>
-                <div style={{ fontSize: '10px', color: 'var(--blue)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '4px 10px', borderRadius: '20px', background: 'rgba(79,142,247,0.10)', border: '1px solid rgba(79,142,247,0.18)' }}>
-                  {log.date}
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                  <div style={{ fontSize: '10px', color: 'var(--blue)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '4px 10px', borderRadius: '20px', background: 'rgba(79,142,247,0.10)', border: '1px solid rgba(79,142,247,0.18)' }}>
+                    {log.date}
+                  </div>
+                  {isAdmin && (
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <button
+                        onClick={() => handleOpenEditModal(log)}
+                        title="Munkalap szerkesztése"
+                        style={{
+                          background: 'rgba(79, 142, 247, 0.15)',
+                          border: '1px solid rgba(79, 142, 247, 0.3)',
+                          color: 'var(--blue)',
+                          borderRadius: '8px',
+                          padding: '4px 8px',
+                          fontSize: '11px',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <Icon name="edit" size={12} color="var(--blue)" strokeWidth={2.2} />
+                        <span>Szerkesztés</span>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteLog(log.id)}
+                        title="Munkalap törlése"
+                        style={{
+                          background: 'rgba(255, 59, 48, 0.15)',
+                          border: '1px solid rgba(255, 59, 48, 0.3)',
+                          color: 'var(--red)',
+                          borderRadius: '8px',
+                          padding: '4px 8px',
+                          fontSize: '11px',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <Icon name="trash" size={12} color="var(--red)" strokeWidth={2.2} />
+                        <span>Törlés</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -378,6 +521,156 @@ export default function Timesheet() {
           ))
         )}
       </div>
+
+      {/* 3. Munkalap Szerkesztése Modal (Admin) */}
+      {showEditModal && editingLog && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.75)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '16px'
+        }}>
+          <div style={{
+            background: 'var(--bg)',
+            border: '1px solid var(--b1)',
+            borderRadius: '20px',
+            width: '100%',
+            maxWidth: '480px',
+            padding: '24px',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--t1)' }}>
+                Munkalap Szerkesztése
+              </div>
+              <button 
+                onClick={() => { setShowEditModal(false); setEditingLog(null); }}
+                style={{ background: 'none', border: 'none', color: 'var(--t3)', cursor: 'pointer', padding: '4px' }}
+              >
+                <Icon name="close" size={20} color="var(--t3)" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div>
+                <label style={labelStyle}>Projekt / Helyszín</label>
+                <select 
+                  value={editingLog.project_id} 
+                  onChange={(e) => setEditingLog({ ...editingLog, project_id: e.target.value })}
+                  required 
+                  style={inputStyle}
+                >
+                  <option value="" style={{ background: 'var(--bg)' }}>Válassz projektet...</option>
+                  {projects.map(proj => (
+                    <option key={proj.id} value={proj.id} style={{ background: 'var(--bg)' }}>
+                      {proj.serial_number ? `[${proj.serial_number}] ` : ''}{proj.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label style={labelStyle}>Dátum</label>
+                <input 
+                  type="date" 
+                  value={editingLog.date} 
+                  onChange={(e) => setEditingLog({ ...editingLog, date: e.target.value })} 
+                  required 
+                  style={inputStyle} 
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label style={labelStyle}>Kezdés (Mettől)</label>
+                  <input 
+                    type="time" 
+                    value={editingLog.start_time} 
+                    onChange={(e) => setEditingLog({ ...editingLog, start_time: e.target.value })} 
+                    required 
+                    style={inputStyle} 
+                  />
+                </div>
+                <div>
+                  <label style={labelStyle}>Befejezés (Meddig)</label>
+                  <input 
+                    type="time" 
+                    value={editingLog.end_time} 
+                    onChange={(e) => setEditingLog({ ...editingLog, end_time: e.target.value })} 
+                    required 
+                    style={inputStyle} 
+                  />
+                </div>
+              </div>
+
+              {computedEditHours > 0 && (
+                <div className="p-2.5 text-xs font-semibold text-center" style={{ background: 'rgba(46, 209, 88, 0.1)', border: '1px solid rgba(46, 209, 88, 0.2)', color: 'var(--green)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                  <Icon name="clock" size={13} color="var(--green)" strokeWidth={2.2} /> Új számolt munkaidő: {computedEditHours} óra
+                </div>
+              )}
+
+              <div>
+                <label style={labelStyle}>Rövid munkaleírás</label>
+                <textarea 
+                  value={editingLog.description} 
+                  onChange={(e) => setEditingLog({ ...editingLog, description: e.target.value })} 
+                  style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => { setShowEditModal(false); setEditingLog(null); }}
+                  style={{
+                    flex: 1,
+                    background: 'var(--s2)',
+                    border: '1px solid var(--b1)',
+                    color: 'var(--t2)',
+                    borderRadius: '12px',
+                    padding: '12px',
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Mégse
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingEdit}
+                  style={{
+                    flex: 1,
+                    background: 'var(--gradient-blue)',
+                    border: 'none',
+                    color: '#fff',
+                    borderRadius: '12px',
+                    padding: '12px',
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 15px rgba(79, 142, 247, 0.25)'
+                  }}
+                >
+                  {savingEdit ? 'Mentés...' : 'Módosítások Mentése'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
