@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import { supabase } from './supabase';
 import { FEATURE_FLAGS } from '../config/features';
 
@@ -339,7 +339,7 @@ export async function exportProjectPDF(projectId, onProgress) {
       normalizeText(wl.materials || '-')
     ]);
 
-    doc.autoTable({
+    autoTable(doc, {
       startY: y,
       margin: { left: margin, right: margin },
       head: [[
